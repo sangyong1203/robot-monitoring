@@ -1,0 +1,227 @@
+html {
+  overflow: hidden;
+}
+
+#app,
+body {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  outline: 0;
+  height: 100vh;
+}
+
+.search-text_label,
+.double-date-picker_label,
+.operation-box-title,
+.operation-box-total,
+.label-form-item_label,
+.dropdown-list_label {
+  font-weight: 700;
+}
+
+.edit-form {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+.edit-form .el-form-item {
+  width: 48%;
+}
+
+.one-column {
+  flex-direction: column;
+}
+
+.one-column .el-form-item {
+  max-width: 600px;
+}
+
+.text-ellipsis {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.no-data {
+  display: flex;
+  flex: 1;
+  justify-content: center;
+  align-items: center;
+  color: var(--text-color--placeholder);
+}
+
+.content-loading-placeholder {
+  flex: 1;
+  min-height: 120px;
+}
+
+.query-button {
+  width: 80px;
+}
+
+.error-image {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+
+  .el-icon {
+    width: 50%;
+    height: 50%;
+  }
+
+  .el-icon svg {
+    width: 50%;
+    height: 50%;
+  }
+}
+.scroll-y{
+    overflow-y: scroll;
+    padding-right: 4px;
+    margin-right: -14px;
+}
+
+.table-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+}
+
+.table-actions .el-button {
+  min-width: auto;
+  height: auto !important;
+  padding: 4px 8px;
+  font-size: 13px;
+}
+
+.table-actions .el-button + .el-button {
+  margin-left: 0;
+}
+
+.table-actions .table-actions__icon-button {
+  display: inline-grid;
+  width: 28px;
+  height: 28px !important;
+  padding: 0;
+  place-items: center;
+  border: 1px solid transparent !important;
+  border-radius: 7px !important;
+  font-size: 15px;
+  transition:
+    color 160ms ease,
+    border-color 160ms ease,
+    background-color 160ms ease,
+    box-shadow 160ms ease,
+    transform 120ms ease;
+}
+
+.table-actions .el-button.table-actions__icon-button.is-text.el-button--primary {
+  border-color: rgba(231, 109, 255, 0.18) !important;
+  background: rgba(231, 109, 255, 0.08) !important;
+  color: var(--primary-color) !important;
+}
+
+.table-actions .el-button.table-actions__icon-button.is-text.el-button--primary:hover,
+.table-actions .el-button.table-actions__icon-button.is-text.el-button--primary:focus-visible {
+  border-color: rgba(231, 109, 255, 0.48) !important;
+  background: rgba(231, 109, 255, 0.18) !important;
+  color: #f08dff !important;
+  box-shadow: 0 0 12px rgba(231, 109, 255, 0.18);
+}
+
+.table-actions .el-button.table-actions__icon-button.is-text.el-button--danger {
+  border-color: rgba(255, 107, 107, 0.18) !important;
+  background: rgba(255, 107, 107, 0.08) !important;
+  color: #ff8a8a !important;
+}
+
+.table-actions .el-button.table-actions__icon-button.is-text.el-button--danger:hover,
+.table-actions .el-button.table-actions__icon-button.is-text.el-button--danger:focus-visible {
+  border-color: rgba(255, 107, 107, 0.46) !important;
+  background: rgba(255, 107, 107, 0.18) !important;
+  color: #ffaaaa !important;
+  box-shadow: 0 0 12px rgba(255, 107, 107, 0.16);
+}
+
+.table-actions .el-button.table-actions__icon-button.is-text.el-button--success {
+  border-color: rgba(21, 224, 183, 0.24) !important;
+  background: rgba(21, 224, 183, 0.08) !important;
+  color: var(--secondary-color) !important;
+}
+
+.table-actions .el-button.table-actions__icon-button.is-text.el-button--success:hover,
+.table-actions .el-button.table-actions__icon-button.is-text.el-button--success:focus-visible {
+  border-color: rgba(21, 224, 183, 0.5) !important;
+  background: rgba(21, 224, 183, 0.16) !important;
+  color: #5ff1d0 !important;
+  box-shadow: 0 0 12px rgba(21, 224, 183, 0.16);
+}
+
+.table-actions .table-actions__icon-button:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.22);
+  outline-offset: 2px;
+}
+
+.table-actions .table-actions__icon-button:active:not(.is-disabled) {
+  transform: translateY(1px);
+  box-shadow: none;
+}
+
+.table-actions .table-actions__icon-button.is-disabled {
+  border-color: rgba(255, 255, 255, 0.06) !important;
+  background: rgba(255, 255, 255, 0.035) !important;
+  color: var(--button-disabled-text-color) !important;
+  box-shadow: none;
+  opacity: 0.48;
+}
+
+.table-actions .el-button.is-text.el-button--primary {
+  color: var(--primary-color) !important;
+}
+
+.table-actions .el-button.is-text.el-button--success {
+  color: var(--secondary-color) !important;
+}
+
+.table-actions .el-button.is-text.el-button--danger {
+  color: #ff8a8a !important;
+}
+
+.table-actions .el-button.is-text.is-disabled {
+  color: var(--button-disabled-text-color) !important;
+}
+
+.icon-spin {
+  animation: spin 2s linear infinite;
+}
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+*::-webkit-scrollbar-thumb {
+  border-radius: 6px;
+}
+
+*:hover::-webkit-scrollbar-thumb {
+  background-color: var(--overlay-scrollbar-thumb-color);
+}
+
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
