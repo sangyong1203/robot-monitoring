@@ -116,66 +116,13 @@
             </el-table>
         </Panel>
 
-        <!-- 신규/수정 다이얼로그 -->
-        <BaseDialog
+        <!-- 신규/수정 다이얼로그 컴포넌트 -->
+        <MapFormDialog
             v-model="dialogVisible"
-            :title="dialogIsEdit ? '지도 정보 수정' : '신규 지도 등록'"
-            description="2D 공간 도면 파일과 좌표 해상도 및 대표 지도 설정을 지정합니다."
-            width="680px"
-            :buttonTypes="['Cancel', 'Save']"
-            @onSave="handleSave"
-        >
-            <el-form ref="formRef" :model="form" :rules="rules" label-position="top" class="management-page__form-grid">
-                <el-form-item label="지도 이름" prop="name">
-                    <el-input v-model="form.name" placeholder="예: 처분용기 장입 실내 1층 도면" />
-                </el-form-item>
-
-                <el-form-item label="지도 식별 코드" prop="code">
-                    <el-input v-model="form.code" placeholder="예: MAP-INDOOR-01" />
-                </el-form-item>
-
-                <el-form-item label="소속 지역 / 구역" prop="zoneName">
-                    <el-input v-model="form.zoneName" placeholder="구역 명칭 입력" />
-                </el-form-item>
-
-                <el-form-item label="지도 구분" prop="mapType">
-                    <el-select v-model="form.mapType" style="width: 100%">
-                        <el-option label="실내 지도 (INDOOR)" value="INDOOR" />
-                        <el-option label="실외 지도 (OUTDOOR)" value="OUTDOOR" />
-                    </el-select>
-                </el-form-item>
-
-                <el-form-item label="지도 픽셀 가로(Width)" prop="width">
-                    <el-input-number v-model="form.width" :min="100" :max="10000" style="width: 100%" />
-                </el-form-item>
-
-                <el-form-item label="지도 픽셀 세로(Height)" prop="height">
-                    <el-input-number v-model="form.height" :min="100" :max="10000" style="width: 100%" />
-                </el-form-item>
-
-                <el-form-item label="좌표 해상도 (m/px)" prop="resolution">
-                    <el-input-number v-model="form.resolution" :precision="3" :step="0.01" :min="0.001" style="width: 100%" />
-                </el-form-item>
-
-                <el-form-item label="원점 좌표 (Origin X, Y)" style="grid-column: span 1">
-                    <div style="display: flex; gap: 8px">
-                        <el-input-number v-model="form.origin_x" placeholder="X" style="width: 50%" />
-                        <el-input-number v-model="form.origin_y" placeholder="Y" style="width: 50%" />
-                    </div>
-                </el-form-item>
-
-                <el-form-item label="지도 사용 및 대표 설정" style="grid-column: span 2">
-                    <div style="display: flex; gap: 24px">
-                        <el-checkbox v-model="form.isPrimary">통합관제 대표 지도로 설정</el-checkbox>
-                        <el-checkbox v-model="form.isActive">지도 활성화 사용</el-checkbox>
-                    </div>
-                </el-form-item>
-
-                <el-form-item label="지도 설명" style="grid-column: span 2">
-                    <el-input v-model="form.description" type="textarea" :rows="2" placeholder="지도 용도 및 구역 설명 입력" />
-                </el-form-item>
-            </el-form>
-        </BaseDialog>
+            :is-edit="dialogIsEdit"
+            :initial-data="selectedMap"
+            @saved="handleSearch"
+        />
     </div>
 </template>
 
@@ -185,13 +132,13 @@ import { useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Map, MapPin, Pencil, Trash2 } from '@lucide/vue'
 import Panel from '@/components/Panel.vue'
-import BaseDialog from '@/components/BaseDialog.vue'
 import StatusBadge from '@/components/StatusBadge.vue'
 import SearchBox from '@/components/SearchBox.vue'
 import SearchText from '@/components/SearchText.vue'
 import DropdownList from '@/components/DropdownList.vue'
-import { deleteMap, getMaps, saveMap } from './service/maps.api'
-import type { MapItem, MapType, SaveMapPayload } from './service/maps.types'
+import MapFormDialog from './components/MapFormDialog.vue'
+import { deleteMap, getMaps } from './service/maps.api'
+import type { MapItem, MapType } from './service/maps.types'
 import { formatDateTime } from '@/utils/date.util'
 
 const router = useRouter()
@@ -218,36 +165,7 @@ const statusOptions = [
 
 const dialogVisible = ref(false)
 const dialogIsEdit = ref(false)
-const formRef = ref()
-
-const form = reactive<SaveMapPayload>({
-    id: undefined,
-    code: '',
-    name: '',
-    mapType: 'INDOOR',
-    orgName: '중저준위 처분시설 운영센터',
-    regionName: 'KORAD 경주 본원',
-    zoneName: '실내 처분용기 장입구역',
-    fileName: 'map.png',
-    fileSize: 4500000,
-    imageUrl: '/sample_map/map.png',
-    width: 1200,
-    height: 800,
-    resolution: 0.05,
-    originX: 0,
-    originY: 0,
-    origin_x: 0,
-    origin_y: 0,
-    isPrimary: false,
-    isActive: true,
-    description: '',
-    registeredByName: '관리자',
-})
-
-const rules = {
-    name: [{ required: true, message: '지도 이름을 입력하세요.', trigger: 'blur' }],
-    code: [{ required: true, message: '지도 코드를 입력하세요.', trigger: 'blur' }],
-}
+const selectedMap = ref<MapItem | null>(null)
 
 const handleSearch = async () => {
     loading.value = true
@@ -260,42 +178,14 @@ const handleSearch = async () => {
 
 const openCreateDialog = () => {
     dialogIsEdit.value = false
-    form.id = undefined
-    form.name = ''
-    form.code = `MAP-${Date.now().toString().slice(-4)}`
-    form.mapType = 'INDOOR'
-    form.width = 1200
-    form.height = 800
-    form.resolution = 0.05
-    form.origin_x = 0
-    form.origin_y = 0
-    form.isPrimary = false
-    form.isActive = true
-    form.description = ''
+    selectedMap.value = null
     dialogVisible.value = true
 }
 
 const openEditDialog = (row: MapItem) => {
     dialogIsEdit.value = true
-    Object.assign(form, row)
+    selectedMap.value = row
     dialogVisible.value = true
-}
-
-const handleSave = async () => {
-    if (!formRef.value) return
-    await formRef.value.validate(async (valid: boolean) => {
-        if (!valid) return
-        try {
-            form.originX = form.origin_x
-            form.originY = form.origin_y
-            await saveMap(form)
-            ElMessage.success(dialogIsEdit.value ? '지도 정보가 수정되었습니다.' : '신규 지도가 등록되었습니다.')
-            dialogVisible.value = false
-            await handleSearch()
-        } catch (e: any) {
-            ElMessage.error(e.message || '저장 실패')
-        }
-    })
 }
 
 const confirmDelete = async (row: MapItem) => {

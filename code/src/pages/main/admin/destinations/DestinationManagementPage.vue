@@ -127,55 +127,15 @@
             </div>
         </Panel>
 
-        <!-- 신규/수정 다이얼로그 -->
-        <BaseDialog
+        <!-- 신규/수정 다이얼로그 컴포넌트 -->
+        <DestinationFormDialog
             v-model="dialogVisible"
-            :title="dialogIsEdit ? '목적지 정보 수정' : '신규 목적지 등록'"
-            description="지도 상의 로봇 이동 및 작업 좌표(X, Y)와 방향(Heading)을 등록합니다."
-            width="600px"
-            :buttonTypes="['Cancel', 'Save']"
-            @onSave="handleSave"
-        >
-            <el-form ref="formRef" :model="form" :rules="rules" label-position="top" class="management-page__form-grid">
-                <el-form-item label="목적지 이름" prop="name">
-                    <el-input v-model="form.name" placeholder="예: 무인지게차 팰릿 상차지점 A" />
-                </el-form-item>
-
-                <el-form-item label="목적지 코드" prop="code">
-                    <el-input v-model="form.code" placeholder="예: DEST-WORK-01" />
-                </el-form-item>
-
-                <el-form-item label="목적지 타입" prop="type">
-                    <el-select v-model="form.type" style="width: 100%">
-                        <el-option label="작업 지점 (WORK_SPOT)" value="WORK_SPOT" />
-                        <el-option label="대기 지점 (WAITING_SPOT)" value="WAITING_SPOT" />
-                        <el-option label="충전 스테이션 (CHARGING_STATION)" value="CHARGING_STATION" />
-                        <el-option label="순찰 웨이포인트 (PATROL_WAYPOINT)" value="PATROL_WAYPOINT" />
-                        <el-option label="저장 구역 (STORAGE_AREA)" value="STORAGE_AREA" />
-                    </el-select>
-                </el-form-item>
-
-                <el-form-item label="소속 지도 ID">
-                    <el-input :model-value="selectedMapName" disabled />
-                </el-form-item>
-
-                <el-form-item label="X 좌표 (미터)" prop="x">
-                    <el-input-number v-model="form.x" :precision="2" :step="0.5" style="width: 100%" />
-                </el-form-item>
-
-                <el-form-item label="Y 좌표 (미터)" prop="y">
-                    <el-input-number v-model="form.y" :precision="2" :step="0.5" style="width: 100%" />
-                </el-form-item>
-
-                <el-form-item label="방향 각도 Heading (0°~360°)" prop="heading" style="grid-column: span 2">
-                    <el-slider v-model="form.heading" :min="0" :max="360" show-input />
-                </el-form-item>
-
-                <el-form-item label="목적지 설명" style="grid-column: span 2">
-                    <el-input v-model="form.description" type="textarea" :rows="2" placeholder="목적지 업무 용도 설명" />
-                </el-form-item>
-            </el-form>
-        </BaseDialog>
+            :is-edit="dialogIsEdit"
+            :map-id="selectedMapId"
+            :map-name="selectedMapName"
+            :initial-data="selectedDest"
+            @saved="handleSearch"
+        />
     </div>
 </template>
 
@@ -185,13 +145,13 @@ import { useRoute } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { MapPin, Pencil, Trash2 } from '@lucide/vue'
 import Panel from '@/components/Panel.vue'
-import BaseDialog from '@/components/BaseDialog.vue'
 import StatusBadge from '@/components/StatusBadge.vue'
 import SearchBox from '@/components/SearchBox.vue'
 import SearchText from '@/components/SearchText.vue'
 import DropdownList from '@/components/DropdownList.vue'
-import { deleteDestination, getDestinations, saveDestination } from './service/destinations.api'
-import type { DestinationItem, DestinationType, SaveDestinationPayload } from './service/destinations.types'
+import DestinationFormDialog from './components/DestinationFormDialog.vue'
+import { deleteDestination, getDestinations } from './service/destinations.api'
+import type { DestinationItem, DestinationType } from './service/destinations.types'
 
 const route = useRoute()
 const loading = ref(false)
@@ -219,25 +179,7 @@ const typeOptions = [
 
 const dialogVisible = ref(false)
 const dialogIsEdit = ref(false)
-const formRef = ref()
-
-const form = reactive<SaveDestinationPayload>({
-    id: undefined,
-    mapId: 1,
-    name: '',
-    code: '',
-    type: 'WORK_SPOT',
-    x: 10,
-    y: 10,
-    heading: 0,
-    description: '',
-    isActive: true,
-})
-
-const rules = {
-    name: [{ required: true, message: '목적지 이름을 입력하세요.', trigger: 'blur' }],
-    code: [{ required: true, message: '목적지 코드를 입력하세요.', trigger: 'blur' }],
-}
+const selectedDest = ref<DestinationItem | null>(null)
 
 const selectedMapName = computed(() => mapOptions.find(m => m.id === selectedMapId.value)?.name || '기본 지도')
 const selectedDestName = computed(() => destinations.value.find(d => d.id === selectedDestId.value)?.name || '선택 안됨')
@@ -307,38 +249,14 @@ const handleSearch = async () => {
 
 const openCreateDialog = () => {
     dialogIsEdit.value = false
-    form.id = undefined
-    form.mapId = selectedMapId.value
-    form.name = ''
-    form.code = `DEST-${Date.now().toString().slice(-4)}`
-    form.type = 'WORK_SPOT'
-    form.x = 10
-    form.y = 10
-    form.heading = 0
-    form.description = ''
-    form.isActive = true
+    selectedDest.value = null
     dialogVisible.value = true
 }
 
 const openEditDialog = (row: DestinationItem) => {
     dialogIsEdit.value = true
-    Object.assign(form, row)
+    selectedDest.value = row
     dialogVisible.value = true
-}
-
-const handleSave = async () => {
-    if (!formRef.value) return
-    await formRef.value.validate(async (valid: boolean) => {
-        if (!valid) return
-        try {
-            await saveDestination(form)
-            ElMessage.success(dialogIsEdit.value ? '목적지가 수정되었습니다.' : '신규 목적지가 등록되었습니다.')
-            dialogVisible.value = false
-            await handleSearch()
-        } catch (e: any) {
-            ElMessage.error(e.message || '저장 실패')
-        }
-    })
 }
 
 const confirmDelete = async (row: DestinationItem) => {
