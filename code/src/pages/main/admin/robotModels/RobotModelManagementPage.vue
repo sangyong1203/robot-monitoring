@@ -21,7 +21,7 @@
         </SearchBox>
 
         <!-- 메인 데이터 패널 -->
-        <Panel class="management-page__panel" title="운영 원형 로봇 모델 목록 (6종 7대 지원)" :total="models.length" fill>
+        <Panel class="management-page__panel" title="운영 원형 로봇 모델 목록" :total="models.length" fill>
             <template #headerRight>
                 <el-button type="primary" class="query-button" @click="openCreateDialog">
                     <el-icon><Bot /></el-icon>
@@ -37,29 +37,39 @@
                 class="management-page__table"
                 @row-dblclick="openEditDialog"
             >
-                <el-table-column prop="modelName" label="로봇 모델명 및 코드" min-width="260">
+                <el-table-column prop="modelName" label="로봇 모델명" min-width="220">
                     <template #default="{ row }">
-                        <strong style="color: var(--text-color--primary); font-size: 15px">{{ row.modelName }}</strong>
-                        <div style="font-size: 12px; color: var(--text-color--body)">코드: {{ row.modelCode }}</div>
+                        <div style="color: var(--text-color--primary); font-size: 15px; font-weight: 600">{{ row.modelName }}</div>
                     </template>
                 </el-table-column>
 
-                <el-table-column prop="robotType" label="로봇 종" width="160" align="center">
+                <el-table-column prop="modelCode" label="모델 코드" width="160" align="center">
+                    <template #default="{ row }">
+                        <span style="color: var(--text-color--primary); font-size: 13px">{{ row.modelCode }}</span>
+                    </template>
+                </el-table-column>
+
+                <el-table-column prop="robotType" label="로봇 종" width="140" align="center">
                     <template #default="{ row }">
                         <StatusBadge :label="typeLabel(row.robotType)" :variant="typeVariant(row.robotType)" />
                     </template>
                 </el-table-column>
 
-                <el-table-column prop="manufacturer" label="제조사 및 OS" width="220">
+                <el-table-column prop="manufacturer" label="제조사" width="150" align="center">
                     <template #default="{ row }">
-                        <div style="color: var(--text-color--primary); font-weight: 600">{{ row.manufacturer }}</div>
-                        <div style="font-size: 12px; color: var(--text-color--body)">{{ row.os }}</div>
+                        <span style="color: var(--text-color--primary)">{{ row.manufacturer }}</span>
+                    </template>
+                </el-table-column>
+
+                <el-table-column prop="os" label="OS / 플랫폼" width="180" align="center">
+                    <template #default="{ row }">
+                        <span style="color: var(--text-color--primary); font-size: 13px">{{ row.os }}</span>
                     </template>
                 </el-table-column>
 
                 <el-table-column prop="registeredRobotCount" label="배치 운영 로봇 수" width="140" align="center">
                     <template #default="{ row }">
-                        <strong style="color: var(--secondary-color)">{{ row.registeredRobotCount }} 대</strong>
+                        <span style="color: var(--secondary-color); font-weight: 700">{{ row.registeredRobotCount }} 대</span>
                     </template>
                 </el-table-column>
 
@@ -88,7 +98,7 @@
                     </template>
                 </el-table-column>
 
-                <el-table-column label="작업" width="100" align="center" fixed="right">
+                <el-table-column label="작업" width="90" align="center" fixed="right">
                     <template #default="{ row }">
                         <div class="table-actions">
                             <el-button
