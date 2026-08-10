@@ -71,6 +71,7 @@
                         v-loading="loading"
                         :data="destinations"
                         row-key="id"
+                        height="100%"
                         class="management-page__table"
                         @row-click="(row: DestinationItem) => (selectedDestId = row.id)"
                         @row-dblclick="openEditDialog"
@@ -78,7 +79,7 @@
                         <el-table-column prop="name" label="목적지 이름 및 코드" min-width="180">
                             <template #default="{ row }">
                                 <strong style="color: var(--text-color--primary)">{{ row.name }}</strong>
-                                <div style="font-size: 11px; color: var(--text-color--muted)">{{ row.code }}</div>
+                                <div style="font-size: 11px; color: var(--text-color--body)">{{ row.code }}</div>
                             </template>
                         </el-table-column>
 
@@ -90,7 +91,7 @@
 
                         <el-table-column label="2D 좌표 (m, deg)" width="150" align="center">
                             <template #default="{ row }">
-                                <div>X: {{ row.x }}m · Y: {{ row.y }}m</div>
+                                <div style="color: var(--text-color--primary)">X: {{ row.x }}m · Y: {{ row.y }}m</div>
                                 <div style="font-size: 11px; color: var(--secondary-color)">방향: {{ row.heading }}°</div>
                             </template>
                         </el-table-column>
@@ -372,6 +373,8 @@ onMounted(() => {
     display: inline-flex;
     align-items: center;
     gap: 6px;
+    flex-shrink: 0;
+    white-space: nowrap;
 }
 
 .icon-svg {
@@ -387,7 +390,7 @@ onMounted(() => {
 .destination-layout {
     display: flex;
     gap: 20px;
-    flex: 1;
+    flex: 1 1 auto;
     min-height: 0;
 }
 

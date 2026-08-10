@@ -33,27 +33,28 @@
                 v-loading="loading"
                 :data="robots"
                 row-key="id"
+                height="100%"
                 class="management-page__table"
                 @row-dblclick="openEditDialog"
             >
                 <el-table-column prop="name" label="운영 로봇 명칭 및 식별 ID" min-width="220">
                     <template #default="{ row }">
                         <strong style="color: var(--text-color--primary); font-size: 15px">{{ row.name }}</strong>
-                        <div style="font-size: 12px; color: var(--primary-color)">ID: {{ row.robotCode }}</div>
+                        <div style="font-size: 12px; color: var(--text-color--body)">ID: {{ row.robotCode }}</div>
                     </template>
                 </el-table-column>
 
                 <el-table-column prop="modelName" label="연계 로봇 모델" min-width="240">
                     <template #default="{ row }">
-                        <div>{{ row.modelName }}</div>
-                        <div style="font-size: 12px; color: var(--text-color--muted)">제조사: {{ row.manufacturer }}</div>
+                        <div style="color: var(--text-color--primary); font-weight: 600">{{ row.modelName }}</div>
+                        <div style="font-size: 12px; color: var(--text-color--body)">제조사: {{ row.manufacturer }}</div>
                     </template>
                 </el-table-column>
 
                 <el-table-column prop="orgPath" label="설치 기관 및 구역" min-width="220">
                     <template #default="{ row }">
-                        <div style="font-size: 13px">{{ row.orgPath }}</div>
-                        <div style="font-size: 12px; color: var(--text-color--secondary)">지도: {{ row.mapName }}</div>
+                        <div style="font-size: 13px; color: var(--text-color--primary)">{{ row.orgPath }}</div>
+                        <div style="font-size: 12px; color: var(--text-color--body)">지도: {{ row.mapName }}</div>
                     </template>
                 </el-table-column>
 
@@ -71,7 +72,7 @@
 
                 <el-table-column label="현재 2D 위치" width="150" align="center">
                     <template #default="{ row }">
-                        <div>X: {{ row.x }}m · Y: {{ row.y }}m</div>
+                        <div style="color: var(--text-color--primary)">X: {{ row.x }}m · Y: {{ row.y }}m</div>
                         <div style="font-size: 11px; color: var(--secondary-color)">방향: {{ row.heading }}°</div>
                     </template>
                 </el-table-column>
@@ -352,6 +353,8 @@ onMounted(() => {
     display: inline-flex;
     align-items: center;
     gap: 6px;
+    flex-shrink: 0;
+    white-space: nowrap;
 }
 
 .icon-svg {

@@ -112,12 +112,14 @@ withDefaults(
     align-items: center;
     justify-content: flex-end;
     gap: 10px;
-    min-width: 0;
+    flex-shrink: 0;
+    white-space: nowrap;
 }
 
 .panel__heading {
     display: flex;
     align-items: center;
+    flex: 1 1 auto;
     min-width: 0;
     min-height: 36px;
 }

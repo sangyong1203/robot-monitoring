@@ -42,6 +42,7 @@
                 v-loading="loading"
                 :data="maps"
                 row-key="id"
+                height="100%"
                 class="management-page__table"
                 @row-dblclick="openEditDialog"
             >
@@ -59,7 +60,7 @@
                             <strong style="color: var(--text-color--primary); font-size: 15px">{{ row.name }}</strong>
                             <StatusBadge v-if="row.isPrimary" label="대표 지도" variant="progress" />
                         </div>
-                        <div style="font-size: 12px; color: var(--text-color--muted); margin-top: 4px">
+                        <div style="font-size: 12px; color: var(--text-color--body); margin-top: 4px">
                             코드: {{ row.code }} · {{ row.regionName }} > {{ row.zoneName }}
                         </div>
                     </template>
@@ -73,8 +74,8 @@
 
                 <el-table-column label="지도 해상도 및 메타" width="180">
                     <template #default="{ row }">
-                        <div>크기: {{ row.width }}px × {{ row.height }}px</div>
-                        <div style="font-size: 12px; color: var(--text-color--secondary)">
+                        <div style="color: var(--text-color--primary)">크기: {{ row.width }}px × {{ row.height }}px</div>
+                        <div style="font-size: 12px; color: var(--text-color--body)">
                             해상도: {{ row.resolution }}m/px (원점 {{ row.origin_x }}, {{ row.origin_y }})
                         </div>
                     </template>
@@ -82,7 +83,7 @@
 
                 <el-table-column label="연계 현황" width="140" align="center">
                     <template #default="{ row }">
-                        <div>로봇 {{ row.linkedRobotCount }}대 · 목적지 {{ row.linkedDestinationCount }}개</div>
+                        <div style="color: var(--text-color--primary)">로봇 {{ row.linkedRobotCount }}대 · 목적지 {{ row.linkedDestinationCount }}개</div>
                     </template>
                 </el-table-column>
 
@@ -94,8 +95,8 @@
 
                 <el-table-column label="최근 변경" width="160" align="center">
                     <template #default="{ row }">
-                        <div style="font-size: 12px">{{ formatDateTime(row.updatedAt) }}</div>
-                        <div style="font-size: 11px; color: var(--text-color--muted)">등록자: {{ row.registeredByName }}</div>
+                        <div style="font-size: 12px; color: var(--text-color--primary)">{{ formatDateTime(row.updatedAt) }}</div>
+                        <div style="font-size: 11px; color: var(--text-color--body)">등록자: {{ row.registeredByName }}</div>
                     </template>
                 </el-table-column>
 
@@ -361,6 +362,8 @@ onMounted(() => {
     display: inline-flex;
     align-items: center;
     gap: 6px;
+    flex-shrink: 0;
+    white-space: nowrap;
 }
 
 .icon-svg {

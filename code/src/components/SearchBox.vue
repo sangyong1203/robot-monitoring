@@ -8,7 +8,6 @@
                 <el-button
                     v-if="!hideSearchButton"
                     :size="size"
-                    :loading="loading"
                     type="primary"
                     class="query-button"
                     @click="onSearch()"

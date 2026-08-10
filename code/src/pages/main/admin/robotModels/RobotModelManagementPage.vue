@@ -33,13 +33,14 @@
                 v-loading="loading"
                 :data="models"
                 row-key="id"
+                height="100%"
                 class="management-page__table"
                 @row-dblclick="openEditDialog"
             >
                 <el-table-column prop="modelName" label="로봇 모델명 및 코드" min-width="260">
                     <template #default="{ row }">
-                        <strong style="color: var(--primary-color); font-size: 15px">{{ row.modelName }}</strong>
-                        <div style="font-size: 12px; color: var(--text-color--muted)">코드: {{ row.modelCode }}</div>
+                        <strong style="color: var(--text-color--primary); font-size: 15px">{{ row.modelName }}</strong>
+                        <div style="font-size: 12px; color: var(--text-color--body)">코드: {{ row.modelCode }}</div>
                     </template>
                 </el-table-column>
 
@@ -49,10 +50,10 @@
                     </template>
                 </el-table-column>
 
-                <el-table-column prop="manufacturer" label="제조사 및 OS" width="200">
+                <el-table-column prop="manufacturer" label="제조사 및 OS" width="220">
                     <template #default="{ row }">
-                        <div>{{ row.manufacturer }}</div>
-                        <div style="font-size: 12px; color: var(--text-color--secondary)">{{ row.os }}</div>
+                        <div style="color: var(--text-color--primary); font-weight: 600">{{ row.manufacturer }}</div>
+                        <div style="font-size: 12px; color: var(--text-color--body)">{{ row.os }}</div>
                     </template>
                 </el-table-column>
 
@@ -177,7 +178,7 @@ import SearchBox from '@/components/SearchBox.vue'
 import SearchText from '@/components/SearchText.vue'
 import DropdownList from '@/components/DropdownList.vue'
 import { getRobotModels, saveRobotModel } from './service/robotModels.api'
-import type { RobotModelItem, RobotModelQuery, SaveRobotModelPayload } from './service/robotModels.types'
+import type { RobotModelItem, SaveRobotModelPayload } from './service/robotModels.types'
 import type { RobotType } from '@/types/enums'
 
 const loading = ref(false)
@@ -338,6 +339,8 @@ onMounted(() => {
     display: inline-flex;
     align-items: center;
     gap: 6px;
+    flex-shrink: 0;
+    white-space: nowrap;
 }
 
 .icon-svg {

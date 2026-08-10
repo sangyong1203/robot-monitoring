@@ -42,13 +42,14 @@
                 v-loading="loading"
                 :data="users"
                 row-key="id"
+                height="100%"
                 class="management-page__table"
                 @row-dblclick="openEditDialog"
             >
                 <el-table-column prop="loginId" label="사용자 ID 및 이름" min-width="220">
                     <template #default="{ row }">
                         <strong style="color: var(--text-color--primary); font-size: 15px">{{ row.name }}</strong>
-                        <div style="font-size: 12px; color: var(--primary-color)">({{ row.loginId }})</div>
+                        <div style="font-size: 12px; color: var(--text-color--body)">({{ row.loginId }})</div>
                     </template>
                 </el-table-column>
 
@@ -60,15 +61,15 @@
 
                 <el-table-column prop="orgPath" label="소속 기관 / 부서" min-width="240">
                     <template #default="{ row }">
-                        <div>{{ row.orgPath }}</div>
-                        <div style="font-size: 12px; color: var(--text-color--muted)">{{ row.deptName }} · {{ row.position }}</div>
+                        <div style="color: var(--text-color--primary)">{{ row.orgPath }}</div>
+                        <div style="font-size: 12px; color: var(--text-color--body)">{{ row.deptName }} · {{ row.position }}</div>
                     </template>
                 </el-table-column>
 
                 <el-table-column prop="phone" label="연락처 및 이메일" width="220">
                     <template #default="{ row }">
-                        <div>{{ row.phone }}</div>
-                        <div style="font-size: 12px; color: var(--text-color--secondary)">{{ row.email }}</div>
+                        <div style="color: var(--text-color--primary)">{{ row.phone }}</div>
+                        <div style="font-size: 12px; color: var(--text-color--body)">{{ row.email }}</div>
                     </template>
                 </el-table-column>
 
@@ -80,7 +81,7 @@
 
                 <el-table-column label="최근 로그인" width="160" align="center">
                     <template #default="{ row }">
-                        <div style="font-size: 12px">{{ row.lastLoginAt ? formatDateTime(row.lastLoginAt) : '기록 없음' }}</div>
+                        <div style="font-size: 12px; color: var(--text-color--primary)">{{ row.lastLoginAt ? formatDateTime(row.lastLoginAt) : '기록 없음' }}</div>
                     </template>
                 </el-table-column>
 
@@ -371,6 +372,8 @@ onMounted(() => {
     display: inline-flex;
     align-items: center;
     gap: 6px;
+    flex-shrink: 0;
+    white-space: nowrap;
 }
 
 .icon-svg {

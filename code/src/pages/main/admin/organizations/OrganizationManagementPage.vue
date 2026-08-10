@@ -42,6 +42,7 @@
                 v-loading="loading"
                 :data="organizations"
                 row-key="id"
+                height="100%"
                 class="management-page__table"
                 @row-dblclick="openEditDialog"
             >
@@ -51,7 +52,7 @@
                             <strong style="color: var(--text-color--primary); font-size: 15px">{{ row.name }}</strong>
                             <StatusBadge v-if="row.isRepresentative" label="대표 기관" variant="progress" />
                         </div>
-                        <div style="font-size: 12px; color: var(--text-color--muted); margin-top: 4px">
+                        <div style="font-size: 12px; color: var(--text-color--body); margin-top: 4px">
                             코드: {{ row.code }} | 경로: {{ row.fullPath || row.name }}
                         </div>
                     </template>
@@ -71,14 +72,14 @@
 
                 <el-table-column prop="registeredUserCount" label="등록 사용자" width="110" align="center">
                     <template #default="{ row }">
-                        <span>{{ row.registeredUserCount }} 명</span>
+                        <span style="color: var(--text-color--primary)">{{ row.registeredUserCount }} 명</span>
                     </template>
                 </el-table-column>
 
-                <el-table-column prop="vendorName" label="운영 관리 업체" width="160">
+                <el-table-column prop="vendorName" label="운영 관리 업체" width="180">
                     <template #default="{ row }">
-                        <div>{{ row.vendorName || '-' }}</div>
-                        <div v-if="row.vendorContactName" style="font-size: 12px; color: var(--text-color--muted)">
+                        <div style="color: var(--text-color--primary); font-weight: 600">{{ row.vendorName || '-' }}</div>
+                        <div v-if="row.vendorContactName" style="font-size: 12px; color: var(--text-color--body)">
                             {{ row.vendorContactName }} ({{ row.vendorContactDept || '' }})
                         </div>
                     </template>
@@ -92,7 +93,7 @@
 
                 <el-table-column label="등록/수정 일시" width="170" align="center">
                     <template #default="{ row }">
-                        <div style="font-size: 12px">{{ formatDateTime(row.updatedAt) }}</div>
+                        <div style="font-size: 12px; color: var(--text-color--primary)">{{ formatDateTime(row.updatedAt) }}</div>
                     </template>
                 </el-table-column>
 
@@ -363,6 +364,8 @@ onMounted(() => {
     display: inline-flex;
     align-items: center;
     gap: 6px;
+    flex-shrink: 0;
+    white-space: nowrap;
 }
 
 .icon-svg {
