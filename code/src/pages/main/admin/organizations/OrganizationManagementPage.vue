@@ -12,19 +12,21 @@
             <DropdownList
                 v-model="query.orgType"
                 label="기관 구분"
+                placeholder="기관 구분 선택"
                 :list="orgTypeOptions"
                 optionLabel="label"
                 optionValue="value"
-                width="200px"
+                selectionWidth="160px"
                 @onChange="handleSearch"
             />
             <DropdownList
                 v-model="query.isActive"
                 label="운영 상태"
+                placeholder="운영 상태 선택"
                 :list="statusOptions"
                 optionLabel="label"
                 optionValue="value"
-                width="180px"
+                selectionWidth="160px"
                 @onChange="handleSearch"
             />
         </SearchBox>

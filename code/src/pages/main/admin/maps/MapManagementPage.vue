@@ -12,19 +12,21 @@
             <DropdownList
                 v-model="query.mapType"
                 label="지도 구분"
+                placeholder="지도 구분 선택"
                 :list="typeOptions"
                 optionLabel="label"
                 optionValue="value"
-                width="200px"
+                selectionWidth="150px"
                 @onChange="handleSearch"
             />
             <DropdownList
                 v-model="query.isActive"
                 label="사용 여부"
+                placeholder="사용 여부 선택"
                 :list="statusOptions"
                 optionLabel="label"
                 optionValue="value"
-                width="180px"
+                selectionWidth="150px"
                 @onChange="handleSearch"
             />
         </SearchBox>

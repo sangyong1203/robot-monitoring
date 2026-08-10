@@ -15,7 +15,7 @@
             v-if="virtualized"
             :model-value="modelValue"
             :options="filteredNormalizedOptions"
-            :placeholder="placeholder ?? ''"
+            :placeholder="displayPlaceholder"
             :style="{ flex: selectionWidth ? 'unset' : 1, width: selectionWidth }"
             :size="size"
             :multiple="multiple"
@@ -42,7 +42,7 @@
         <el-select
             v-else
             :model-value="modelValue"
-            :placeholder="placeholder ?? ''"
+            :placeholder="displayPlaceholder"
             :style="{ flex: selectionWidth ? 'unset' : 1, width: selectionWidth }"
             :size="size"
             :multiple="multiple"
@@ -72,7 +72,7 @@
                 :value="item[optionValue]"
             >
                 <span>{{ item[optionLabel] }}</span>
-                <img style="height: 18px; float: right" :src="item.icon" />
+                <img v-if="item.icon" style="height: 18px; float: right" :src="item.icon" />
             </el-option>
         </el-select>
     </div>
@@ -131,6 +131,12 @@ const emits = defineEmits(['update:modelValue', 'onChange'])
 
 const searchKeyword = ref('')
 
+const displayPlaceholder = computed(() => {
+    if (placeholder?.value) return placeholder.value
+    if (label?.value) return `${label.value} 선택`
+    return '선택'
+})
+
 const filteredList = computed(() => {
     const keyword = searchKeyword.value.trim().toLowerCase()
 
@@ -173,6 +179,7 @@ const onChange = (value: any) => {
     }
 }
 </script>
+
 <style scoped>
 .dropdown-list {
     display: flex;

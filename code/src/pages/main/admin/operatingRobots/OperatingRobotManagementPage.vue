@@ -12,10 +12,11 @@
             <DropdownList
                 v-model="query.isOperating"
                 label="운영 상태"
+                placeholder="운영 상태 선택"
                 :list="statusOptions"
                 optionLabel="label"
                 optionValue="value"
-                width="180px"
+                selectionWidth="150px"
                 @onChange="handleSearch"
             />
         </SearchBox>

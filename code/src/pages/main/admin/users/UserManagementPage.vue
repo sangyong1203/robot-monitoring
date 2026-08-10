@@ -5,19 +5,21 @@
             <DropdownList
                 v-model="selectedOrgId"
                 label="소속 기관"
+                placeholder="소속 기관 선택"
                 :list="orgOptions"
                 optionLabel="name"
                 optionValue="id"
-                width="280px"
+                selectionWidth="180px"
                 @onChange="handleSearch"
             />
             <DropdownList
                 v-model="query.userLevel"
                 label="사용자 등급"
+                placeholder="사용자 등급 선택"
                 :list="levelOptions"
                 optionLabel="label"
                 optionValue="value"
-                width="200px"
+                selectionWidth="180px"
                 @onChange="handleSearch"
             />
             <SearchText

@@ -5,6 +5,7 @@
             <DropdownList
                 v-model="selectedMapId"
                 label="대상 지도"
+                placeholder="대상 지도 선택"
                 :list="mapOptions"
                 optionLabel="name"
                 optionValue="id"
@@ -14,10 +15,11 @@
             <DropdownList
                 v-model="query.type"
                 label="목적지 타입"
+                placeholder="목적지 타입 선택"
                 :list="typeOptions"
                 optionLabel="label"
                 optionValue="value"
-                width="200px"
+                selectionWidth="160px"
                 @onChange="handleSearch"
             />
             <SearchText
