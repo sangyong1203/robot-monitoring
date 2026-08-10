@@ -51,7 +51,11 @@
             </el-form-item>
 
             <el-form-item label="연락처" prop="phone">
-                <el-input v-model="form.phone" placeholder="예: 010-1234-5678" />
+                <el-input
+                    :model-value="form.phone"
+                    placeholder="예: 010-1234-5678"
+                    @input="handlePhoneInput"
+                />
             </el-form-item>
 
             <el-form-item label="이메일 주소" prop="email" style="grid-column: span 2">
@@ -73,6 +77,7 @@
 import { reactive, ref, watch } from 'vue'
 import { ElMessage } from 'element-plus'
 import BaseDialog from '@/components/BaseDialog.vue'
+import { phoneFormatter } from '@/utils'
 import { saveUser } from '../service/users.api'
 import type { SaveUserPayload, UserItem } from '../service/users.types'
 
@@ -116,6 +121,10 @@ const rules = {
     loginId: [{ required: true, message: '사용자 ID를 입력하세요.', trigger: 'blur' }],
     name: [{ required: true, message: '성명을 입력하세요.', trigger: 'blur' }],
     email: [{ required: true, message: '이메일을 입력하세요.', trigger: 'blur' }],
+}
+
+const handlePhoneInput = (val: string) => {
+    form.phone = phoneFormatter(val)
 }
 
 const handleOrgChange = (orgId: number) => {
