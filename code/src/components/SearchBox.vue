@@ -37,7 +37,7 @@ const { onSearch, extra, size, padding, gap, hideSearchButton = false, loading =
 
 <style scoped lang="scss">
 .search-box {
-    border-radius: 8px;
+    border-radius: 36px;
     display: flex;
     flex-direction: column;
     margin-bottom: 12px;
@@ -51,9 +51,10 @@ const { onSearch, extra, size, padding, gap, hideSearchButton = false, loading =
     //     0 7px 12px rgba(0, 0, 0, 0.28),
     //     0 0 18px rgba(231, 109, 255, 0.08),
     //     inset 0 1px 0 rgb(255 255 255 / 10%);
+    // background-color: var(--panel-bg-color);
+    // border: 1px solid var(--panel-border-color);
+    // box-shadow: var(--panel-shadow);
     background-color: var(--panel-bg-color);
-    border: 1px solid var(--panel-border-color);
-    box-shadow: var(--panel-shadow);
 }
 .search-box-content {
     justify-content: space-between;
@@ -63,6 +64,11 @@ const { onSearch, extra, size, padding, gap, hideSearchButton = false, loading =
     gap: 8px;
     padding: 20px 24px;
     min-height: 76px;
+
+    background-color: var(--panel-bg-color);
+    border-radius: 99px;
+    border: 1px solid var(--panel-border-color);
+    box-shadow: var(--panel-shadow);
 }
 .upper-row {
     flex: 1;
@@ -78,9 +84,8 @@ const { onSearch, extra, size, padding, gap, hideSearchButton = false, loading =
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    background-color: var(--surface-muted-color);
-    padding: 20px 24px;
-    min-height: 76px;
+    padding: 18px 24px;
+    min-height: 72px;
     border-bottom-right-radius: 8px;
     border-bottom-left-radius: 8px;
     :deep(.dropdown-list .el-select__wrapper) {
