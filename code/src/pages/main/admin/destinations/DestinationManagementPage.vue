@@ -2,6 +2,13 @@
     <div class="management-page">
         <!-- 상단 검색 및 지도 선택 패널 -->
         <SearchBox :onSearch="handleSearch" :loading="loading">
+            <SearchText
+                v-model="query.keyword"
+                placeholder="목적지 이름, 코드 검색"
+                width="280px"
+                @onEnter="handleSearch"
+                @clear="handleSearch"
+            />
             <DropdownList
                 v-model="selectedMapId"
                 label="대상 지도"
@@ -21,13 +28,6 @@
                 optionValue="value"
                 selectionWidth="160px"
                 @onChange="handleSearch"
-            />
-            <SearchText
-                v-model="query.keyword"
-                placeholder="목적지 이름, 코드 검색"
-                width="280px"
-                @onEnter="handleSearch"
-                @clear="handleSearch"
             />
         </SearchBox>
 

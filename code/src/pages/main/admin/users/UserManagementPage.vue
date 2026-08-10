@@ -2,6 +2,13 @@
     <div class="management-page">
         <!-- 상단 검색 패널 -->
         <SearchBox :onSearch="handleSearch" :loading="loading">
+            <SearchText
+                v-model="query.keyword"
+                placeholder="ID, 이름, 연락처, 이메일 검색"
+                width="300px"
+                @onEnter="handleSearch"
+                @clear="handleSearch"
+            />
             <DropdownList
                 v-model="selectedOrgId"
                 label="소속 기관"
@@ -21,13 +28,6 @@
                 optionValue="value"
                 selectionWidth="180px"
                 @onChange="handleSearch"
-            />
-            <SearchText
-                v-model="query.keyword"
-                placeholder="ID, 이름, 연락처, 이메일 검색"
-                width="300px"
-                @onEnter="handleSearch"
-                @clear="handleSearch"
             />
         </SearchBox>
 
