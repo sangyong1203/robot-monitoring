@@ -46,12 +46,9 @@
                 class="management-page__table"
                 @row-dblclick="openEditDialog"
             >
-                <el-table-column prop="loginId" label="사용자 ID 및 이름" min-width="220">
-                    <template #default="{ row }">
-                        <strong style="color: var(--text-color--primary); font-size: 15px">{{ row.name }}</strong>
-                        <div style="font-size: 12px; color: var(--text-color--body)">({{ row.loginId }})</div>
-                    </template>
-                </el-table-column>
+                <el-table-column prop="name" label="사용자 이름" width="140" align="center" />
+
+                <el-table-column prop="loginId" label="사용자 ID" width="150" align="center" />
 
                 <el-table-column prop="userLevel" label="권한 등급" width="160" align="center">
                     <template #default="{ row }">
@@ -59,19 +56,11 @@
                     </template>
                 </el-table-column>
 
-                <el-table-column prop="orgPath" label="소속 기관 / 부서" min-width="240">
-                    <template #default="{ row }">
-                        <div style="color: var(--text-color--primary)">{{ row.orgPath }}</div>
-                        <div style="font-size: 12px; color: var(--text-color--body)">{{ row.deptName }} · {{ row.position }}</div>
-                    </template>
-                </el-table-column>
+                <el-table-column prop="orgPath" label="소속 기관 / 부서" min-width="240" show-overflow-tooltip />
 
-                <el-table-column prop="phone" label="연락처 및 이메일" width="220">
-                    <template #default="{ row }">
-                        <div style="color: var(--text-color--primary)">{{ row.phone }}</div>
-                        <div style="font-size: 12px; color: var(--text-color--body)">{{ row.email }}</div>
-                    </template>
-                </el-table-column>
+                <el-table-column prop="phone" label="연락처" width="150" align="center" />
+
+                <el-table-column prop="email" label="이메일 주소" width="200" align="center" show-overflow-tooltip />
 
                 <el-table-column prop="isActive" label="계정 상태" width="100" align="center">
                     <template #default="{ row }">
@@ -81,7 +70,7 @@
 
                 <el-table-column label="최근 로그인" width="160" align="center">
                     <template #default="{ row }">
-                        <div style="font-size: 12px; color: var(--text-color--primary)">{{ row.lastLoginAt ? formatDateTime(row.lastLoginAt) : '기록 없음' }}</div>
+                        <span>{{ row.lastLoginAt ? formatDateTime(row.lastLoginAt) : '기록 없음' }}</span>
                     </template>
                 </el-table-column>
 

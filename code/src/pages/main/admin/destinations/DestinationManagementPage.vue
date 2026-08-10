@@ -76,12 +76,9 @@
                         @row-click="(row: DestinationItem) => (selectedDestId = row.id)"
                         @row-dblclick="openEditDialog"
                     >
-                        <el-table-column prop="name" label="목적지 이름 및 코드" min-width="180">
-                            <template #default="{ row }">
-                                <strong style="color: var(--text-color--primary)">{{ row.name }}</strong>
-                                <div style="font-size: 11px; color: var(--text-color--body)">{{ row.code }}</div>
-                            </template>
-                        </el-table-column>
+                        <el-table-column prop="name" label="목적지 이름" min-width="180" show-overflow-tooltip />
+
+                        <el-table-column prop="code" label="목적지 코드" width="150" align="center" />
 
                         <el-table-column prop="type" label="타입" width="130" align="center">
                             <template #default="{ row }">
@@ -89,12 +86,11 @@
                             </template>
                         </el-table-column>
 
-                        <el-table-column label="2D 좌표 (m, deg)" width="150" align="center">
-                            <template #default="{ row }">
-                                <div style="color: var(--text-color--primary)">X: {{ row.x }}m · Y: {{ row.y }}m</div>
-                                <div style="font-size: 11px; color: var(--secondary-color)">방향: {{ row.heading }}°</div>
-                            </template>
-                        </el-table-column>
+                        <el-table-column prop="x" label="X (m)" width="80" align="center" />
+
+                        <el-table-column prop="y" label="Y (m)" width="80" align="center" />
+
+                        <el-table-column prop="heading" label="방향(°)" width="90" align="center" />
 
                         <el-table-column prop="isActive" label="상태" width="90" align="center">
                             <template #default="{ row }">

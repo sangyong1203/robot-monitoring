@@ -46,17 +46,9 @@
                 class="management-page__table"
                 @row-dblclick="openEditDialog"
             >
-                <el-table-column prop="name" label="기관 / 사이트명" min-width="240">
-                    <template #default="{ row }">
-                        <div style="display: flex; align-items: center; gap: 8px">
-                            <strong style="color: var(--text-color--primary); font-size: 15px">{{ row.name }}</strong>
-                            <StatusBadge v-if="row.isRepresentative" label="대표 기관" variant="progress" />
-                        </div>
-                        <div style="font-size: 12px; color: var(--text-color--body); margin-top: 4px">
-                            코드: {{ row.code }} | 경로: {{ row.fullPath || row.name }}
-                        </div>
-                    </template>
-                </el-table-column>
+                <el-table-column prop="name" label="기관 / 사이트명" min-width="220" show-overflow-tooltip />
+
+                <el-table-column prop="code" label="기관 코드" width="160" align="center" />
 
                 <el-table-column prop="orgType" label="구분" width="130" align="center">
                     <template #default="{ row }">
@@ -64,26 +56,13 @@
                     </template>
                 </el-table-column>
 
-                <el-table-column prop="activeRobotCount" label="운영 로봇" width="110" align="center">
-                    <template #default="{ row }">
-                        <strong style="color: var(--secondary-color)">{{ row.activeRobotCount }} 대</strong>
-                    </template>
-                </el-table-column>
+                <el-table-column prop="activeRobotCount" label="운영 로봇" width="110" align="center" />
 
-                <el-table-column prop="registeredUserCount" label="등록 사용자" width="110" align="center">
-                    <template #default="{ row }">
-                        <span style="color: var(--text-color--primary)">{{ row.registeredUserCount }} 명</span>
-                    </template>
-                </el-table-column>
+                <el-table-column prop="registeredUserCount" label="등록 사용자" width="110" align="center" />
 
-                <el-table-column prop="vendorName" label="운영 관리 업체" width="180">
-                    <template #default="{ row }">
-                        <div style="color: var(--text-color--primary); font-weight: 600">{{ row.vendorName || '-' }}</div>
-                        <div v-if="row.vendorContactName" style="font-size: 12px; color: var(--text-color--body)">
-                            {{ row.vendorContactName }} ({{ row.vendorContactDept || '' }})
-                        </div>
-                    </template>
-                </el-table-column>
+                <el-table-column prop="vendorName" label="운영 관리 업체" width="160" align="center" show-overflow-tooltip />
+
+                <el-table-column prop="vendorContactName" label="업체 담당자" width="130" align="center" />
 
                 <el-table-column prop="isActive" label="운영 상태" width="110" align="center">
                     <template #default="{ row }">
@@ -91,9 +70,9 @@
                     </template>
                 </el-table-column>
 
-                <el-table-column label="등록/수정 일시" width="170" align="center">
+                <el-table-column label="등록/수정 일시" width="160" align="center">
                     <template #default="{ row }">
-                        <div style="font-size: 12px; color: var(--text-color--primary)">{{ formatDateTime(row.updatedAt) }}</div>
+                        <span>{{ formatDateTime(row.updatedAt) }}</span>
                     </template>
                 </el-table-column>
 

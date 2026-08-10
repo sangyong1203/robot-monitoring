@@ -46,7 +46,7 @@
                 class="management-page__table"
                 @row-dblclick="openEditDialog"
             >
-                <el-table-column label="2D 미리보기" width="120" align="center">
+                <el-table-column label="2D 미리보기" width="110" align="center">
                     <template #default="{ row }">
                         <div class="map-thumbnail-preview">
                             <img :src="row.imageUrl || '/sample_map/map.png'" alt="지도 썸네일" />
@@ -54,17 +54,11 @@
                     </template>
                 </el-table-column>
 
-                <el-table-column prop="name" label="지도 정보" min-width="220">
-                    <template #default="{ row }">
-                        <div style="display: flex; align-items: center; gap: 8px">
-                            <strong style="color: var(--text-color--primary); font-size: 15px">{{ row.name }}</strong>
-                            <StatusBadge v-if="row.isPrimary" label="대표 지도" variant="progress" />
-                        </div>
-                        <div style="font-size: 12px; color: var(--text-color--body); margin-top: 4px">
-                            코드: {{ row.code }} · {{ row.regionName }} > {{ row.zoneName }}
-                        </div>
-                    </template>
-                </el-table-column>
+                <el-table-column prop="name" label="지도 이름" min-width="200" show-overflow-tooltip />
+
+                <el-table-column prop="code" label="지도 코드" width="160" align="center" />
+
+                <el-table-column prop="zoneName" label="소속 구역" width="160" align="center" show-overflow-tooltip />
 
                 <el-table-column prop="mapType" label="구분" width="110" align="center">
                     <template #default="{ row }">
@@ -72,20 +66,7 @@
                     </template>
                 </el-table-column>
 
-                <el-table-column label="지도 해상도 및 메타" width="180">
-                    <template #default="{ row }">
-                        <div style="color: var(--text-color--primary)">크기: {{ row.width }}px × {{ row.height }}px</div>
-                        <div style="font-size: 12px; color: var(--text-color--body)">
-                            해상도: {{ row.resolution }}m/px (원점 {{ row.origin_x }}, {{ row.origin_y }})
-                        </div>
-                    </template>
-                </el-table-column>
-
-                <el-table-column label="연계 현황" width="140" align="center">
-                    <template #default="{ row }">
-                        <div style="color: var(--text-color--primary)">로봇 {{ row.linkedRobotCount }}대 · 목적지 {{ row.linkedDestinationCount }}개</div>
-                    </template>
-                </el-table-column>
+                <el-table-column prop="resolution" label="해상도(m/px)" width="120" align="center" />
 
                 <el-table-column prop="isActive" label="사용 상태" width="100" align="center">
                     <template #default="{ row }">
@@ -93,10 +74,9 @@
                     </template>
                 </el-table-column>
 
-                <el-table-column label="최근 변경" width="160" align="center">
+                <el-table-column label="등록/수정 일시" width="160" align="center">
                     <template #default="{ row }">
-                        <div style="font-size: 12px; color: var(--text-color--primary)">{{ formatDateTime(row.updatedAt) }}</div>
-                        <div style="font-size: 11px; color: var(--text-color--body)">등록자: {{ row.registeredByName }}</div>
+                        <span>{{ formatDateTime(row.updatedAt) }}</span>
                     </template>
                 </el-table-column>
 

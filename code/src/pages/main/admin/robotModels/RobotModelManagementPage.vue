@@ -37,17 +37,9 @@
                 class="management-page__table"
                 @row-dblclick="openEditDialog"
             >
-                <el-table-column prop="modelName" label="로봇 모델명" min-width="220">
-                    <template #default="{ row }">
-                        <div style="color: var(--text-color--primary); font-size: 15px; font-weight: 600">{{ row.modelName }}</div>
-                    </template>
-                </el-table-column>
+                <el-table-column prop="modelName" label="로봇 모델명" min-width="260" show-overflow-tooltip />
 
-                <el-table-column prop="modelCode" label="모델 코드" width="160" align="center">
-                    <template #default="{ row }">
-                        <span style="color: var(--text-color--primary); font-size: 13px">{{ row.modelCode }}</span>
-                    </template>
-                </el-table-column>
+                <el-table-column prop="modelCode" label="모델 코드" width="160" align="center" />
 
                 <el-table-column prop="robotType" label="로봇 종" width="140" align="center">
                     <template #default="{ row }">
@@ -55,23 +47,11 @@
                     </template>
                 </el-table-column>
 
-                <el-table-column prop="manufacturer" label="제조사" width="150" align="center">
-                    <template #default="{ row }">
-                        <span style="color: var(--text-color--primary)">{{ row.manufacturer }}</span>
-                    </template>
-                </el-table-column>
+                <el-table-column prop="manufacturer" label="제조사" width="150" align="center" show-overflow-tooltip />
 
-                <el-table-column prop="os" label="OS / 플랫폼" width="180" align="center">
-                    <template #default="{ row }">
-                        <span style="color: var(--text-color--primary); font-size: 13px">{{ row.os }}</span>
-                    </template>
-                </el-table-column>
+                <el-table-column prop="os" label="OS / 플랫폼" width="180" align="center" />
 
-                <el-table-column prop="registeredRobotCount" label="배치 운영 로봇 수" width="140" align="center">
-                    <template #default="{ row }">
-                        <span style="color: var(--secondary-color); font-weight: 700">{{ row.registeredRobotCount }} 대</span>
-                    </template>
-                </el-table-column>
+                <el-table-column prop="registeredRobotCount" label="배치 운영 로봇 수" width="140" align="center" />
 
                 <el-table-column label="모니터링 & 제어 지원" min-width="240">
                     <template #default="{ row }">
