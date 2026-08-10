@@ -48,15 +48,18 @@
 
                 <el-table-column prop="orgPath" label="설치 기관 및 구역" min-width="220" show-overflow-tooltip />
 
-                <el-table-column label="실시간 상태 / 배터리" width="180" align="center">
+                <el-table-column prop="communicationStatus" label="통신 상태" width="120" align="center">
                     <template #default="{ row }">
-                        <div style="display: flex; gap: 4px; justify-content: center; align-items: center">
-                            <StatusBadge
-                                :label="row.communicationStatus === 'ONLINE' ? '정상' : row.communicationStatus === 'STALE' ? '지연' : '오프라인'"
-                                :variant="row.communicationStatus === 'ONLINE' ? 'success' : row.communicationStatus === 'STALE' ? 'warning' : 'danger'"
-                            />
-                            <StatusBadge :label="`${row.batteryPercent}%`" :variant="row.batteryPercent > 20 ? 'info' : 'danger'" />
-                        </div>
+                        <StatusBadge
+                            :label="row.communicationStatus === 'ONLINE' ? '정상' : row.communicationStatus === 'STALE' ? '지연' : '오프라인'"
+                            :variant="row.communicationStatus === 'ONLINE' ? 'success' : row.communicationStatus === 'STALE' ? 'warning' : 'danger'"
+                        />
+                    </template>
+                </el-table-column>
+
+                <el-table-column prop="batteryPercent" label="배터리" width="110" align="center">
+                    <template #default="{ row }">
+                        <StatusBadge :label="`${row.batteryPercent}%`" :variant="row.batteryPercent > 20 ? 'info' : 'danger'" />
                     </template>
                 </el-table-column>
 
