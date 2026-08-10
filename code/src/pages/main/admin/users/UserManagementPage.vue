@@ -35,7 +35,6 @@
         <Panel class="management-page__panel" title="사용자 계정 목록" :total="users.length" fill>
             <template #headerRight>
                 <el-button type="primary" class="query-button" @click="openCreateDialog">
-                    <el-icon><UserPlus /></el-icon>
                     신규 사용자 등록
                 </el-button>
             </template>

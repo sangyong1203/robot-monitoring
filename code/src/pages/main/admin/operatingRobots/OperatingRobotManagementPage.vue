@@ -25,7 +25,6 @@
         <Panel class="management-page__panel" title="배치 운영 로봇 목록 (6종 7대)" :total="robots.length" fill>
             <template #headerRight>
                 <el-button type="primary" class="query-button" @click="openCreateDialog">
-                    <el-icon><Bot /></el-icon>
                     신규 운영 로봇 등록
                 </el-button>
             </template>

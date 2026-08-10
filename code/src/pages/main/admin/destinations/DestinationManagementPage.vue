@@ -35,7 +35,6 @@
         <Panel class="management-page__panel" title="지도 목적지 (Position & Heading) 목록" :total="destinations.length" fill>
             <template #headerRight>
                 <el-button type="primary" class="query-button" @click="openCreateDialog">
-                    <el-icon><MapPin /></el-icon>
                     신규 목적지 등록
                 </el-button>
             </template>

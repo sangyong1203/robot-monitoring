@@ -35,7 +35,6 @@
         <Panel class="management-page__panel" title="기관 및 사이트 목록" :total="organizations.length" fill>
             <template #headerRight>
                 <el-button type="primary" class="query-button" @click="openCreateDialog">
-                    <el-icon><Building2 /></el-icon>
                     신규 기관 등록
                 </el-button>
             </template>
