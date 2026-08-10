@@ -32,7 +32,7 @@
         </SearchBox>
 
         <!-- 데이터 목록 및 2D 위치 지도 뷰어 -->
-        <Panel class="management-page__panel" title="지도 목적지 (Position & Heading) 목록" :total="destinations.length" fill>
+        <Panel class="management-page__panel" title="지도 목적지 목록" :total="destinations.length" fill>
             <template #headerRight>
                 <el-button type="primary" class="query-button" @click="openCreateDialog">
                     신규 목적지 등록

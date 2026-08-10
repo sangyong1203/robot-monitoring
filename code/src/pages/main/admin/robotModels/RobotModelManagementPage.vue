@@ -22,7 +22,7 @@
         </SearchBox>
 
         <!-- 메인 데이터 패널 -->
-        <Panel class="management-page__panel" title="운영 원형 로봇 모델 목록" :total="models.length" fill>
+        <Panel class="management-page__panel" title="로봇 모델 목록" :total="models.length" fill>
             <template #headerRight>
                 <el-button type="primary" class="query-button" @click="openCreateDialog">
                     신규 로봇 모델 등록

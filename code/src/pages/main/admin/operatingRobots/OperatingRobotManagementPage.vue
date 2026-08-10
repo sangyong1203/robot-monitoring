@@ -22,7 +22,7 @@
         </SearchBox>
 
         <!-- 메인 데이터 패널 -->
-        <Panel class="management-page__panel" title="배치 운영 로봇 목록 (6종 7대)" :total="robots.length" fill>
+        <Panel class="management-page__panel" title="운영 로봇 목록" :total="robots.length" fill>
             <template #headerRight>
                 <el-button type="primary" class="query-button" @click="openCreateDialog">
                     신규 운영 로봇 등록
