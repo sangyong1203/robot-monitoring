@@ -1,59 +1,61 @@
 <template>
     <section class="cyber-monitoring">
-        <!-- Top HUD Header -->
-        <header class="hud-header glass-panel">
-            <div class="hud-left">
-                <div class="live-badge">
-                    <span class="pulse-dot"></span>
-                    <span class="live-text">LIVE STREAMING (1s)</span>
+        <!-- Top HUD Header Panel -->
+        <Panel class="hud-header-panel">
+            <div class="hud-header-content">
+                <div class="hud-left">
+                    <div class="live-badge">
+                        <span class="pulse-dot"></span>
+                        <span class="live-text">LIVE</span>
+                    </div>
+                    <div class="hud-title-wrap">
+                        <span class="hud-subtitle">{{ updatedLabel }}</span>
+                    </div>
                 </div>
-                <div class="hud-title-wrap">
-                    <span class="hud-subtitle">{{ updatedLabel }}</span>
-                </div>
-            </div>
 
-            <div class="hud-metrics">
-                <div class="hud-chip">
-                    <Bot class="chip-icon text-blue" :size="18" />
-                    <span class="chip-label">운영 로봇</span>
-                    <strong class="chip-val">{{ snapshot?.counts.total ?? 7 }}대</strong>
+                <div class="hud-metrics">
+                    <div class="hud-chip">
+                        <Bot class="chip-icon text-blue" :size="18" />
+                        <span class="chip-label">운영 로봇</span>
+                        <strong class="chip-val">{{ snapshot?.counts.total ?? 7 }}대</strong>
+                    </div>
+                    <div class="hud-chip">
+                        <Radio class="chip-icon text-green" :size="18" />
+                        <span class="chip-label">정상 통신</span>
+                        <strong class="chip-val text-green">{{ snapshot?.counts.online ?? 6 }}</strong>
+                    </div>
+                    <div class="hud-chip">
+                        <Zap class="chip-icon text-amber" :size="18" />
+                        <span class="chip-label">통신 지연</span>
+                        <strong class="chip-val text-amber">{{ snapshot?.counts.stale ?? 1 }}</strong>
+                    </div>
+                    <div class="hud-chip">
+                        <ShieldAlert class="chip-icon text-red" :size="18" />
+                        <span class="chip-label">비상 정지</span>
+                        <strong class="chip-val text-red">0</strong>
+                    </div>
                 </div>
-                <div class="hud-chip">
-                    <Radio class="chip-icon text-green" :size="18" />
-                    <span class="chip-label">정상 통신</span>
-                    <strong class="chip-val text-green">{{ snapshot?.counts.online ?? 6 }}</strong>
-                </div>
-                <div class="hud-chip">
-                    <Zap class="chip-icon text-amber" :size="18" />
-                    <span class="chip-label">통신 지연</span>
-                    <strong class="chip-val text-amber">{{ snapshot?.counts.stale ?? 1 }}</strong>
-                </div>
-                <div class="hud-chip">
-                    <ShieldAlert class="chip-icon text-red" :size="18" />
-                    <span class="chip-label">비상 정지</span>
-                    <strong class="chip-val text-red">0</strong>
-                </div>
-            </div>
 
-            <div class="hud-actions">
-                <el-select v-model="selectedMapId" class="map-select" placeholder="관제 지도 선택">
-                    <el-option
-                        v-for="map in snapshot?.maps ?? []"
-                        :key="map.id"
-                        :label="map.name"
-                        :value="map.id"
-                    />
-                </el-select>
-                <el-button type="danger" class="btn-emergency" @click="openGlobalEmergency">
-                    <ShieldAlert :size="16" /> 전체 E-STOP (일괄 정지)
-                </el-button>
+                <div class="hud-actions">
+                    <el-select v-model="selectedMapId" class="map-select" placeholder="관제 지도 선택">
+                        <el-option
+                            v-for="map in snapshot?.maps ?? []"
+                            :key="map.id"
+                            :label="map.name"
+                            :value="map.id"
+                        />
+                    </el-select>
+                    <el-button type="danger" class="btn-emergency" @click="openGlobalEmergency">
+                        <ShieldAlert :size="16" /> 전체 E-STOP (일괄 정지)
+                    </el-button>
+                </div>
             </div>
-        </header>
+        </Panel>
 
         <!-- Main Cyber Content Grid -->
         <div class="cyber-grid">
             <!-- Left/Center: High-Tech 2D Map Canvas -->
-            <div class="map-container glass-panel">
+            <Panel class="map-container-panel" :fill="true">
                 <div class="map-toolbar">
                     <div class="map-info-tag">
                         <span>현재 지도:</span>
@@ -134,14 +136,13 @@
                         </g>
                     </svg>
                 </div>
-            </div>
+            </Panel>
 
             <!-- Right Vertical Panel: Modern Telemetry Cards -->
-            <div class="telemetry-panel glass-panel">
-                <div class="panel-header">
-                    <h3>로봇 실시간 텔레메트리</h3>
+            <Panel class="telemetry-panel-panel" title="로봇 실시간 텔레메트리" :fill="true">
+                <template #headerRight>
                     <span class="robot-count-badge">{{ robots.length }}대 가동 중</span>
-                </div>
+                </template>
 
                 <div class="robot-card-scroll">
                     <div
@@ -197,7 +198,7 @@
                         </div>
                     </div>
                 </div>
-            </div>
+            </Panel>
         </div>
 
         <!-- Robot Control Modal -->
@@ -470,25 +471,29 @@ const submitCommand = async () => {
     overflow: hidden;
 }
 
-.glass-panel {
-    background: #0f172a;
-    border: 1px solid #1e293b;
-    border-radius: 12px;
+.hud-header-panel {
+    padding: 10px 16px;
+    flex-shrink: 0;
+
+    :deep(.panel__body) {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+    }
 }
 
-/* HUD Header */
-.hud-header {
+.hud-header-content {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 10px 16px;
-    flex-shrink: 0;
+    width: 100%;
 }
 
 .hud-left {
     display: flex;
     align-items: center;
-    gap: 16px;
+    gap: 8px;
 }
 
 .live-badge {
@@ -523,15 +528,8 @@ const submitCommand = async () => {
     100% { opacity: 0.4; }
 }
 
-.hud-title {
-    margin: 0;
-    font-size: 18px;
-    font-weight: 700;
-    color: #fff;
-}
-
 .hud-subtitle {
-    font-size: 11px;
+    font-size: 12px;
     color: #94a3b8;
 }
 
@@ -580,15 +578,20 @@ const submitCommand = async () => {
     overflow: hidden;
 }
 
-/* Map Container */
-.map-container {
-    display: flex;
-    flex-direction: column;
+/* Map Container Panel */
+.map-container-panel {
     padding: 12px;
     position: relative;
     overflow: hidden;
     height: 100%;
     min-height: 0;
+
+    :deep(.panel__body) {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        min-height: 0;
+    }
 }
 
 .map-toolbar {
@@ -659,25 +662,21 @@ const submitCommand = async () => {
 }
 
 /* Telemetry Panel */
-.telemetry-panel {
-    display: flex;
-    flex-direction: column;
+.telemetry-panel-panel {
     padding: 12px;
     height: 100%;
     min-height: 0;
     overflow: hidden;
+
+    :deep(.panel__body) {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        min-height: 0;
+    }
 }
 
-.panel-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 10px;
-    flex-shrink: 0;
-
-    h3 { margin: 0; font-size: 15px; color: #fff; }
-    .robot-count-badge { font-size: 12px; color: #3b82f6; font-weight: 600; }
-}
+.robot-count-badge { font-size: 12px; color: var(--secondary-color); font-weight: 600; }
 
 .robot-card-scroll {
     display: flex;
@@ -690,17 +689,17 @@ const submitCommand = async () => {
 }
 
 .robot-cyber-card {
-    background: #162032;
-    border: 1px solid #25334e;
+    background: var(--surface-elevated-color);
+    border: 1px solid var(--border-color);
     border-radius: 10px;
     padding: 14px;
     cursor: pointer;
     transition: all 0.2s ease;
 
     &:hover, &.is-selected {
-        border-color: #3b82f6;
-        background: #1b2a45;
-        box-shadow: 0 0 12px rgba(59, 130, 246, 0.3);
+        border-color: var(--primary-color);
+        background: var(--layout-menu-active-bg-color);
+        box-shadow: 0 0 14px var(--layout-purple-glow-color);
     }
 
     &.is-warning {
@@ -724,16 +723,17 @@ const submitCommand = async () => {
 .robot-type-tag {
     font-size: 10px;
     padding: 2px 6px;
-    background: #25334e;
+    background: var(--surface-muted-color);
+    border: 1px solid var(--border-color);
     border-radius: 4px;
-    color: #cbd5e1;
+    color: var(--text-color--secondary);
     font-weight: 600;
 }
 
 .robot-card-title {
     font-size: 14px;
     font-weight: 700;
-    color: #ffffff;
+    color: var(--text-color--primary);
 }
 
 /* Battery Meter */
@@ -744,15 +744,15 @@ const submitCommand = async () => {
         display: flex;
         justify-content: space-between;
         font-size: 11px;
-        color: #94a3b8;
+        color: var(--text-color--secondary);
         margin-bottom: 4px;
 
-        strong { color: #fff; }
+        strong { color: var(--text-color--white); }
     }
 
     .meter-bar-track {
         height: 6px;
-        background: #0d1322;
+        background: var(--surface-color);
         border-radius: 3px;
         overflow: hidden;
     }
@@ -768,8 +768,8 @@ const submitCommand = async () => {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 6px;
-    background: #0b101d;
-    border: 1px solid #1e293b;
+    background: var(--surface-color);
+    border: 1px solid var(--border-color);
     padding: 6px 8px;
     border-radius: 6px;
     margin-bottom: 10px;
@@ -779,8 +779,8 @@ const submitCommand = async () => {
         flex-direction: column;
         align-items: center;
 
-        span { font-size: 10px; color: #94a3b8; }
-        strong { font-size: 12px; color: #38bdf8; font-family: monospace; font-weight: 700; }
+        span { font-size: 10px; color: var(--text-color--muted); }
+        strong { font-size: 12px; color: var(--secondary-color); font-family: monospace; font-weight: 700; }
     }
 }
 
