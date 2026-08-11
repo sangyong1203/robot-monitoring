@@ -68,7 +68,7 @@ import RobotCameraDialog from '@/features/monitoring/components/RobotCameraDialo
 const kind: TypedMonitoringKind = 'SURVEILLANCE'
 
 const snapshot = ref<IntegratedMonitoringSnapshot | null>(null)
-const selectedMapId = ref<number | null>(1)
+const selectedMapId = ref<number | null>(2)
 const selectedRobotId = ref<number | null>(5)
 
 const controlDialogVisible = ref(false)
