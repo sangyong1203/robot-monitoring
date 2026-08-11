@@ -184,7 +184,7 @@ const statusTag = (status: CommunicationStatus) =>
         gap: 3px;
 
         span { font-size: 11px; color: var(--text-color--secondary); }
-        strong { font-size: 11px; color: var(--secondary-color); font-weight: 700; }
+        strong { font-size: 11px; color: var(--secondary-color); font-weight: 700; width: 30px;}
     }
 }
 
