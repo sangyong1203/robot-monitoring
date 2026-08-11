@@ -166,13 +166,21 @@ export const mockIntegratedSnapshot: IntegratedMonitoringSnapshot = {
     ],
 }
 
+import { fetchMockMaps } from '@/pages/main/admin/maps/service/maps.mock'
+
 export const getIntegratedMonitoring = async () => {
+    const activeMaps = await fetchMockMaps({ isActive: true })
+    const snapshotData = {
+        ...mockIntegratedSnapshot,
+        maps: activeMaps.length > 0 ? activeMaps.map(m => ({ ...m, robots: [] })) : mockIntegratedSnapshot.maps,
+    }
+
     if (API_MODE === 'mock') {
-        return { data: mockIntegratedSnapshot, result: 'SUCCESS', resultMessage: '성공' }
+        return { data: snapshotData, result: 'SUCCESS', resultMessage: '성공' }
     }
     try {
         return await fetchApi().get<IntegratedMonitoringSnapshot>('/api/v1/monitoring/integrated')
     } catch {
-        return { data: mockIntegratedSnapshot, result: 'SUCCESS', resultMessage: '성공' }
+        return { data: snapshotData, result: 'SUCCESS', resultMessage: '성공' }
     }
 }

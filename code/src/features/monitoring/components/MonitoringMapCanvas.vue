@@ -1,6 +1,10 @@
 <template>
     <div class="map-grid-wrapper" :class="gridLayoutClass">
-        <template v-if="selectedMaps.length > 0">
+        <div v-if="loading" class="empty-map-placeholder is-loading">
+            <Loader2 class="loading-spinner" :size="22" />
+            <span>관제 지도를 불러오는 중입니다...</span>
+        </div>
+        <template v-else-if="selectedMaps.length > 0">
             <SingleMapItemCanvas
                 v-for="mapItem in displayMaps"
                 :key="mapItem.id"
@@ -19,6 +23,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
+import { Loader2 } from '@lucide/vue'
 import SingleMapItemCanvas from './SingleMapItemCanvas.vue'
 import type {
     MonitoringMap,
@@ -30,6 +35,7 @@ const props = defineProps<{
     allRobots: MonitoringRobot[]
     selectedRobotId: number | null
     isIntegratedMode?: boolean
+    loading?: boolean
 }>()
 
 defineEmits<{
@@ -40,7 +46,7 @@ const displayMaps = computed(() => props.selectedMaps.slice(0, 4))
 
 const gridLayoutClass = computed(() => {
     const count = displayMaps.value.length
-    if (count === 1) return 'grid-layout-1'
+    if (count === 0 || count === 1) return 'grid-layout-1'
     if (count === 2) return 'grid-layout-2'
     return 'grid-layout-4'
 })
@@ -73,13 +79,32 @@ const gridLayoutClass = computed(() => {
 }
 
 .empty-map-placeholder {
+    grid-column: 1 / -1;
+    grid-row: 1 / -1;
     display: flex;
     align-items: center;
     justify-content: center;
+    gap: 8px;
+    width: 100%;
     height: 100%;
     background: #080c14;
+    border: 1px solid var(--border-color);
     border-radius: 8px;
     color: #64748b;
-    font-size: 13px;
+    font-size: 14px;
+
+    &.is-loading {
+        color: var(--primary-color);
+    }
+}
+
+.loading-spinner {
+    font-size: 20px;
+    animation: rotating 2s linear infinite;
+}
+
+@keyframes rotating {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
 }
 </style>

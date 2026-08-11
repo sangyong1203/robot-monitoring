@@ -15,6 +15,7 @@
                 :selected-maps="selectedMaps"
                 :all-robots="robots"
                 :selected-robot-id="selectedRobotId"
+                :loading="loading"
                 @select-robot="selectRobot"
             />
 
@@ -67,6 +68,7 @@ import RobotCameraDialog from '@/features/monitoring/components/RobotCameraDialo
 const kind: TypedMonitoringKind = 'WORK'
 
 const snapshot = ref<IntegratedMonitoringSnapshot | null>(null)
+const loading = ref(true)
 const selectedMapIds = ref<number[]>([2])
 const selectedRobotId = ref<number | null>(1)
 
@@ -88,6 +90,8 @@ onMounted(async () => {
         snapshot.value = res.data
     } catch {
         // Fallback
+    } finally {
+        loading.value = false
     }
 
     unsubscribeSim = simulationService.subscribe((updatedRobots) => {

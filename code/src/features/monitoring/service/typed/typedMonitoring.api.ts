@@ -1,6 +1,7 @@
 import { fetchApi } from '@/http'
 import type { IntegratedMonitoringSnapshot } from '../integrated/integratedMonitoring.types'
 import { mockIntegratedSnapshot } from '../integrated/integratedMonitoring.api'
+import { fetchMockMaps } from '@/pages/main/admin/maps/service/maps.mock'
 
 const API_MODE = import.meta.env.VITE_API_MODE || 'mock'
 
@@ -33,8 +34,12 @@ export const getTypedMonitoring = async (kind: TypedMonitoringKind) => {
     if (kind === 'WORK') filteredRobots = mockIntegratedSnapshot.robots.filter(r => r.robotType === 'WORK')
     else if (kind === 'SURVEILLANCE') filteredRobots = mockIntegratedSnapshot.robots.filter(r => r.robotType === 'SURVEILLANCE')
 
+    const activeMaps = await fetchMockMaps({ isActive: true })
+    const snapshotMaps = activeMaps.length > 0 ? activeMaps.map(m => ({ ...m, robots: [] })) : mockIntegratedSnapshot.maps
+
     const snapshotData: IntegratedMonitoringSnapshot = {
         ...mockIntegratedSnapshot,
+        maps: snapshotMaps,
         robots: filteredRobots,
         counts: {
             total: filteredRobots.length,
