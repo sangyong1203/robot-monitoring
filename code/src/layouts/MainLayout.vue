@@ -34,9 +34,7 @@ withDefaults(
     height: 100%;
     display: flex;
     flex-direction: row;
-    background: radial-gradient(circle at 78% 12%, rgba(231, 109, 255, 0.16), transparent 30%),
-        radial-gradient(circle at 18% 84%, rgba(21, 224, 183, 0.08), transparent 34%),
-        linear-gradient(135deg, #0a0d17 0%, #111421 42%, #090b12 100%);
+    background: #090d16;
     overflow: hidden;
 }
 

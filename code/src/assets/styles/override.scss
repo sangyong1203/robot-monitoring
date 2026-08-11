@@ -1035,6 +1035,21 @@
   color: #12021f !important;
 }
 
+/* E-Stop 및 비상 경보 Confirm 팝업 확인 버튼 색상 (#ff8a8a) */
+.el-message-box__btns .el-button--danger,
+.estop-confirm-dialog .el-message-box__btns .el-button--primary,
+.estop-confirm-dialog .el-message-box__btns .el-button--danger {
+  background: #f56c6c !important;
+  color: #ffffff !important;
+}
+
+.el-message-box__btns .el-button--danger:hover,
+.estop-confirm-dialog .el-message-box__btns .el-button--primary:hover,
+.estop-confirm-dialog .el-message-box__btns .el-button--danger:hover {
+  background: #ff8a8a !important;
+  color: #ffffff !important;
+}
+
 .el-select-dropdown__item,
 .el-picker-panel {
   color: var(--text-color--body) !important;
