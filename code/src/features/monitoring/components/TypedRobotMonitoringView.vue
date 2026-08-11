@@ -64,15 +64,23 @@
                     </div>
 
                     <div class="map-zoom-tools">
-                        <el-button-group>
+                        <div class="zoom-btn-group">
                             <el-button size="small" @click="zoomIn"><ZoomIn :size="14" /></el-button>
                             <el-button size="small" @click="zoomOut"><ZoomOut :size="14" /></el-button>
                             <el-button size="small" @click="resetZoom"><RotateCcw :size="14" /></el-button>
-                        </el-button-group>
+                        </div>
                     </div>
                 </div>
 
-                <div class="map-canvas-wrap">
+                <div
+                    class="map-canvas-wrap"
+                    :class="{ 'is-dragging': isDragging }"
+                    @mousedown="startPan"
+                    @mousemove="onPan"
+                    @mouseup="endPan"
+                    @mouseleave="endPan"
+                    @wheel.prevent="onWheel"
+                >
                     <svg
                         class="map-svg"
                         :viewBox="viewBoxString"
@@ -84,18 +92,20 @@
                             </pattern>
                         </defs>
 
-                        <!-- Map Background -->
-                        <rect width="100%" height="100%" fill="#080c14" />
+                        <!-- Map Background Infinite Dark Canvas -->
+                        <rect x="-3000" y="-3000" width="8000" height="8000" fill="#080c14" />
                         <image
                             v-if="mapImageSource && !imageFailed"
                             :href="mapImageSource"
-                            width="100%"
-                            height="100%"
+                            x="0"
+                            y="0"
+                            :width="selectedMap?.width ?? 1200"
+                            :height="selectedMap?.height ?? 800"
                             preserveAspectRatio="none"
-                            opacity="0.6"
+                            opacity="0.8"
                             @error="imageFailed = true"
                         />
-                        <rect width="100%" height="100%" :fill="`url(#${gridId})`" opacity="0.8" />
+                        <rect x="-3000" y="-3000" width="8000" height="8000" :fill="`url(#${gridId})`" opacity="0.6" />
 
                         <!-- Interactive Robot Markers with Pulsing Aura -->
                         <g
@@ -318,6 +328,11 @@ const commandForm = reactive({
     missionId: 1,
 })
 
+const panX = ref(0)
+const panY = ref(0)
+const isDragging = ref(false)
+const dragStart = ref({ x: 0, y: 0 })
+
 const gridId = computed(() => `cyber-grid-${props.kind.toLowerCase()}`)
 const robots = computed(() => snapshot.value?.robots ?? [])
 const selectedRobot = computed(() => robots.value.find(r => r.id === selectedRobotId.value) ?? null)
@@ -329,10 +344,41 @@ const { imageSource: mapImageSource } = useAuthenticatedMapImage(selectedMapImag
 const updatedLabel = computed(() => snapshot.value?.generatedAt ? `수신 시각: ${formatDateTime(snapshot.value.generatedAt)}` : '실시간 수신 중')
 
 const viewBoxString = computed(() => {
-    const w = (selectedMap.value?.width ?? 1200) / zoomLevel.value
-    const h = (selectedMap.value?.height ?? 800) / zoomLevel.value
-    return `-30 -30 ${w + 60} ${h + 60}`
+    const mapW = selectedMap.value?.width ?? 1200
+    const mapH = selectedMap.value?.height ?? 800
+    const w = mapW / zoomLevel.value
+    const h = mapH / zoomLevel.value
+    const x = -30 + panX.value
+    const y = -30 + panY.value
+    return `${x} ${y} ${w + 60} ${h + 60}`
 })
+
+const startPan = (e: MouseEvent) => {
+    if (e.button !== 0) return
+    isDragging.value = true
+    dragStart.value = { x: e.clientX, y: e.clientY }
+}
+
+const onPan = (e: MouseEvent) => {
+    if (!isDragging.value) return
+    const dx = (e.clientX - dragStart.value.x) / zoomLevel.value
+    const dy = (e.clientY - dragStart.value.y) / zoomLevel.value
+    panX.value -= dx
+    panY.value -= dy
+    dragStart.value = { x: e.clientX, y: e.clientY }
+}
+
+const endPan = () => {
+    isDragging.value = false
+}
+
+const onWheel = (e: WheelEvent) => {
+    if (e.deltaY < 0) {
+        if (zoomLevel.value < 3.0) zoomLevel.value += 0.15
+    } else {
+        if (zoomLevel.value > 0.6) zoomLevel.value -= 0.15
+    }
+}
 
 let unsubscribeSim: (() => void) | null = null
 
@@ -364,9 +410,13 @@ const selectRobot = (robot: MonitoringRobot) => {
     selectedMapId.value = robot.mapId
 }
 
-const zoomIn = () => { if (zoomLevel.value < 2.5) zoomLevel.value += 0.25 }
-const zoomOut = () => { if (zoomLevel.value > 0.75) zoomLevel.value -= 0.25 }
-const resetZoom = () => { zoomLevel.value = 1 }
+const zoomIn = () => { if (zoomLevel.value < 3.0) zoomLevel.value += 0.25 }
+const zoomOut = () => { if (zoomLevel.value > 0.6) zoomLevel.value -= 0.25 }
+const resetZoom = () => {
+    zoomLevel.value = 1
+    panX.value = 0
+    panY.value = 0
+}
 
 const markerTransform = (robot: MonitoringRobot) => {
     if (!selectedMap.value) return `translate(${robot.x * 15}, ${robot.y * 15})`
@@ -580,17 +630,19 @@ const submitCommand = async () => {
 
 /* Map Container Panel */
 .map-container-panel {
-    padding: 12px;
     position: relative;
     overflow: hidden;
     height: 100%;
     min-height: 0;
+    box-sizing: border-box;
 
     :deep(.panel__body) {
         display: flex;
         flex-direction: column;
-        height: 100%;
+        flex: 1 1 0%;
+        height: 0;
         min-height: 0;
+        overflow: hidden;
     }
 }
 
@@ -604,25 +656,60 @@ const submitCommand = async () => {
 
 .map-info-tag {
     font-size: 12px;
-    color: #94a3b8;
+    color: var(--text-color--secondary);
 
-    strong { color: #fff; margin: 0 4px; }
-    .map-res { color: #64748b; }
+    strong { color: var(--text-color--white); margin: 0 4px; }
+    .map-res { color: var(--text-color--muted); }
+}
+
+.map-zoom-tools {
+    .zoom-btn-group {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .el-button {
+        background: var(--surface-elevated-color) !important;
+        border-color: var(--border-color) !important;
+        color: var(--text-color--primary) !important;
+        border-radius: 6px !important;
+        margin: 0 !important;
+        transition: all 0.2s ease !important;
+
+        &:hover, &:focus {
+            background: var(--layout-menu-active-bg-color) !important;
+            border-color: var(--primary-color) !important;
+            color: var(--primary-color) !important;
+            box-shadow: 0 0 10px var(--layout-purple-glow-color) !important;
+        }
+    }
 }
 
 .map-canvas-wrap {
-    flex: 1;
+    display: flex;
+    flex: 1 1 0%;
+    width: 100%;
+    height: 0;
+    min-height: 0;
+    min-width: 0;
     border-radius: 8px;
     overflow: hidden;
     background: #080c14;
     position: relative;
-    height: 100%;
-    min-height: 0;
+    cursor: grab;
+    user-select: none;
+
+    &:active, &.is-dragging {
+        cursor: grabbing;
+    }
 }
 
 .map-svg {
     width: 100%;
     height: 100%;
+    max-height: 100%;
+    display: block;
 }
 
 .map-marker-group {
@@ -663,16 +750,18 @@ const submitCommand = async () => {
 
 /* Telemetry Panel */
 .telemetry-panel-panel {
-    padding: 12px;
+    position: relative;
+    overflow: hidden;
     height: 100%;
     min-height: 0;
-    overflow: hidden;
 
     :deep(.panel__body) {
         display: flex;
         flex-direction: column;
-        height: 100%;
+        flex: 1 1 0%;
+        height: 0;
         min-height: 0;
+        overflow: hidden;
     }
 }
 
