@@ -15,37 +15,46 @@
 
                 <div class="hud-metrics">
                     <div class="hud-chip">
-                        <Bot class="chip-icon text-blue" :size="18" />
-                        <span class="chip-label">운영 로봇</span>
+                        <div class="chip-info">
+                            <Bot class="chip-icon text-blue" :size="18" />
+                            <span class="chip-label">운영 로봇</span>
+                        </div>
                         <strong class="chip-val">{{ snapshot?.counts.total ?? 7 }}대</strong>
                     </div>
                     <div class="hud-chip">
-                        <Radio class="chip-icon text-green" :size="18" />
-                        <span class="chip-label">정상 통신</span>
+                        <div class="chip-info">
+                            <Radio class="chip-icon text-green" :size="18" />
+                            <span class="chip-label">정상 통신</span>
+                        </div>
                         <strong class="chip-val text-green">{{ snapshot?.counts.online ?? 6 }}</strong>
                     </div>
                     <div class="hud-chip">
-                        <Zap class="chip-icon text-amber" :size="18" />
-                        <span class="chip-label">통신 지연</span>
+                        <div class="chip-info">
+                            <Zap class="chip-icon text-amber" :size="18" />
+                            <span class="chip-label">통신 지연</span>
+                        </div>
                         <strong class="chip-val text-amber">{{ snapshot?.counts.stale ?? 1 }}</strong>
                     </div>
                     <div class="hud-chip">
-                        <ShieldAlert class="chip-icon text-red" :size="18" />
-                        <span class="chip-label">비상 정지</span>
+                        <div class="chip-info">
+                            <ShieldAlert class="chip-icon text-red" :size="18" />
+                            <span class="chip-label">비상 정지</span>
+                        </div>
                         <strong class="chip-val text-red">0</strong>
                     </div>
                 </div>
 
                 <div class="hud-actions">
-                    <el-select v-model="selectedMapId" class="map-select" placeholder="관제 지도 선택">
-                        <el-option
-                            v-for="map in snapshot?.maps ?? []"
-                            :key="map.id"
-                            :label="map.name"
-                            :value="map.id"
-                        />
-                    </el-select>
-                    <el-button type="danger" class="btn-emergency" @click="openGlobalEmergency">
+                    <DropdownList
+                        v-model="selectedMapId"
+                        :list="snapshot?.maps ?? []"
+                        option-label="name"
+                        option-value="id"
+                        placeholder="관제 지도 선택"
+                        selection-width="220px"
+                        :clearable="false"
+                    />
+                    <el-button type="danger" class="btn-estop-card" @click="openGlobalEmergency">
                         <ShieldAlert :size="16" /> 전체 E-STOP (일괄 정지)
                     </el-button>
                 </div>
@@ -173,18 +182,16 @@
                             />
                         </div>
 
-                        <!-- Battery Progress Bar -->
+                        <!-- Battery Progress Bar (Single Line) -->
                         <div class="battery-meter">
-                            <div class="meter-info">
-                                <span>배터리 잔량</span>
-                                <strong>{{ robot.batteryPercent }}%</strong>
-                            </div>
+                            <span class="meter-label">배터리</span>
                             <div class="meter-bar-track">
                                 <div
                                     class="meter-bar-fill"
                                     :style="{ width: `${robot.batteryPercent}%`, background: batteryGradient(robot.batteryPercent) }"
                                 ></div>
                             </div>
+                            <strong class="meter-val">{{ robot.batteryPercent }}%</strong>
                         </div>
 
                         <!-- Digital Coordinate Readout -->
@@ -579,7 +586,9 @@ const submitCommand = async () => {
 }
 
 .hud-subtitle {
+    display: inline-block;
     font-size: 12px;
+    width: 180px;
     color: #94a3b8;
 }
 
@@ -591,13 +600,21 @@ const submitCommand = async () => {
 .hud-chip {
     display: flex;
     align-items: center;
+    justify-content: space-between;
     gap: 6px;
     padding: 6px 12px;
     background: #182238;
     border: 1px solid #283654;
     border-radius: 8px;
+    width: 130px;
 
-    .chip-label { font-size: 11px; color: #cbd5e1; }
+    .chip-info {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .chip-label { font-size: 12px; color: #cbd5e1; }
     .chip-val { font-size: 15px; font-weight: 700; color: #ffffff; }
 
     .text-green { color: #22c55e; }
@@ -614,9 +631,6 @@ const submitCommand = async () => {
 
 .map-select { width: 170px; }
 
-.btn-emergency {
-    font-weight: 700;
-}
 
 /* Main Grid */
 .cyber-grid {
@@ -781,7 +795,7 @@ const submitCommand = async () => {
     background: var(--surface-elevated-color);
     border: 1px solid var(--border-color);
     border-radius: 10px;
-    padding: 14px;
+    padding: 10px 12px;
     cursor: pointer;
     transition: all 0.2s ease;
 
@@ -800,7 +814,7 @@ const submitCommand = async () => {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 10px;
+    margin-bottom: 6px;
 }
 
 .robot-identity {
@@ -811,7 +825,7 @@ const submitCommand = async () => {
 
 .robot-type-tag {
     font-size: 10px;
-    padding: 2px 6px;
+    padding: 1px 5px;
     background: var(--surface-muted-color);
     border: 1px solid var(--border-color);
     border-radius: 4px;
@@ -820,27 +834,27 @@ const submitCommand = async () => {
 }
 
 .robot-card-title {
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 700;
     color: var(--text-color--primary);
 }
 
 /* Battery Meter */
 .battery-meter {
-    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 6px;
 
-    .meter-info {
-        display: flex;
-        justify-content: space-between;
+    .meter-label {
         font-size: 11px;
         color: var(--text-color--secondary);
-        margin-bottom: 4px;
-
-        strong { color: var(--text-color--white); }
+        white-space: nowrap;
     }
 
     .meter-bar-track {
-        height: 6px;
+        flex: 1;
+        height: 5px;
         background: var(--surface-color);
         border-radius: 3px;
         overflow: hidden;
@@ -850,26 +864,35 @@ const submitCommand = async () => {
         height: 100%;
         transition: width 0.3s ease;
     }
+
+    .meter-val {
+        font-size: 11px;
+        color: var(--text-color--white);
+        white-space: nowrap;
+        min-width: 28px;
+        text-align: right;
+    }
 }
 
 /* Digital Coords */
 .digital-coords {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
     gap: 6px;
     background: var(--surface-color);
     border: 1px solid var(--border-color);
-    padding: 6px 8px;
+    padding: 4px 8px;
     border-radius: 6px;
-    margin-bottom: 10px;
+    margin-bottom: 8px;
 
     .coord-cell {
         display: flex;
-        flex-direction: column;
         align-items: center;
+        gap: 3px;
 
         span { font-size: 10px; color: var(--text-color--muted); }
-        strong { font-size: 12px; color: var(--secondary-color); font-family: monospace; font-weight: 700; }
+        strong { font-size: 11px; color: var(--secondary-color); font-family: monospace; font-weight: 700; }
     }
 }
 
@@ -880,7 +903,8 @@ const submitCommand = async () => {
     .el-button {
         flex: 1;
         font-size: 11px;
-        padding: 4px 8px;
+        height: 26px !important;
+        padding: 4px !important;
     }
 }
 
