@@ -15,10 +15,16 @@ export const routes: RouteRecordRaw[] = [
     },
     {
         path: '/',
-        redirect: { name: 'organizations' },
+        redirect: { name: 'dashboard' },
         name: 'main',
         component: () => import('@/pages/main/MainPage.vue'),
         children: [
+            {
+                path: 'dashboard',
+                name: 'dashboard',
+                component: () => import('@/pages/main/dashboard/DashboardPage.vue'),
+                meta: { screenId: 'IRCS_DB_01_P', title: '통합 관제 대시보드' },
+            },
             {
                 path: 'admin/organizations',
                 alias: ['settings/institutions'],
@@ -60,6 +66,36 @@ export const routes: RouteRecordRaw[] = [
                 name: 'operatingRobots',
                 component: () => import('@/pages/main/admin/operatingRobots/OperatingRobotManagementPage.vue'),
                 meta: { screenId: 'IRCS_RM_02_P' },
+            },
+            {
+                path: 'monitoring/integrated',
+                name: 'integratedMonitoring',
+                component: () => import('@/pages/main/monitoring/IntegratedMonitoringPage.vue'),
+                meta: { screenId: 'IRCS_MC_01_P', title: '통합 관제 모니터링' },
+            },
+            {
+                path: 'monitoring/work',
+                name: 'workMonitoring',
+                component: () => import('@/pages/main/monitoring/WorkRobotMonitoringPage.vue'),
+                meta: { screenId: 'IRCS_MC_02_P', title: '작업 로봇 관제' },
+            },
+            {
+                path: 'monitoring/surveillance',
+                name: 'surveillanceMonitoring',
+                component: () => import('@/pages/main/monitoring/SurveillanceRobotMonitoringPage.vue'),
+                meta: { screenId: 'IRCS_MC_03_P', title: '감시 로봇 관제' },
+            },
+            {
+                path: 'robot-control',
+                name: 'robotControl',
+                component: () => import('@/pages/main/robotControl/RobotControlPage.vue'),
+                meta: { screenId: 'IRCS_RC_01_P', title: '로봇 제어 및 스케줄' },
+            },
+            {
+                path: 'admin/missions',
+                name: 'missions',
+                component: () => import('@/pages/main/admin/missions/MissionManagementPage.vue'),
+                meta: { screenId: 'IRCS_MS_01_P', title: '미션 및 임무 관리' },
             },
         ],
     },

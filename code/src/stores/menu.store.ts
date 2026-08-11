@@ -18,6 +18,15 @@ export type Menu = {
 
 const KORAD_MENUS: Menu[] = [
     {
+        id: 10,
+        parentId: 0,
+        title: '통합 관제 대시보드',
+        path: '/dashboard',
+        icon: 'IconMonitoring',
+        useYn: 'Y',
+        children: [],
+    },
+    {
         id: 90,
         parentId: 0,
         title: '시스템 설정',
@@ -65,6 +74,24 @@ const KORAD_MENUS: Menu[] = [
             { id: 22, parentId: 20, title: '작업 로봇 관제', path: '/monitoring/work', icon: 'IconDevice', useYn: 'Y', children: [] },
             { id: 23, parentId: 20, title: '감시 로봇 관제', path: '/monitoring/surveillance', icon: 'IconDevice', useYn: 'Y', children: [] },
         ],
+    },
+    {
+        id: 30,
+        parentId: 0,
+        title: '로봇 제어 & 스케줄',
+        path: '/robot-control',
+        icon: 'IconDeviceManagement',
+        useYn: 'Y',
+        children: [],
+    },
+    {
+        id: 40,
+        parentId: 0,
+        title: '미션 및 임무 관리',
+        path: '/admin/missions',
+        icon: 'IconSetting',
+        useYn: 'Y',
+        children: [],
     },
 ]
 
