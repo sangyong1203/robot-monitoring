@@ -78,7 +78,7 @@ const KORAD_MENUS: Menu[] = [
     {
         id: 30,
         parentId: 0,
-        title: '로봇 제어 & 스케줄',
+        title: '로봇 제어',
         path: '/robot-control',
         icon: 'IconDeviceManagement',
         useYn: 'Y',

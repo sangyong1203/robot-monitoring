@@ -6,6 +6,8 @@ export type ActivityItem = {
     code: string
     activityType: ActivityType
     targetRobotModelId?: number
+    destinationId?: number
+    destinationName?: string
     description?: string
     createdAt: string
 }
@@ -16,6 +18,8 @@ export type TaskItem = {
     code: string
     robotModelId: number
     robotModelName: string
+    destinationId?: number
+    destinationName?: string
     activities: {
         sequence: number
         activityId: number
@@ -48,5 +52,20 @@ export type MissionItem = {
     }[]
     conditions: MissionCondition[]
     status: 'ACTIVE' | 'INACTIVE'
+    createdAt: string
+}
+
+export type ScheduleItem = {
+    id: number
+    code: string
+    name: string
+    missionId: number
+    missionName: string
+    robotId?: number
+    robotName?: string
+    cronExpression: string
+    scheduleType: 'DAILY' | 'HOURLY' | 'WEEKLY' | 'CUSTOM'
+    nextRunAt: string
+    isActive: boolean
     createdAt: string
 }

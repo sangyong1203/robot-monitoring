@@ -1,5 +1,5 @@
 import { fetchApi } from '@/http'
-import type { ActivityItem, TaskItem, MissionItem } from './missionManagement.types'
+import type { ActivityItem, TaskItem, MissionItem, ScheduleItem } from './missionManagement.types'
 
 const API_MODE = import.meta.env.VITE_API_MODE || 'mock'
 
@@ -9,6 +9,8 @@ export const mockActivities: ActivityItem[] = [
         name: '폐기물 팰릿 상차',
         code: 'ACT-PICK-PALLET-01',
         activityType: 'PICK',
+        destinationId: 1,
+        destinationName: '무인지게차 팰릿 상차지점 A',
         description: '무인지게차 폐기물 팰릿 상차 작업',
         createdAt: '2026-08-01 10:00:00',
     },
@@ -17,6 +19,8 @@ export const mockActivities: ActivityItem[] = [
         name: 'AMR 팰릿 하차 및 교대',
         code: 'ACT-PLACE-AMR-01',
         activityType: 'PLACE',
+        destinationId: 2,
+        destinationName: 'AMR 1호기 교대 대기위치',
         description: '무인지게차 AMR 1호기 상면 하차',
         createdAt: '2026-08-01 10:05:00',
     },
@@ -25,6 +29,8 @@ export const mockActivities: ActivityItem[] = [
         name: '처분용기 앞 이동',
         code: 'ACT-MOVE-DISPOSAL-01',
         activityType: 'MOVE',
+        destinationId: 3,
+        destinationName: '산업용 로봇 드럼 정밀 장입위치',
         description: 'AMR 1호기 처분용기 전면 이동',
         createdAt: '2026-08-01 10:10:00',
     },
@@ -33,6 +39,8 @@ export const mockActivities: ActivityItem[] = [
         name: '드럼 처분용기 정밀 장입',
         code: 'ACT-INSERT-DRUM-01',
         activityType: 'PLACE',
+        destinationId: 3,
+        destinationName: '산업용 로봇 드럼 정밀 장입위치',
         description: '산업용 로봇 팰릿 위 드럼 장입',
         createdAt: '2026-08-01 10:15:00',
     },
@@ -41,6 +49,8 @@ export const mockActivities: ActivityItem[] = [
         name: '외곽 험지 순찰',
         code: 'ACT-PATROL-SURVEILLANCE-01',
         activityType: 'INSPECT',
+        destinationId: 5,
+        destinationName: '외곽 침입 감시 웨이포인트 #1',
         description: '4족 보행 로봇 외곽 험지 감시',
         createdAt: '2026-08-01 10:20:00',
     },
@@ -53,9 +63,11 @@ export const mockTasks: TaskItem[] = [
         code: 'TASK-FORKLIFT-LOAD-01',
         robotModelId: 1,
         robotModelName: '무인지게차',
+        destinationId: 1,
+        destinationName: '무인지게차 팰릿 상차지점 A',
         activities: [
-            { sequence: 1, activityId: 1, activityName: '폐기물 팰릿 상차', destinationName: '폐기물 보관소 A' },
-            { sequence: 2, activityId: 2, activityName: 'AMR 팰릿 하차 및 교대', destinationName: 'AMR 대기구간 1' },
+            { sequence: 1, activityId: 1, activityName: '폐기물 팰릿 상차', destinationName: '무인지게차 팰릿 상차지점 A' },
+            { sequence: 2, activityId: 2, activityName: 'AMR 팰릿 하차 및 교대', destinationName: 'AMR 1호기 교대 대기위치' },
         ],
         description: '무인지게차 팰릿 상차 및 AMR 하차 Task',
         createdAt: '2026-08-01 11:00:00',
@@ -66,8 +78,10 @@ export const mockTasks: TaskItem[] = [
         code: 'TASK-AMR1-TRANSPORT-01',
         robotModelId: 2,
         robotModelName: '저상형 AMR',
+        destinationId: 3,
+        destinationName: '산업용 로봇 드럼 정밀 장입위치',
         activities: [
-            { sequence: 1, activityId: 3, activityName: '처분용기 앞 이동', destinationName: '처분용기 장입구' },
+            { sequence: 1, activityId: 3, activityName: '처분용기 앞 이동', destinationName: '산업용 로봇 드럼 정밀 장입위치' },
         ],
         description: 'AMR 1호기 처분용기 운반 Task',
         createdAt: '2026-08-01 11:05:00',
@@ -78,8 +92,10 @@ export const mockTasks: TaskItem[] = [
         code: 'TASK-ROBOT-INSERT-01',
         robotModelId: 4,
         robotModelName: '산업용 로봇',
+        destinationId: 3,
+        destinationName: '산업용 로봇 드럼 정밀 장입위치',
         activities: [
-            { sequence: 1, activityId: 4, activityName: '드럼 처분용기 정밀 장입', destinationName: '장입셀 #1' },
+            { sequence: 1, activityId: 4, activityName: '드럼 처분용기 정밀 장입', destinationName: '산업용 로봇 드럼 정밀 장입위치' },
         ],
         description: '산업용 로봇 드럼 정밀 장입 Task',
         createdAt: '2026-08-01 11:10:00',
@@ -119,6 +135,37 @@ export const mockMissions: MissionItem[] = [
     },
 ]
 
+export const mockSchedules: ScheduleItem[] = [
+    {
+        id: 1,
+        code: 'SCHED-DAILY-01',
+        name: '매일 오전 방사성 폐기물 자동 이송 및 장입 미션',
+        missionId: 1,
+        missionName: '[융합] 폐기물 이송 및 처분용기 자동 장입 복합 미션',
+        robotId: 1,
+        robotName: '무인지게차 1호기 (통합 제어)',
+        cronExpression: '매일 09:00',
+        scheduleType: 'DAILY',
+        nextRunAt: '2026-08-12 09:00:00',
+        isActive: true,
+        createdAt: '2026-08-05 10:00:00',
+    },
+    {
+        id: 2,
+        code: 'SCHED-HOURLY-01',
+        name: '2시간 간격 Spot 험지 순찰 스케줄',
+        missionId: 1,
+        missionName: '[융합] 폐기물 이송 및 처분용기 자동 장입 복합 미션',
+        robotId: 5,
+        robotName: '4족 보행 로봇 1호기 (Spot)',
+        cronExpression: '매 2시간 마다',
+        scheduleType: 'HOURLY',
+        nextRunAt: '2026-08-11 18:00:00',
+        isActive: true,
+        createdAt: '2026-08-06 14:00:00',
+    },
+]
+
 export const getActivities = async () => {
     if (API_MODE === 'mock') return { data: mockActivities }
     return fetchApi().get<ActivityItem[]>('/api/v1/missions/activities')
@@ -132,4 +179,9 @@ export const getTasks = async () => {
 export const getMissions = async () => {
     if (API_MODE === 'mock') return { data: mockMissions }
     return fetchApi().get<MissionItem[]>('/api/v1/missions')
+}
+
+export const getSchedules = async () => {
+    if (API_MODE === 'mock') return { data: mockSchedules }
+    return fetchApi().get<ScheduleItem[]>('/api/v1/missions/schedules')
 }

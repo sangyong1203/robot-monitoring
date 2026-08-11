@@ -89,7 +89,7 @@ export const routes: RouteRecordRaw[] = [
                 path: 'robot-control',
                 name: 'robotControl',
                 component: () => import('@/pages/main/robotControl/RobotControlPage.vue'),
-                meta: { screenId: 'IRCS_RC_01_P', title: '로봇 제어 및 스케줄' },
+                meta: { screenId: 'IRCS_RC_01_P', title: '로봇 제어' },
             },
             {
                 path: 'admin/missions',
