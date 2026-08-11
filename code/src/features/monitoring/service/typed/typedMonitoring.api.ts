@@ -36,6 +36,14 @@ export const getTypedMonitoring = async (kind: TypedMonitoringKind) => {
     const snapshotData: IntegratedMonitoringSnapshot = {
         ...mockIntegratedSnapshot,
         robots: filteredRobots,
+        counts: {
+            total: filteredRobots.length,
+            online: filteredRobots.filter(r => r.communicationStatus === 'ONLINE').length,
+            stale: filteredRobots.filter(r => r.communicationStatus === 'STALE').length,
+            offline: filteredRobots.filter(r => r.communicationStatus === 'OFFLINE').length,
+            work: filteredRobots.filter(r => r.robotType === 'WORK').length,
+            surveillance: filteredRobots.filter(r => r.robotType === 'SURVEILLANCE').length,
+        },
     }
 
     if (API_MODE === 'mock') {
