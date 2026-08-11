@@ -353,11 +353,11 @@ const updatedLabel = computed(() => snapshot.value?.generatedAt ? `수신 시각
 const viewBoxString = computed(() => {
     const mapW = selectedMap.value?.width ?? 1200
     const mapH = selectedMap.value?.height ?? 800
-    const w = mapW / zoomLevel.value
-    const h = mapH / zoomLevel.value
-    const x = -30 + panX.value
-    const y = -30 + panY.value
-    return `${x} ${y} ${w + 60} ${h + 60}`
+    const viewW = mapW / zoomLevel.value
+    const viewH = mapH / zoomLevel.value
+    const minX = (mapW - viewW) / 2 - 30 + panX.value
+    const minY = (mapH - viewH) / 2 - 30 + panY.value
+    return `${minX} ${minY} ${viewW + 60} ${viewH + 60}`
 })
 
 const startPan = (e: MouseEvent) => {
