@@ -27,6 +27,8 @@ export type RobotRegistration = {
     batteryPercent: number
     x: number
     y: number
+    siteX?: number
+    siteY?: number
     heading: number
     status?: string
     lastSeenAt?: string | null

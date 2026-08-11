@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="800" viewBox="0 0 1400 800">
+    <style>
+        .bg { fill: #080c14; }
+        .grid { stroke: #1e293b; stroke-width: 1; stroke-dasharray: 4 4; }
+        .wall { fill: rgba(245, 158, 11, 0.04); stroke: #f59e0b; stroke-width: 3; }
+        .chamber { fill: rgba(15, 23, 42, 0.8); stroke: #d97706; stroke-width: 1.5; }
+        .conveyor { fill: none; stroke: #f59e0b; stroke-width: 3; stroke-dasharray: 8 4; }
+        .title { fill: #f59e0b; font-family: sans-serif; font-size: 18px; font-weight: 700; }
+        .sub { fill: #94a3b8; font-family: sans-serif; font-size: 13px; }
+    </style>
+
+    <rect class="bg" width="1400" height="800" />
+    
+    <g class="grid">
+        <line x1="200" y1="0" x2="200" y2="800" /><line x1="400" y1="0" x2="400" y2="800" />
+        <line x1="600" y1="0" x2="600" y2="800" /><line x1="800" y1="0" x2="800" y2="800" />
+        <line x1="1000" y1="0" x2="1000" y2="800" /><line x1="1200" y1="0" x2="1200" y2="800" />
+        <line x1="0" y1="200" x2="1400" y2="200" /><line x1="0" y1="400" x2="1400" y2="400" />
+        <line x1="0" y1="600" x2="1400" y2="600" />
+    </g>
+
+    <!-- Outer Building Shell (Zone B) -->
+    <rect class="wall" x="40" y="40" width="1320" height="720" rx="8" />
+
+    <!-- Title Header -->
+    <text class="title" x="70" y="80">ZONE B : 방사성 폐기물 인수검사동 2D 도면</text>
+    <text class="sub" x="70" y="105">구역 비례 크기: 1400 x 800 | 산업용 장입 로봇 1호기 인수검사 및 장입 셀</text>
+
+    <!-- Inspection Chambers -->
+    <rect class="chamber" x="80" y="140" width="560" height="300" rx="6" />
+    <text class="title" x="100" y="180" font-size="15">인수 검사 1차 체임버 (Inspection Chamber A)</text>
+    <text class="sub" x="100" y="205">폐기물 드럼 표면 방사선량 자동 측정 라인</text>
+
+    <rect class="chamber" x="680" y="140" width="640" height="300" rx="6" />
+    <text class="title" x="700" y="180" font-size="15">산업용 장입 로봇 작업 셀 (Robot Cell 1)</text>
+    <text class="sub" x="700" y="205">고정밀 매니퓰레이터 장입 작업 구역</text>
+
+    <!-- Conveyor Track -->
+    <path class="conveyor" d="M 120,290 L 1240,290" />
+    <text class="sub" x="120" y="275" fill="#f59e0b">자동 이송 컨베이어 벨트 라인</text>
+
+    <!-- Control Desk -->
+    <rect class="chamber" x="80" y="480" width="1240" height="240" rx="6" />
+    <text class="title" x="100" y="520" font-size="15">현장 비상 통제실 &amp; 차폐 검사 베이</text>
+    <text class="sub" x="100" y="545">안전 엑스레이 비파괴 검사 디바이스</text>
+</svg>

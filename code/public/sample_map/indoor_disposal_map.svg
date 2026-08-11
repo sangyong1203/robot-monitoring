@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="800" viewBox="0 0 1400 800">
+    <style>
+        .bg { fill: #080c14; }
+        .grid { stroke: #1e293b; stroke-width: 1; stroke-dasharray: 4 4; }
+        .wall { fill: rgba(56, 189, 248, 0.04); stroke: #38bdf8; stroke-width: 3; }
+        .bay { fill: rgba(15, 23, 42, 0.8); stroke: #0284c7; stroke-width: 1.5; }
+        .track { fill: none; stroke: #38bdf8; stroke-width: 2; stroke-dasharray: 6 4; }
+        .title { fill: #38bdf8; font-family: sans-serif; font-size: 18px; font-weight: 700; }
+        .sub { fill: #94a3b8; font-family: sans-serif; font-size: 13px; }
+        .badge { fill: #0284c7; font-family: sans-serif; font-size: 12px; font-weight: 700; }
+    </style>
+
+    <rect class="bg" width="1400" height="800" />
+    
+    <g class="grid">
+        <line x1="200" y1="0" x2="200" y2="800" /><line x1="400" y1="0" x2="400" y2="800" />
+        <line x1="600" y1="0" x2="600" y2="800" /><line x1="800" y1="0" x2="800" y2="800" />
+        <line x1="1000" y1="0" x2="1000" y2="800" /><line x1="1200" y1="0" x2="1200" y2="800" />
+        <line x1="0" y1="200" x2="1400" y2="200" /><line x1="0" y1="400" x2="1400" y2="400" />
+        <line x1="0" y1="600" x2="1400" y2="600" />
+    </g>
+
+    <!-- Outer Building Shell (Zone A) -->
+    <rect class="wall" x="40" y="40" width="1320" height="720" rx="8" />
+
+    <!-- Title Header -->
+    <text class="title" x="70" y="80">ZONE A : 처분용기 장입 실내 1층 2D 도면</text>
+    <text class="sub" x="70" y="105">구역 비례 크기: 1400 x 800 | 무인지게차 1호기, AMR 1호기, AMR 2호기 전용 이송 작업장</text>
+
+    <!-- Layout Bays -->
+    <rect class="bay" x="80" y="140" width="380" height="260" rx="6" />
+    <text class="title" x="100" y="180" font-size="15">하역 및 입고 베이 (Loading Bay 1)</text>
+    <text class="sub" x="100" y="205">무인지게차 고정 이송 반입구</text>
+
+    <rect class="bay" x="490" y="140" width="380" height="260" rx="6" />
+    <text class="title" x="510" y="180" font-size="15">처분용기 장입 구역 (Loading Bay 2)</text>
+    <text class="sub" x="510" y="205">크레인 연동 수직 장입셀</text>
+
+    <rect class="bay" x="900" y="140" width="420" height="580" rx="6" />
+    <text class="title" x="920" y="180" font-size="15">AMR 자동 스테이징 &amp; 충전 센터</text>
+    <text class="sub" x="920" y="205">급속 충전 스테이션 Dock 1~4</text>
+    <rect x="940" y="240" width="340" height="80" fill="rgba(56,189,248,0.1)" stroke="#38bdf8" rx="4" />
+    <text class="sub" x="960" y="285" fill="#38bdf8">AMR-01 / AMR-02 듀얼 자동 충전 패드</text>
+
+    <!-- AMR Automated Track -->
+    <path class="track" d="M 120,480 L 840,480 L 840,680 L 120,680 Z" />
+    <text class="sub" x="120" y="465" fill="#38bdf8">AMR 고속 자율주행 이송 루프 Track (140m)</text>
+</svg>

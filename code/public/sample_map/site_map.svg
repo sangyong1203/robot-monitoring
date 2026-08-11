@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="800" viewBox="0 0 1600 800">
+    <style>
+        .bg { fill: #080c14; }
+        .grid { stroke: #1e293b; stroke-width: 1; stroke-dasharray: 4 4; }
+        .border { stroke: #334155; stroke-width: 2; fill: none; }
+        .zone-a { fill: rgba(56, 189, 248, 0.06); stroke: #38bdf8; stroke-width: 2; }
+        .zone-b { fill: rgba(245, 158, 11, 0.06); stroke: #f59e0b; stroke-width: 2; }
+        .zone-c { fill: rgba(34, 197, 94, 0.06); stroke: #22c55e; stroke-width: 2; }
+        .road { fill: none; stroke: #475569; stroke-width: 20; stroke-linejoin: round; }
+        .road-line { fill: none; stroke: #cbd5e1; stroke-width: 2; stroke-dasharray: 8 6; }
+        .title { fill: #f8fafc; font-family: sans-serif; font-size: 16px; font-weight: 700; }
+        .sub { fill: #94a3b8; font-family: sans-serif; font-size: 12px; }
+        .gate { fill: #0f172a; stroke: #3b82f6; stroke-width: 2; }
+    </style>
+
+    <!-- Background -->
+    <rect class="bg" width="1600" height="800" />
+    
+    <!-- Grid -->
+    <g class="grid">
+        <line x1="200" y1="0" x2="200" y2="800" /><line x1="400" y1="0" x2="400" y2="800" />
+        <line x1="600" y1="0" x2="600" y2="800" /><line x1="800" y1="0" x2="800" y2="800" />
+        <line x1="1000" y1="0" x2="1000" y2="800" /><line x1="1200" y1="0" x2="1200" y2="800" />
+        <line x1="1400" y1="0" x2="1400" y2="800" />
+        <line x1="0" y1="200" x2="1600" y2="200" /><line x1="0" y1="400" x2="1600" y2="400" />
+        <line x1="0" y1="600" x2="1600" y2="600" />
+    </g>
+
+    <!-- Outer Perimeter Frame -->
+    <rect class="border" x="20" y="20" width="1560" height="760" rx="8" />
+
+    <!-- Connecting Roadway System -->
+    <path class="road" d="M 800,760 L 800,450 L 410,450 L 410,250 M 800,450 L 1190,450 L 1190,250" />
+    <path class="road-line" d="M 800,760 L 800,450 L 410,450 L 410,250 M 800,450 L 1190,450 L 1190,250" />
+
+    <!-- ZONE A: Indoor Disposal Hall (Top-Left) -->
+    <g>
+        <rect class="zone-a" x="60" y="60" width="700" height="360" rx="6" />
+        <text class="title" x="80" y="95" fill="#38bdf8">ZONE A : 실내 처분용기 장입동</text>
+        <text class="sub" x="80" y="115">규격: 1400 x 800m · 무인지게차 및 AMR 이송 작업 구역</text>
+        <!-- Inner Details -->
+        <rect x="90" y="140" width="300" height="240" fill="none" stroke="#38bdf8" stroke-width="1.5" stroke-dasharray="4 2" />
+        <text class="sub" x="100" y="165">하역 및 이송 베이 (Bay 1~2)</text>
+        <rect x="420" y="140" width="310" height="240" fill="none" stroke="#38bdf8" stroke-width="1.5" stroke-dasharray="4 2" />
+        <text class="sub" x="430" y="165">무인 AMR 자동 스테이징 셀</text>
+    </g>
+
+    <!-- ZONE B: Inspection Building (Top-Right) -->
+    <g>
+        <rect class="zone-b" x="840" y="60" width="700" height="360" rx="6" />
+        <text class="title" x="860" y="95" fill="#f59e0b">ZONE B : 방사성 폐기물 인수검사동</text>
+        <text class="sub" x="860" y="115">규격: 1400 x 800m · 산업용 장입 로봇 인수검사 구역</text>
+        <!-- Inner Details -->
+        <rect x="870" y="140" width="320" height="240" fill="none" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="4 2" />
+        <text class="sub" x="880" y="165">인수 검사 1차 체임버</text>
+        <rect x="1210" y="140" width="310" height="240" fill="none" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="4 2" />
+        <text class="sub" x="1220" y="165">산업용 로봇 장입 자동화 셀</text>
+    </g>
+
+    <!-- ZONE C: Outdoor Patrol Zone (Bottom) -->
+    <g>
+        <rect class="zone-c" x="60" y="480" width="1480" height="240" rx="6" />
+        <text class="title" x="80" y="515" fill="#22c55e">ZONE C : 외곽 시설물 경계 감시 구역</text>
+        <text class="sub" x="80" y="535">규격: 1600 x 500m · 편심, Spot 4족 보행, 실외 자율주행 순찰 전용 구역</text>
+        <!-- Inner Details -->
+        <path d="M 80,570 L 1520,570 M 80,650 L 1520,650" stroke="#22c55e" stroke-width="1.5" stroke-dasharray="6 4" fill="none" />
+        <text class="sub" x="80" y="560">외곽 경계 순찰로 Waypoint Alpha ~ Delta</text>
+    </g>
+
+    <!-- MAIN GATE -->
+    <rect class="gate" x="730" y="740" width="140" height="38" rx="4" />
+    <text class="title" x="755" y="765" font-size="13">MAIN GATE</text>
+</svg>

@@ -41,7 +41,7 @@
                     y="0"
                     :width="map.width"
                     :height="map.height"
-                    preserveAspectRatio="xMidYMid meet"
+                    preserveAspectRatio="none"
                     opacity="0.85"
                     @error="imageFailed = true"
                 />
@@ -79,7 +79,7 @@
                     <g transform="translate(24, -10)" class="marker-label-box">
                         <rect x="-4" y="-12" width="130" height="34" rx="4" fill="rgba(15, 23, 42, 0.85)" stroke="rgba(255,255,255,0.15)" stroke-width="1" />
                         <text x="0" y="4" class="marker-name">{{ robot.name }}</text>
-                        <text x="0" y="18" class="marker-status">
+                        <text x="0" y="20" class="marker-status">
                             {{ robot.batteryPercent }}% · {{ statusLabel(robot.status) }}
                         </text>
                     </g>
@@ -123,9 +123,12 @@ const gridPatternId = computed(() => `grid-pattern-${props.map.id}`)
 const mapImageUrl = computed(() => props.map.imageUrl ?? '')
 const { imageSource: mapImageSource } = useAuthenticatedMapImage(mapImageUrl)
 
+// Check if this map is the global Site Map
+const isSiteMap = computed(() => props.map.code === 'MAP-SITE-01')
+
 // Robots displayed on this map
 const displayRobots = computed(() => {
-    if (props.isIntegratedMode && props.map.code === 'MAP-SITE-01') {
+    if (isSiteMap.value) {
         return props.allRobots
     }
     return props.allRobots.filter(r => r.mapId === props.map.id)
@@ -177,7 +180,9 @@ const resetZoom = () => {
 }
 
 const markerTransform = (robot: MonitoringRobot) => {
-    const point = worldToPixel({ x: robot.x, y: robot.y }, props.map)
+    const targetX = isSiteMap.value ? (robot.siteX ?? robot.x) : robot.x
+    const targetY = isSiteMap.value ? (robot.siteY ?? robot.y) : robot.y
+    const point = worldToPixel({ x: targetX, y: targetY }, props.map)
     return `translate(${point.pixel_x}, ${point.pixel_y})`
 }
 
@@ -298,12 +303,12 @@ const statusLabel = (status?: string) => {
 
 .marker-name {
     fill: #fff;
-    font-size: 12px;
+    font-size: 14px;
     font-weight: 700;
 }
 
 .marker-status {
-    fill: #94a3b8;
-    font-size: 10px;
+    fill: #cdcecf;
+    font-size: 12px;
 }
 </style>
