@@ -206,7 +206,7 @@
                             <el-button size="small" type="primary" plain @click.stop="openControlDialogWithRobot(robot)">
                                 수동 제어
                             </el-button>
-                            <el-button size="small" type="info" plain @click.stop="openCameraModal(robot)">
+                            <el-button size="small" type="primary" plain @click.stop="openCameraModal(robot)">
                                 <Camera :size="13" /> 카메라
                             </el-button>
                             <el-button size="small" type="danger" class="btn-estop-card" @click.stop="triggerRobotEStop(robot)">
