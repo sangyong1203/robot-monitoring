@@ -2,8 +2,8 @@
     <BaseDialog
         :model-value="modelValue"
         :title="isEdit ? '목적지 정보 수정' : '신규 목적지 등록'"
-        description="지도 상의 로봇 이동 및 작업 좌표(X, Y)와 방향(Heading)을 등록합니다."
-        width="600px"
+        description="지도 상의 로봇 이동 및 작업 좌표(X, Y)와 방향(Heading) 및 종합 배치도 연동 좌표를 지정합니다."
+        width="660px"
         :buttonTypes="['Cancel', 'Save']"
         @update:model-value="val => emit('update:modelValue', val)"
         @onSave="handleSave"
@@ -27,16 +27,32 @@
                 </el-select>
             </el-form-item>
 
-            <el-form-item label="소속 지도 명칭">
+            <el-form-item label="적용 대상 로봇">
+                <el-select v-model="form.targetRobotType" style="width: 100%">
+                    <el-option label="전체 로봇 공용 (ALL)" value="ALL" />
+                    <el-option label="작업 로봇 전용 (WORK)" value="WORK" />
+                    <el-option label="감시 로봇 전용 (SURVEILLANCE)" value="SURVEILLANCE" />
+                </el-select>
+            </el-form-item>
+
+            <el-form-item label="소속 지도 명칭" style="grid-column: span 2">
                 <el-input :model-value="mapName" disabled />
             </el-form-item>
 
-            <el-form-item label="X 좌표 (미터)" prop="x">
+            <el-form-item label="구역 지도 X 좌표 (m)" prop="x">
                 <el-input-number v-model="form.x" :precision="2" :step="0.5" style="width: 100%" />
             </el-form-item>
 
-            <el-form-item label="Y 좌표 (미터)" prop="y">
+            <el-form-item label="구역 지도 Y 좌표 (m)" prop="y">
                 <el-input-number v-model="form.y" :precision="2" :step="0.5" style="width: 100%" />
+            </el-form-item>
+
+            <el-form-item label="종합 배치도 X 좌표 (siteX)">
+                <el-input-number v-model="form.siteX" :precision="2" :step="0.5" placeholder="자동/오버라이드" style="width: 100%" />
+            </el-form-item>
+
+            <el-form-item label="종합 배치도 Y 좌표 (siteY)">
+                <el-input-number v-model="form.siteY" :precision="2" :step="0.5" placeholder="자동/오버라이드" style="width: 100%" />
             </el-form-item>
 
             <el-form-item label="방향 각도 Heading (0°~360°)" prop="heading" style="grid-column: span 2">
@@ -55,7 +71,7 @@ import { reactive, ref, watch } from 'vue'
 import { ElMessage } from 'element-plus'
 import BaseDialog from '@/components/BaseDialog.vue'
 import { saveDestination } from '../service/destinations.api'
-import type { DestinationItem, SaveDestinationPayload } from '../service/destinations.types'
+import type { DestinationItem, SaveDestinationPayload, TargetRobotType } from '../service/destinations.types'
 
 const props = defineProps<{
     modelValue: boolean
@@ -80,7 +96,10 @@ const form = reactive<SaveDestinationPayload>({
     type: 'WORK_SPOT',
     x: 10,
     y: 10,
+    siteX: undefined,
+    siteY: undefined,
     heading: 0,
+    targetRobotType: 'ALL',
     description: '',
     isActive: true,
 })
@@ -102,9 +121,12 @@ watch(
                 form.name = ''
                 form.code = `DEST-${Date.now().toString().slice(-4)}`
                 form.type = 'WORK_SPOT'
-                form.x = 10
-                form.y = 10
+                form.x = (props.initialData as any)?.x ?? 10
+                form.y = (props.initialData as any)?.y ?? 10
+                form.siteX = undefined
+                form.siteY = undefined
                 form.heading = 0
+                form.targetRobotType = 'ALL'
                 form.description = ''
                 form.isActive = true
             }
@@ -117,7 +139,10 @@ const handleSave = async () => {
     await formRef.value.validate(async (valid: boolean) => {
         if (!valid) return
         try {
-            await saveDestination(form)
+            await saveDestination({
+                ...form,
+                mapName: props.mapName,
+            })
             ElMessage.success(props.isEdit ? '목적지가 수정되었습니다.' : '신규 목적지가 등록되었습니다.')
             emit('update:modelValue', false)
             emit('saved')

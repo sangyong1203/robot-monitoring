@@ -16,8 +16,8 @@
                 :list="mapOptions"
                 optionLabel="name"
                 optionValue="id"
-                width="300px"
-                @onChange="handleSearch"
+                selection-width="280px"
+                @onChange="handleMapChange"
             />
             <DropdownList
                 v-model="query.type"
@@ -34,32 +34,57 @@
         <!-- 데이터 목록 및 2D 위치 지도 뷰어 -->
         <Panel class="management-page__panel" title="지도 목적지 목록" :total="destinations.length" fill>
             <template #headerRight>
-                <el-button type="primary" class="query-button" @click="openCreateDialog">
+                <el-button type="primary" class="query-button" @click="openCreateDialog()">
                     신규 목적지 등록
                 </el-button>
             </template>
 
             <div class="destination-layout">
-                <!-- 2D 지도 위치 미리보기 영역 -->
+                <!-- 2D 지도 위치 인터랙티브 피커 영역 -->
                 <div class="destination-map-wrap">
                     <div class="destination-map-header">
-                        <span>지도 2D 목적지 오버레이 (선택: {{ selectedDestName }})</span>
+                        <span class="header-title">
+                            2D CAD 지도 피커 — {{ currentMap?.name || '지도 선택 안됨' }}
+                        </span>
+                        <span class="header-hint">
+                            💡 지도를 클릭하면 해당 위치(X, Y)로 신규 목적지가 생성됩니다.
+                        </span>
                     </div>
-                    <div class="destination-map-canvas">
-                        <svg viewBox="0 0 1200 800" class="map-svg">
-                            <rect width="100%" height="100%" fill="#0d111a" />
-                            <image href="/sample_map/map.png" width="100%" height="100%" preserveAspectRatio="none" />
-                            <!-- 목적지 핀 & 방향 마커 -->
+                    <div class="destination-map-canvas" ref="canvasContainerRef">
+                        <svg
+                            ref="svgRef"
+                            :viewBox="viewBoxString"
+                            class="map-svg"
+                            @click="handleCanvasClick"
+                        >
+                            <rect width="100%" height="100%" fill="#080c14" />
+                            <image
+                                :href="mapImageSource"
+                                width="100%"
+                                height="100%"
+                                preserveAspectRatio="none"
+                            />
+
+                            <!-- 등록된 목적지 핀 & 방향 마커 -->
                             <g
                                 v-for="dest in destinations"
                                 :key="dest.id"
                                 class="dest-marker"
                                 :class="{ 'is-selected': selectedDestId === dest.id }"
-                                :transform="`translate(${dest.x * 30}, ${dest.y * 30})`"
-                                @click="selectedDestId = dest.id"
+                                :transform="markerTransform(dest)"
+                                @click.stop="selectedDestId = dest.id"
                             >
-                                <circle :r="selectedDestId === dest.id ? 14 : 10" :fill="destTypeColor(dest.type)" stroke="#fff" stroke-width="2" />
-                                <path d="M 0 -8 L 4 2 L 0 0 L -4 2 Z" fill="#fff" :transform="`rotate(${dest.heading})`" />
+                                <circle
+                                    :r="selectedDestId === dest.id ? 14 : 10"
+                                    :fill="destTypeColor(dest.type)"
+                                    stroke="#ffffff"
+                                    stroke-width="2"
+                                />
+                                <path
+                                    d="M 0 -8 L 4 2 L 0 0 L -4 2 Z"
+                                    fill="#ffffff"
+                                    :transform="`rotate(${dest.heading})`"
+                                />
                                 <text x="16" y="4" class="dest-text">{{ dest.name }}</text>
                             </g>
                         </svg>
@@ -77,29 +102,32 @@
                         @row-click="(row: DestinationItem) => (selectedDestId = row.id)"
                         @row-dblclick="openEditDialog"
                     >
-                        <el-table-column prop="name" label="목적지 이름" min-width="180" show-overflow-tooltip />
+                        <el-table-column prop="name" label="목적지 이름" min-width="170" show-overflow-tooltip />
 
-                        <el-table-column prop="code" label="목적지 코드" width="150" align="center" />
+                        <el-table-column prop="code" label="목적지 코드" width="130" align="center" />
 
-                        <el-table-column prop="type" label="타입" width="130" align="center">
+                        <el-table-column prop="type" label="타입" width="120" align="center">
                             <template #default="{ row }">
                                 <StatusBadge :label="typeLabel(row.type)" :variant="typeVariant(row.type)" />
                             </template>
                         </el-table-column>
 
-                        <el-table-column prop="x" label="X (m)" width="80" align="center" />
-
-                        <el-table-column prop="y" label="Y (m)" width="80" align="center" />
-
-                        <el-table-column prop="heading" label="방향(°)" width="90" align="center" />
-
-                        <el-table-column prop="isActive" label="상태" width="90" align="center">
+                        <el-table-column label="적용 로봇" width="100" align="center">
                             <template #default="{ row }">
-                                <StatusBadge :label="row.isActive ? '사용' : '미사용'" :variant="row.isActive ? 'success' : 'danger'" />
+                                <StatusBadge
+                                    :label="row.targetRobotType === 'WORK' ? '작업용' : row.targetRobotType === 'SURVEILLANCE' ? '감시용' : '공용'"
+                                    :variant="row.targetRobotType === 'WORK' ? 'info' : row.targetRobotType === 'SURVEILLANCE' ? 'warning' : 'muted'"
+                                />
                             </template>
                         </el-table-column>
 
-                        <el-table-column label="작업" width="110" align="center" fixed="right">
+                        <el-table-column prop="x" label="X(m)" width="75" align="center" />
+
+                        <el-table-column prop="y" label="Y(m)" width="75" align="center" />
+
+                        <el-table-column prop="heading" label="방향(°)" width="75" align="center" />
+
+                        <el-table-column label="작업" width="100" align="center" fixed="right">
                             <template #default="{ row }">
                                 <div class="table-actions">
                                     <el-button
@@ -144,7 +172,7 @@
 import { computed, onMounted, reactive, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { MapPin, Pencil, Trash2 } from '@lucide/vue'
+import { Pencil, Trash2 } from '@lucide/vue'
 import Panel from '@/components/Panel.vue'
 import StatusBadge from '@/components/StatusBadge.vue'
 import SearchBox from '@/components/SearchBox.vue'
@@ -153,22 +181,34 @@ import DropdownList from '@/components/DropdownList.vue'
 import DestinationFormDialog from './components/DestinationFormDialog.vue'
 import { deleteDestination, getDestinations } from './service/destinations.api'
 import type { DestinationItem, DestinationType } from './service/destinations.types'
+import { fetchMockMaps } from '../maps/service/maps.mock'
+import type { MapItem } from '../maps/service/maps.types'
+import { pixelToWorld, worldToPixel } from '@/utils/mapCoordinates'
 
 const route = useRoute()
 const loading = ref(false)
+const maps = ref<MapItem[]>([])
 const destinations = ref<DestinationItem[]>([])
 const selectedMapId = ref<number>(Number(route.query.mapId) || 1)
 const selectedDestId = ref<number | null>(1)
+
+const svgRef = ref<SVGSVGElement | null>(null)
 
 const query = reactive<{ keyword: string; type?: DestinationType }>({
     keyword: '',
     type: undefined,
 })
 
-const mapOptions = [
-    { id: 1, name: '처분용기 장입 실내 1층 도면' },
-    { id: 2, name: '외곽 시설물 정밀 순찰 2D 지도' },
-]
+const currentMap = computed(() => maps.value.find(m => m.id === selectedMapId.value) ?? maps.value[0])
+const mapOptions = computed(() => maps.value)
+const mapImageUrl = computed(() => currentMap.value?.imageUrl ?? '/sample_map/site_map.svg')
+const mapImageSource = mapImageUrl
+
+const viewBoxString = computed(() => {
+    const w = currentMap.value?.width || 1600
+    const h = currentMap.value?.height || 800
+    return `0 0 ${w} ${h}`
+})
 
 const typeOptions = [
     { label: '전체 타입', value: undefined },
@@ -182,7 +222,7 @@ const dialogVisible = ref(false)
 const dialogIsEdit = ref(false)
 const selectedDest = ref<DestinationItem | null>(null)
 
-const selectedMapName = computed(() => mapOptions.find(m => m.id === selectedMapId.value)?.name || '기본 지도')
+const selectedMapName = computed(() => currentMap.value?.name || '지도 선택 안됨')
 const selectedDestName = computed(() => destinations.value.find(d => d.id === selectedDestId.value)?.name || '선택 안됨')
 
 const typeLabel = (type: DestinationType) => {
@@ -194,7 +234,7 @@ const typeLabel = (type: DestinationType) => {
         case 'CHARGING_STATION':
             return '충전소'
         case 'PATROL_WAYPOINT':
-            return '순찰인자'
+            return '순찰웨이포인트'
         case 'STORAGE_AREA':
             return '저장구역'
         default:
@@ -232,6 +272,43 @@ const destTypeColor = (type: DestinationType) => {
     }
 }
 
+const markerTransform = (dest: DestinationItem) => {
+    if (!currentMap.value) return `translate(${dest.x * 20}, ${dest.y * 20})`
+    
+    const isSiteMap = currentMap.value.code === 'MAP-SITE-01'
+    const posX = isSiteMap ? (dest.siteX ?? dest.x) : dest.x
+    const posY = isSiteMap ? (dest.siteY ?? dest.y) : dest.y
+    
+    const pt = worldToPixel({ x: posX, y: posY }, currentMap.value)
+    return `translate(${pt.pixel_x}, ${pt.pixel_y})`
+}
+
+const handleCanvasClick = (e: MouseEvent) => {
+    if (!svgRef.value || !currentMap.value) return
+    const rect = svgRef.value.getBoundingClientRect()
+    const pixelX = ((e.clientX - rect.left) / rect.width) * currentMap.value.width
+    const pixelY = ((e.clientY - rect.top) / rect.height) * currentMap.value.height
+    
+    const worldPoint = pixelToWorld({ pixel_x: pixelX, pixel_y: pixelY }, currentMap.value)
+    
+    openCreateDialog({
+        x: Number(worldPoint.x.toFixed(2)),
+        y: Number(worldPoint.y.toFixed(2)),
+    })
+}
+
+const loadMaps = async () => {
+    const mapList = await fetchMockMaps({ isActive: true })
+    maps.value = mapList
+    if (mapList.length > 0 && !mapList.some(m => m.id === selectedMapId.value)) {
+        selectedMapId.value = mapList[0].id
+    }
+}
+
+const handleMapChange = () => {
+    handleSearch()
+}
+
 const handleSearch = async () => {
     loading.value = true
     try {
@@ -248,9 +325,11 @@ const handleSearch = async () => {
     }
 }
 
-const openCreateDialog = () => {
+const openCreateDialog = (initialCoords?: { x: number; y: number }) => {
     dialogIsEdit.value = false
-    selectedDest.value = null
+    selectedDest.value = initialCoords
+        ? ({ x: initialCoords.x, y: initialCoords.y, heading: 0 } as any)
+        : null
     dialogVisible.value = true
 }
 
@@ -275,8 +354,9 @@ const confirmDelete = async (row: DestinationItem) => {
     }
 }
 
-onMounted(() => {
-    handleSearch()
+onMounted(async () => {
+    await loadMaps()
+    await handleSearch()
 })
 </script>
 
@@ -292,16 +372,6 @@ onMounted(() => {
     white-space: nowrap;
 }
 
-.icon-svg {
-    width: 18px;
-    height: 18px;
-}
-
-.icon-action {
-    width: 16px;
-    height: 16px;
-}
-
 .destination-layout {
     display: flex;
     gap: 20px;
@@ -310,7 +380,7 @@ onMounted(() => {
 }
 
 .destination-map-wrap {
-    flex: 1;
+    flex: 1.1;
     display: flex;
     flex-direction: column;
     border-radius: 8px;
@@ -320,17 +390,29 @@ onMounted(() => {
 }
 
 .destination-map-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     padding: 10px 16px;
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--text-color--secondary);
     border-bottom: 1px solid var(--border-color);
     background: rgba(255, 255, 255, 0.03);
+
+    .header-title {
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--secondary-color);
+    }
+
+    .header-hint {
+        font-size: 12px;
+        color: #94a3b8;
+    }
 }
 
 .destination-map-canvas {
     flex: 1;
     position: relative;
+    cursor: crosshair;
 }
 
 .map-svg {

@@ -1,5 +1,7 @@
 export type DestinationType = 'WORK_SPOT' | 'CHARGING_STATION' | 'WAITING_SPOT' | 'PATROL_WAYPOINT' | 'STORAGE_AREA'
 
+export type TargetRobotType = 'ALL' | 'WORK' | 'SURVEILLANCE'
+
 export type DestinationItem = {
     id: number
     mapId: number
@@ -9,7 +11,10 @@ export type DestinationItem = {
     type: DestinationType
     x: number
     y: number
+    siteX?: number
+    siteY?: number
     heading: number
+    targetRobotType?: TargetRobotType
     description?: string
     isActive: boolean
     createdAt: string
@@ -24,4 +29,5 @@ export type DestinationQuery = {
 
 export type SaveDestinationPayload = Omit<DestinationItem, 'id' | 'mapName' | 'createdAt' | 'updatedAt'> & {
     id?: number
+    mapName?: string
 }
