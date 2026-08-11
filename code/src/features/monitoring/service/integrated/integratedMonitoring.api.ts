@@ -18,6 +18,7 @@ export const mockIntegratedSnapshot: IntegratedMonitoringSnapshot = {
             id: 1,
             code: 'MAP-SITE-01',
             name: 'KORAD 시설 종합 배치도 (Site Map)',
+            mapType: 'SITE_MAP',
             width: 1600,
             height: 800,
             imageUrl: '/sample_map/site_map.svg',

@@ -61,9 +61,12 @@
 
                 <el-table-column prop="zoneName" label="소속 구역" width="160" align="center" show-overflow-tooltip />
 
-                <el-table-column prop="mapType" label="구분" width="110" align="center">
+                <el-table-column prop="mapType" label="구분" width="130" align="center">
                     <template #default="{ row }">
-                        <StatusBadge :label="row.mapType === 'INDOOR' ? '실내 지도' : '실외 지도'" :variant="row.mapType === 'INDOOR' ? 'info' : 'warning'" />
+                        <StatusBadge
+                            :label="row.mapType === 'SITE_MAP' ? '종합 배치도' : row.mapType === 'INDOOR' ? '실내 지도' : '실외 지도'"
+                            :variant="row.mapType === 'SITE_MAP' ? 'progress' : row.mapType === 'INDOOR' ? 'info' : 'warning'"
+                        />
                     </template>
                 </el-table-column>
 
@@ -154,6 +157,7 @@ const query = reactive<{ keyword: string; mapType?: MapType; isActive?: boolean 
 
 const typeOptions = [
     { label: '전체 지도', value: undefined },
+    { label: '종합 배치도', value: 'SITE_MAP' },
     { label: '실내 지도', value: 'INDOOR' },
     { label: '실외 지도', value: 'OUTDOOR' },
 ]

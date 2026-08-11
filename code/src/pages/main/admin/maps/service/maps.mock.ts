@@ -5,7 +5,7 @@ let mockMaps: MapItem[] = [
         id: 1,
         code: 'MAP-SITE-01',
         name: 'KORAD 시설 종합 배치도 (Site Map)',
-        mapType: 'OUTDOOR',
+        mapType: 'SITE_MAP',
         orgName: '통합관제센터',
         regionName: 'KORAD 경주 본원',
         zoneName: '본원 전체 부지 구역',

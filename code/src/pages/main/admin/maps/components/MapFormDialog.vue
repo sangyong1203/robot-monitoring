@@ -23,6 +23,7 @@
 
             <el-form-item label="지도 구분" prop="mapType">
                 <el-select v-model="form.mapType" style="width: 100%">
+                    <el-option label="종합 배치도 (SITE_MAP)" value="SITE_MAP" />
                     <el-option label="실내 지도 (INDOOR)" value="INDOOR" />
                     <el-option label="실외 지도 (OUTDOOR)" value="OUTDOOR" />
                 </el-select>

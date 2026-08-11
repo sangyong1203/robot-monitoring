@@ -1,4 +1,4 @@
-export type MapType = 'INDOOR' | 'OUTDOOR'
+export type MapType = 'INDOOR' | 'OUTDOOR' | 'SITE_MAP'
 
 export type MapItem = {
     id: number
