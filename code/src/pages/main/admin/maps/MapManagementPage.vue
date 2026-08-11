@@ -32,7 +32,7 @@
         </SearchBox>
 
         <!-- 데이터 카드 & 테이블 패널 -->
-        <Panel class="management-page__panel" title="지역 / 구역 / 지도 목록" :total="maps.length" fill>
+        <Panel class="management-page__panel" title="지도 목록" :total="maps.length" fill>
             <template #headerRight>
                 <el-button type="primary" class="query-button" @click="openCreateDialog">
                     신규 지도 등록
