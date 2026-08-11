@@ -4,18 +4,18 @@
         <MonitoringHudHeader
             :snapshot="snapshot"
             :updated-label="updatedLabel"
-            v-model:selected-map-id="selectedMapId"
+            v-model:selected-map-ids="selectedMapIds"
             @global-estop="openGlobalEmergency"
         />
 
         <!-- Main Cyber Content Grid -->
         <div class="cyber-grid">
-            <!-- 2. Left/Center 2D Map Canvas Block Component -->
+            <!-- 2. Left/Center Multi-Map Canvas Grid Block Component -->
             <MonitoringMapCanvas
-                :selected-map="selectedMap"
-                :selected-map-robots="selectedMapRobots"
+                :selected-maps="selectedMaps"
+                :all-robots="robots"
                 :selected-robot-id="selectedRobotId"
-                :grid-id="gridId"
+                :is-integrated-mode="true"
                 @select-robot="selectRobot"
             />
 
@@ -68,18 +68,16 @@ import RobotCameraDialog from '@/features/monitoring/components/RobotCameraDialo
 const kind: TypedMonitoringKind = 'INTEGRATED'
 
 const snapshot = ref<IntegratedMonitoringSnapshot | null>(null)
-const selectedMapId = ref<number | null>(1)
+const selectedMapIds = ref<number[]>([1])
 const selectedRobotId = ref<number | null>(1)
 
 const controlDialogVisible = ref(false)
 const cameraModalVisible = ref(false)
 const activeCameraRobot = ref<MonitoringRobot | null>(null)
 
-const gridId = computed(() => `cyber-grid-${kind.toLowerCase()}`)
 const robots = computed(() => snapshot.value?.robots ?? [])
 const selectedRobot = computed(() => robots.value.find(r => r.id === selectedRobotId.value) ?? null)
-const selectedMap = computed(() => snapshot.value?.maps.find(m => m.id === selectedMapId.value) ?? snapshot.value?.maps[0] ?? null)
-const selectedMapRobots = computed(() => selectedMap.value ? robots.value.filter(r => r.mapId === selectedMap.value?.id) : robots.value)
+const selectedMaps = computed(() => snapshot.value?.maps.filter(m => selectedMapIds.value.includes(m.id)) ?? [])
 
 const updatedLabel = computed(() => snapshot.value?.generatedAt ? `수신 시각: ${formatDateTime(snapshot.value.generatedAt)}` : '실시간 수신 중')
 
@@ -106,7 +104,6 @@ onBeforeUnmount(() => {
 
 const selectRobot = (robot: MonitoringRobot) => {
     selectedRobotId.value = robot.id
-    selectedMapId.value = robot.mapId
 }
 
 const openControlDialogWithRobot = (robot: MonitoringRobot) => {

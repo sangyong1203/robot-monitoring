@@ -19,6 +19,7 @@
             :style="{ flex: selectionWidth ? 'unset' : 1, width: selectionWidth }"
             :size="size"
             :multiple="multiple"
+            :multiple-limit="multipleLimit"
             :clearable="clearable"
             :collapse-tags="collapseTags"
             :suffix-icon="ChevronDown"
@@ -46,6 +47,7 @@
             :style="{ flex: selectionWidth ? 'unset' : 1, width: selectionWidth }"
             :size="size"
             :multiple="multiple"
+            :multiple-limit="multipleLimit"
             :clearable="clearable"
             :collapse-tags="collapseTags"
             @change="onChange"
@@ -92,6 +94,7 @@ export interface Props {
     size?: '' | 'default' | 'small' | 'large'
     placeholder?: string | null
     multiple?: boolean
+    multipleLimit?: number
     modelValue: any
     disabled?: boolean
     optionLabel: string
@@ -116,6 +119,7 @@ const {
     size,
     placeholder,
     multiple,
+    multipleLimit,
     modelValue,
     disabled,
     optionLabel,
@@ -180,7 +184,7 @@ const onChange = (value: any) => {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .dropdown-list {
     display: flex;
     align-items: center;
@@ -219,6 +223,13 @@ const onChange = (value: any) => {
 .label-position-top {
     flex-direction: column;
     align-items: flex-start;
+}
+.dropdown-list :deep(.el-select__selected-item) {
+     .el-tag{
+        background-color: var(--accent-color-soft) !important;
+        border-radius: 20px;
+        color: white;
+     }
 }
 </style>
 

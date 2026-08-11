@@ -44,13 +44,15 @@
 
             <div class="hud-actions">
                 <DropdownList
-                    :model-value="selectedMapId"
-                    @update:model-value="$emit('update:selectedMapId', $event)"
+                    :model-value="selectedMapIds"
+                    @update:model-value="$emit('update:selectedMapIds', $event)"
                     :list="snapshot?.maps ?? []"
                     option-label="name"
                     option-value="id"
-                    placeholder="관제 지도 선택"
-                    selection-width="220px"
+                    placeholder="관제 지도 선택 (최대 4개)"
+                    selection-width="260px"
+                    :multiple="true"
+                    :multiple-limit="4"
                     :clearable="false"
                 />
                 <el-button type="danger" class="btn-estop-card" @click="$emit('globalEstop')">
@@ -70,11 +72,11 @@ import type { IntegratedMonitoringSnapshot } from '../service/integrated/integra
 defineProps<{
     snapshot: IntegratedMonitoringSnapshot | null
     updatedLabel: string
-    selectedMapId: number | null
+    selectedMapIds: number[]
 }>()
 
 defineEmits<{
-    (e: 'update:selectedMapId', id: number | null): void
+    (e: 'update:selectedMapIds', ids: number[]): void
     (e: 'globalEstop'): void
 }>()
 </script>
