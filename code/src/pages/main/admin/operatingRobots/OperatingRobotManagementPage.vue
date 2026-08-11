@@ -193,7 +193,7 @@ const confirmDelete = async (row: OperatingRobotItem) => {
 }
 
 const goMonitoring = (row: OperatingRobotItem) => {
-    router.push({ path: '/main/integrated-monitoring', query: { robotId: row.id } })
+    router.push({ name: 'integratedMonitoring', query: { robotId: row.id } })
 }
 
 onMounted(() => {
