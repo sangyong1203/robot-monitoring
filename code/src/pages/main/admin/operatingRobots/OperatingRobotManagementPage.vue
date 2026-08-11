@@ -56,9 +56,12 @@
                     </template>
                 </el-table-column>
 
-                <el-table-column prop="batteryPercent" label="배터리" width="110" align="center">
+                <el-table-column prop="batteryPercent" label="배터리" width="130" align="center">
                     <template #default="{ row }">
-                        <StatusBadge :label="`${row.batteryPercent}%`" :variant="row.batteryPercent > 20 ? 'info' : 'danger'" />
+                        <MeterBar
+                            :percent="row.batteryPercent"
+                            :value="`${row.batteryPercent}%`"
+                        />
                     </template>
                 </el-table-column>
 
@@ -122,6 +125,7 @@ import { ElMessage, ElMessageBox } from 'element-plus'
 import { Bot, Pencil, Trash2, Tv } from '@lucide/vue'
 import Panel from '@/components/Panel.vue'
 import StatusBadge from '@/components/StatusBadge.vue'
+import MeterBar from '@/components/MeterBar.vue'
 import SearchBox from '@/components/SearchBox.vue'
 import SearchText from '@/components/SearchText.vue'
 import DropdownList from '@/components/DropdownList.vue'

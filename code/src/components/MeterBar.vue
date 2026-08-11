@@ -37,9 +37,9 @@ const clampedPercent = computed(() => Math.max(0, Math.min(100, props.percent)))
 
 const barColor = computed(() => {
     if (props.color) return props.color
-    if (clampedPercent.value > 50) return 'linear-gradient(90deg, #15e0b7, #3b82f6)'
-    if (clampedPercent.value > 20) return 'linear-gradient(90deg, #f59e0b, #f6bd60)'
-    return 'linear-gradient(90deg, #ef4444, #ff6b6b)'
+    if (clampedPercent.value > 50) return 'linear-gradient(90deg, #22c55e, #10b981)'
+    if (clampedPercent.value > 20) return 'linear-gradient(90deg, #f59e0b, #d97706)'
+    return 'linear-gradient(90deg, #ef4444, #dc2626)'
 })
 </script>
 

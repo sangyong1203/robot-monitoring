@@ -29,7 +29,6 @@
                     label="배터리"
                     :percent="robot.batteryPercent"
                     :value="`${robot.batteryPercent}%`"
-                    :color="batteryGradient(robot.batteryPercent)"
                 />
 
                 <!-- Digital Coordinate Readout -->
@@ -83,12 +82,6 @@ const communicationLabel = (status: CommunicationStatus) =>
 
 const statusTag = (status: CommunicationStatus) =>
     (({ ONLINE: 'success', STALE: 'warning', OFFLINE: 'danger' }) as const)[status] ?? 'success'
-
-const batteryGradient = (pct: number) => {
-    if (pct > 50) return 'linear-gradient(90deg, #22c55e, #10b981)'
-    if (pct > 20) return 'linear-gradient(90deg, #f59e0b, #d97706)'
-    return 'linear-gradient(90deg, #ef4444, #dc2626)'
-}
 </script>
 
 <style scoped lang="scss">
