@@ -23,17 +23,14 @@
                     />
                 </div>
 
-                <!-- Battery Progress Bar (Single Line) -->
-                <div class="battery-meter">
-                    <span class="meter-label">배터리</span>
-                    <div class="meter-bar-track">
-                        <div
-                            class="meter-bar-fill"
-                            :style="{ width: `${robot.batteryPercent}%`, background: batteryGradient(robot.batteryPercent) }"
-                        ></div>
-                    </div>
-                    <strong class="meter-val">{{ robot.batteryPercent }}%</strong>
-                </div>
+                <!-- MeterBar Component -->
+                <MeterBar
+                    class="battery-meter"
+                    label="배터리"
+                    :percent="robot.batteryPercent"
+                    :value="`${robot.batteryPercent}%`"
+                    :color="batteryGradient(robot.batteryPercent)"
+                />
 
                 <!-- Digital Coordinate Readout -->
                 <div class="digital-coords">
@@ -62,6 +59,7 @@
 <script setup lang="ts">
 import Panel from '@/components/Panel.vue'
 import StatusBadge from '@/components/StatusBadge.vue'
+import MeterBar from '@/components/MeterBar.vue'
 import { Camera } from '@lucide/vue'
 import type {
     CommunicationStatus,
@@ -172,37 +170,7 @@ const batteryGradient = (pct: number) => {
 
 /* Battery Meter */
 .battery-meter {
-    display: flex;
-    align-items: center;
-    gap: 8px;
     margin-bottom: 6px;
-
-    .meter-label {
-        font-size: 11px;
-        color: var(--text-color--secondary);
-        white-space: nowrap;
-    }
-
-    .meter-bar-track {
-        flex: 1;
-        height: 5px;
-        background: var(--surface-color);
-        border-radius: 3px;
-        overflow: hidden;
-    }
-
-    .meter-bar-fill {
-        height: 100%;
-        transition: width 0.3s ease;
-    }
-
-    .meter-val {
-        font-size: 11px;
-        color: var(--text-color--white);
-        white-space: nowrap;
-        min-width: 28px;
-        text-align: right;
-    }
 }
 
 /* Digital Coords */
