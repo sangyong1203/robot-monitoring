@@ -34,7 +34,7 @@
                             </template>
                         </el-table-column>
                         <el-table-column prop="description" label="설명" min-width="200" show-overflow-tooltip />
-                        <el-table-column prop="createdAt" label="등록일시" width="170" />
+                        <el-table-column prop="createdAt" label="등록일시" width="180" />
                         <el-table-column label="관리" width="120" align="center">
                             <template #default="{ row }">
                                 <TableRowActions
@@ -69,7 +69,7 @@
                                 </span>
                             </template>
                         </el-table-column>
-                        <el-table-column prop="createdAt" label="등록일시" width="170" />
+                        <el-table-column prop="createdAt" label="등록일시" width="180" />
                     </el-table>
                 </el-tab-pane>
 
@@ -88,7 +88,7 @@
                         <el-table-column prop="name" label="Activity 이름" min-width="200" />
                         <el-table-column prop="activityType" label="유형" width="120" />
                         <el-table-column prop="description" label="설명" min-width="240" />
-                        <el-table-column prop="createdAt" label="등록일시" width="170" />
+                        <el-table-column prop="createdAt" label="등록일시" width="180" />
                     </el-table>
                 </el-tab-pane>
             </el-tabs>

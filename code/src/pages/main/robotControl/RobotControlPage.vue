@@ -75,7 +75,7 @@
                         <div class="control-logs">
                             <h3>최근 제어 이력</h3>
                             <el-table :data="logs" stripe style="width: 100%">
-                                <el-table-column prop="requestedAt" label="요청 시각" width="160" />
+                                <el-table-column prop="requestedAt" label="요청 시각" width="180" />
                                 <el-table-column prop="robotName" label="로봇" width="140" />
                                 <el-table-column prop="commandType" label="명령 유형" width="140" />
                                 <el-table-column prop="payloadSummary" label="세부 내용" min-width="180" />

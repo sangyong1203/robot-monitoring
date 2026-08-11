@@ -69,7 +69,7 @@
                     </template>
                 </el-table-column>
 
-                <el-table-column label="최근 로그인" width="160" align="center">
+                <el-table-column label="최근 로그인" width="180" align="center">
                     <template #default="{ row }">
                         <span>{{ row.lastLoginAt ? formatDateTime(row.lastLoginAt) : '기록 없음' }}</span>
                     </template>

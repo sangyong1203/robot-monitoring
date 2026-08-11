@@ -71,7 +71,7 @@
                     </template>
                 </el-table-column>
 
-                <el-table-column label="등록/수정 일시" width="160" align="center">
+                <el-table-column label="등록/수정 일시" width="180" align="center">
                     <template #default="{ row }">
                         <span>{{ formatDateTime(row.updatedAt) }}</span>
                     </template>
