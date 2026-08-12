@@ -3,7 +3,10 @@
         <!-- 상단 영역: 소속 기관 운영 중인 로봇 목록 (한 줄 레이아웃 + 좌우 가로 스크롤) -->
         <div class="robots-overview-section">
             <div class="section-title">
-                <span class="title-text">소속 기관 운영 로봇 목록 (클릭하여 제어 대상 선택)</span>
+                <div class="title-left">
+                    <span class="title-text">소속 기관 운영 로봇 목록</span>
+                    <span class="title-sub">(클릭하여 제어 대상 선택)</span>
+                </div>
                 <span class="active-count">가동 중 로봇: <strong>{{ operatingRobotCount }}대</strong> / 전체 7대</span>
             </div>
             <div class="robots-card-scroll-wrap">
@@ -471,8 +474,8 @@ const stateLabel = (st: OperatingState) => {
 const stateVariant = (st: OperatingState) => {
     switch (st) {
         case 'RUNNING': return 'progress'
-        case 'SCHEDULE_RUNNING': return 'warning'
-        case 'IDLE': return 'info'
+        case 'SCHEDULE_RUNNING': return 'progress'
+        case 'IDLE': return 'muted'
         case 'CHARGING': return 'success'
         default: return 'muted'
     }
@@ -664,28 +667,40 @@ onMounted(() => {
     display: flex;
     flex-direction: column;
     gap: 10px;
-    padding: 14px 16px 8px;
-    background: rgba(255, 255, 255, 0.02);
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
+    padding: 14px 16px 10px;
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid var(--border-glass-color);
+    border-radius: 10px;
 
     .section-title {
         display: flex;
         justify-content: space-between;
         align-items: center;
 
-        .title-text {
-            font-size: 13px;
-            font-weight: 700;
-            color: var(--secondary-color);
+        .title-left {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+
+            .title-text {
+                font-size: 14px;
+                font-weight: 700;
+                color: var(--text-color--primary);
+            }
+
+            .title-sub {
+                font-size: 12px;
+                color: var(--text-color--secondary);
+            }
         }
 
         .active-count {
-            font-size: 12px;
-            color: #94a3b8;
+            font-size: 13px;
+            color: var(--text-color--secondary);
 
             strong {
                 color: var(--primary-color);
+                font-weight: 700;
             }
         }
     }
@@ -693,22 +708,22 @@ onMounted(() => {
 
 .robots-card-scroll-wrap {
     width: 100%;
-    height: 112px;
+    height: 122px;
     overflow-x: auto;
     overflow-y: hidden;
 
     &::-webkit-scrollbar {
-        height: 8px;
+        height: 6px;
     }
     &::-webkit-scrollbar-thumb {
         border-radius: 4px;
+        background-color: rgba(255, 255, 255, 0.15);
 
         &:hover {
             background-color: var(--overlay-scrollbar-thumb-color);
             cursor: pointer;
         }
     }
-    
 }
 
 .robots-card-grid {
@@ -717,27 +732,27 @@ onMounted(() => {
 }
 
 .robot-overview-card {
-    flex: 0 0 210px;
-    min-width: 210px;
+    flex: 0 0 215px;
+    min-width: 215px;
     display: flex;
     flex-direction: column;
     gap: 6px;
-    padding: 10px 12px;
-    background: rgba(255, 255, 255, 0.04);
-    border: 1px solid var(--border-color);
+    padding: 12px 14px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 8px;
     cursor: pointer;
-    transition: all 200ms ease;
+    transition: all 0.2s ease;
 
     &:hover {
-        border-color: var(--primary-color);
-        background: var(--primary-color-1);
+        border-color: rgba(180, 70, 210, 0.4);
+        background: rgba(180, 70, 210, 0.08);
     }
 
     &.is-selected {
         border-color: var(--primary-color);
-        background: var(--primary-color-1);
-        box-shadow: 0 0 4px rgba(21, 224, 183, 0.25);
+        background: rgba(180, 70, 210, 0.15);
+        box-shadow: 0 0 12px rgba(180, 70, 210, 0.35);
     }
 
     .card-header {
@@ -747,44 +762,53 @@ onMounted(() => {
     }
 
     .robot-type-tag {
-        font-size: 10px;
-        padding: 2px 6px;
+        font-size: 11px;
+        padding: 2px 8px;
         border-radius: 4px;
         font-weight: 600;
 
         &.work {
-            background: rgba(140, 200, 255, 0.15);
-            color: #8cc8ff;
+            background: rgba(56, 189, 248, 0.12);
+            color: #38bdf8;
+            border: 1px solid rgba(56, 189, 248, 0.25);
         }
         &.surveillance {
-            background: rgba(246, 189, 96, 0.15);
-            color: #f6bd60;
+            background: rgba(192, 132, 252, 0.12);
+            color: #c084fc;
+            border: 1px solid rgba(192, 132, 252, 0.25);
         }
     }
 
     .card-name {
-        font-size: 13px;
+        font-size: 14px;
         font-weight: 700;
         color: var(--text-color--primary);
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
+        margin-top: 2px;
     }
 
     .card-details {
         display: flex;
         flex-direction: column;
-        gap: 2px;
-        font-size: 11px;
-        color: #94a3b8;
+        gap: 3px;
+        font-size: 12px;
+        color: var(--text-color--secondary);
 
         .detail-row {
             display: flex;
             justify-content: space-between;
+            align-items: center;
+        }
+
+        .text-zone {
+            color: var(--text-color--secondary);
+            font-size: 11px;
         }
 
         .text-battery {
-            color: #22c55e;
+            color: #34d399;
             font-weight: 700;
         }
     }
