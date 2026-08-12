@@ -265,7 +265,9 @@ const passwordReset = () => {
     width: 100%;
     height: 100%;
     overflow: hidden;
-    background: #040711;
+    background:
+        linear-gradient(120deg, rgba(234, 220, 190, 0.28), rgba(8, 18, 32, 0.58)),
+        url('@/assets/images/login-bg-image.png') center / cover no-repeat;
 
     &::before,
     &::after {
@@ -274,20 +276,21 @@ const passwordReset = () => {
         pointer-events: none;
     }
 
-    // &::before {
-    //     inset: -40px;
-    //     background: url('@/assets/images/login-bg-image.png') center / cover no-repeat;
-    //     filter: blur(28px) saturate(0.85) brightness(0.85);
-    //     opacity: 0.65;
-    //     transform: scale(1.04);
-    // }
+    &::before {
+        inset: -24px;
+        background: url('@/assets/images/login-bg-image.png') center / cover no-repeat;
+        filter: blur(10px) saturate(0.95);
+        opacity: 0.72;
+        transform: scale(1.02);
+    }
 
     &::after {
         inset: 0;
         z-index: 1;
-        background: radial-gradient(circle at 58% 35%, rgba(255, 255, 255, 0.08), transparent 26%),
+        background: radial-gradient(circle at 58% 35%, rgba(255, 255, 255, 0.18), transparent 26%),
             radial-gradient(circle at 30% 72%, rgba(42, 15, 66, 0.2), transparent 38%), rgba(4, 9, 17, 0.15);
     }
+
 
     :deep(input:-webkit-autofill),
     :deep(input:-webkit-autofill:hover),
