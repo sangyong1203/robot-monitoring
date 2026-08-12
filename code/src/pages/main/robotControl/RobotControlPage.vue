@@ -230,7 +230,7 @@
             v-model="scheduleDialogVisible"
             title="신규 자동 제어 스케줄 등록"
             description="Task 또는 Mission에 주기 조건, 반복 조건, 운영·이벤트 코드를 연결하여 스케줄을 생성합니다."
-            width="640px"
+            width="680px"
         >
             <el-form label-position="top" class="management-page__form-grid">
                 <el-form-item label="스케줄 명칭" required style="grid-column: span 2">
@@ -238,10 +238,13 @@
                 </el-form-item>
 
                 <el-form-item label="제어 실행 단위" required>
-                    <el-radio-group v-model="scheduleForm.targetType">
-                        <el-radio-button value="MISSION">Mission 단위</el-radio-button>
-                        <el-radio-button value="TASK">Task 단위</el-radio-button>
-                    </el-radio-group>
+                    <RadioToggleGroup
+                        v-model="scheduleForm.targetType"
+                        :options="[
+                            { label: 'Mission 단위', value: 'MISSION' },
+                            { label: 'Task 단위', value: 'TASK' },
+                        ]"
+                    />
                 </el-form-item>
 
                 <el-form-item label="대상 선택" required>
@@ -259,14 +262,65 @@
                     </el-select>
                 </el-form-item>
 
-                <el-form-item label="실행 주기" required>
+                <el-form-item label="주기 유형 (실행 주기)" required>
                     <el-select v-model="scheduleForm.cycleType" style="width:100%">
-                        <el-option label="월별 주기 (MONTHLY)" value="MONTHLY" />
-                        <el-option label="주간 주기 (WEEKLY)" value="WEEKLY" />
-                        <el-option label="일별 주기 (DAILY)" value="DAILY" />
-                        <el-option label="시간별 주기 (HOURLY)" value="HOURLY" />
+                        <el-option label="매일 정시 실행 (DAILY)" value="DAILY" />
+                        <el-option label="시간 간격 실행 (HOURLY)" value="HOURLY" />
+                        <el-option label="주간 지정 실행 (WEEKLY)" value="WEEKLY" />
+                        <el-option label="사용자 지정 Cron 표현식 (CUSTOM)" value="CUSTOM" />
                     </el-select>
                 </el-form-item>
+
+                <!-- 1. DAILY 옵션 -->
+                <el-form-item v-if="scheduleForm.cycleType === 'DAILY'" label="매일 실행 시간 설정" required style="grid-column: span 2">
+                    <el-time-picker
+                        v-model="scheduleDailyTime"
+                        format="HH:mm"
+                        value-format="HH:mm"
+                        placeholder="매일 실행 시간 선택"
+                        style="width: 100%"
+                    />
+                </el-form-item>
+
+                <!-- 2. HOURLY 옵션 -->
+                <el-form-item v-if="scheduleForm.cycleType === 'HOURLY'" label="실행 시간 간격 설정" required style="grid-column: span 2">
+                    <div class="hourly-picker-row">
+                        <el-input-number v-model="scheduleHourlyInterval" :min="1" :max="24" style="width: 160px" />
+                        <span class="unit-txt">시간 간격마다 자동 실행</span>
+                    </div>
+                </el-form-item>
+
+                <!-- 3. WEEKLY 옵션 -->
+                <el-form-item v-if="scheduleForm.cycleType === 'WEEKLY'" label="주간 실행 요일 및 시간 설정" required style="grid-column: span 2">
+                    <div class="weekly-picker-box">
+                        <DaysCheckboxGroup v-model="scheduleWeeklyDays" />
+                        <el-time-picker
+                            v-model="scheduleWeeklyTime"
+                            format="HH:mm"
+                            value-format="HH:mm"
+                            placeholder="실행 시간 선택"
+                            style="width: 100%; margin-top: 8px"
+                        />
+                    </div>
+                </el-form-item>
+
+                <!-- 4. CUSTOM 옵션 -->
+                <el-form-item v-if="scheduleForm.cycleType === 'CUSTOM'" label="Cron 표현식 직접 입력" required style="grid-column: span 2">
+                    <el-input v-model="scheduleCustomCron" placeholder="예: 0 0 9 * * ?" />
+                    <div class="preset-badges">
+                        <span class="preset-label">자주 쓰는 프리셋:</span>
+                        <button type="button" class="preset-btn" @click="scheduleCustomCron = '매일 09:00'">매일 09:00</button>
+                        <button type="button" class="preset-btn" @click="scheduleCustomCron = '2시간 간격'">2시간 간격</button>
+                        <button type="button" class="preset-btn" @click="scheduleCustomCron = '매주 월,수 09:00'">매주 월,수 09:00</button>
+                    </div>
+                </el-form-item>
+
+                <!-- 요약 프리뷰 -->
+                <div class="schedule-summary-box" style="grid-column: span 2">
+                    <span class="summary-icon">⏱️</span>
+                    <span class="summary-label">실행 표현식 요약:</span>
+                    <span class="summary-value">{{ computedScheduleCronExpression }}</span>
+                </div>
 
                 <el-form-item label="반복 조건" required>
                     <el-select v-model="scheduleForm.repeatType" style="width:100%">
@@ -278,6 +332,7 @@
                 <el-form-item v-if="scheduleForm.repeatType === 'COUNT'" label="반복 횟수">
                     <el-input-number v-model="scheduleForm.repeatCount" :min="1" :max="100" style="width:100%" />
                 </el-form-item>
+                <div v-else></div>
 
                 <el-form-item label="연동 운영·이벤트 코드 선택" style="grid-column: span 2">
                     <el-select v-model="scheduleForm.eventCodeId" style="width:100%" clearable placeholder="이벤트 코드 선택 (선택 사항)">
@@ -299,6 +354,8 @@ import { ref, computed, onMounted } from 'vue'
 import TableToolbar from '@/components/TableToolbar.vue'
 import StatusBadge from '@/components/StatusBadge.vue'
 import BaseDialog from '@/components/BaseDialog.vue'
+import DaysCheckboxGroup from '@/components/DaysCheckboxGroup.vue'
+import RadioToggleGroup from '@/components/RadioToggleGroup.vue'
 import { ElMessage } from 'element-plus'
 import { simulationService } from '@/services/simulation.service'
 import { getControlLogs, getControlSchedules } from './service/robotControl.api'
@@ -346,10 +403,31 @@ const scheduleForm = ref({
     targetType: 'MISSION' as 'TASK' | 'MISSION',
     targetId: 1,
     robotId: 1,
-    cycleType: 'DAILY' as 'MONTHLY' | 'WEEKLY' | 'DAILY' | 'HOURLY',
+    cycleType: 'DAILY' as 'DAILY' | 'HOURLY' | 'WEEKLY' | 'CUSTOM',
     repeatType: 'PERMANENT' as 'PERMANENT' | 'COUNT',
     repeatCount: 10,
     eventCodeId: undefined as number | undefined,
+})
+
+const scheduleDailyTime = ref('09:00')
+const scheduleHourlyInterval = ref(2)
+const scheduleWeeklyDays = ref(['월', '수', '금'])
+const scheduleWeeklyTime = ref('09:00')
+const scheduleCustomCron = ref('매일 09:00')
+
+const computedScheduleCronExpression = computed(() => {
+    switch (scheduleForm.value.cycleType) {
+        case 'DAILY':
+            return `매일 ${scheduleDailyTime.value || '09:00'}`
+        case 'HOURLY':
+            return `${scheduleHourlyInterval.value || 1}시간 간격`
+        case 'WEEKLY':
+            return `매주 ${scheduleWeeklyDays.value.length ? scheduleWeeklyDays.value.join(',') : '월'} ${scheduleWeeklyTime.value || '09:00'}`
+        case 'CUSTOM':
+            return scheduleCustomCron.value || '매일 09:00'
+        default:
+            return '매일 09:00'
+    }
 })
 
 const robots = ref<RobotOverviewItem[]>([
@@ -502,6 +580,11 @@ const openScheduleDialog = () => {
         repeatCount: 10,
         eventCodeId: undefined,
     }
+    scheduleDailyTime.value = '09:00'
+    scheduleHourlyInterval.value = 2
+    scheduleWeeklyDays.value = ['월', '수', '금']
+    scheduleWeeklyTime.value = '09:00'
+    scheduleCustomCron.value = '매일 09:00'
     scheduleDialogVisible.value = true
 }
 
@@ -515,7 +598,7 @@ const saveSchedule = () => {
     const mis = missions.value.find(m => m.id === scheduleForm.value.targetId)
     const taskItem = tasks.value.find(t => t.id === scheduleForm.value.targetId)
 
-    const cycleText = scheduleForm.value.cycleType === 'DAILY' ? '매일 09:00' : scheduleForm.value.cycleType === 'HOURLY' ? '매 2시간 마다' : '주간 지정'
+    const cycleText = computedScheduleCronExpression.value
     const repeatText = scheduleForm.value.repeatType === 'PERMANENT' ? '영구 반복' : `${scheduleForm.value.repeatCount}회 반복`
 
     schedules.value.unshift({
@@ -528,7 +611,7 @@ const saveSchedule = () => {
         taskName: taskItem?.name,
         robotId: scheduleForm.value.robotId,
         robotName: r?.name || '로봇',
-        cycleType: scheduleForm.value.cycleType,
+        cycleType: scheduleForm.value.cycleType as any,
         cronExpression: cycleText,
         repeatType: scheduleForm.value.repeatType,
         repeatCount: scheduleForm.value.repeatCount,
@@ -843,6 +926,116 @@ onMounted(() => {
     > * {
         flex: 1;
         min-width: 0;
+    }
+}
+
+.mission-type-radio-group {
+    display: flex;
+    width: 100%;
+    background: rgba(0, 0, 0, 0.25);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    padding: 3px;
+
+    :deep(.el-radio-button) {
+        flex: 1;
+        display: flex;
+
+        .el-radio-button__inner {
+            width: 100%;
+            background: transparent;
+            border: 1px solid transparent !important;
+            border-radius: 6px;
+            color: var(--text-color--secondary);
+            box-shadow: none !important;
+            transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+            padding: 8px 16px;
+            font-weight: 500;
+
+            &:hover {
+                color: var(--primary-color);
+            }
+        }
+
+        &.is-active .el-radio-button__inner {
+            background: var(--primary-color-1) !important;
+            color: var(--primary-color) !important;
+            border-color: var(--border-glass-color) !important;
+            font-weight: 700;
+        }
+    }
+}
+
+.hourly-picker-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+
+    .unit-txt {
+        font-size: 14px;
+        color: var(--text-color--secondary);
+    }
+}
+
+.weekly-picker-box {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.preset-badges {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 8px;
+
+    .preset-label {
+        font-size: 12px;
+        color: var(--secondary-color);
+    }
+
+    .preset-btn {
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid var(--border-glass-color);
+        color: var(--primary-color);
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 12px;
+        cursor: pointer;
+        transition: background 0.18s ease;
+
+        &:hover {
+            background: rgba(231, 109, 255, 0.2);
+        }
+    }
+}
+
+.schedule-summary-box {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(0, 0, 0, 0.25);
+    border: 1px solid var(--border-glass-color);
+    padding: 10px 14px;
+    border-radius: 8px;
+    margin-top: 4px;
+    margin-bottom: 8px;
+
+    .summary-icon {
+        font-size: 16px;
+    }
+
+    .summary-label {
+        font-size: 13px;
+        color: var(--secondary-color);
+        font-weight: 500;
+    }
+
+    .summary-value {
+        font-size: 14px;
+        font-weight: 700;
+        color: var(--primary-color);
     }
 }
 </style>

@@ -22,7 +22,7 @@
                 <div class="dialog-header-content">
                     <slot name="title"></slot>
                     <span class="dialog-header-title">{{ title }}</span>
-                    <span class="dialog-description" v-show="description"> {{ '* ' + description }}</span>
+                    <span class="dialog-description" v-show="description">{{ '* ' + description }}</span>
                 </div>
                 <el-icon style="cursor: pointer" color="var(--text-color--primary)" @click="onClose"><X /></el-icon>
             </div>
@@ -59,71 +59,53 @@
     </el-dialog>
 </template>
 
-<script lang="ts" setup>
+<script setup lang="ts">
 import { X } from '@lucide/vue'
 import { toRefs } from 'vue'
 
-export interface Props {
+const props = defineProps<{
+    modelValue: boolean
     title?: string
     description?: string
-    maxHeight?: string
-    height?: string
-    width?: string | number
-    buttonTypes?: ButtonType[]
-    footerCenter?: boolean
-    modelValue: boolean
     isEdit?: boolean
-    hideHeader?: boolean
+    buttonTypes?: Array<
+        'Save' | 'Edit' | 'Delete' | 'Cancel' | 'Confirm' | 'Select' | 'Reset' | 'Close' | 'Add' | 'Review' | 'Reject' | 'Approve'
+    >
+    width?: string
+    height?: string
+    maxHeight?: string
     dialogClass?: string
     headerClass?: string
+    footerCenter?: boolean
     fullscreen?: boolean
+    hideHeader?: boolean
     closeOnClickModal?: boolean
     closeOnPressEscape?: boolean
+    draggable?: boolean
     destroyOnClose?: boolean
     showClose?: boolean
-    draggable?: boolean
-}
-type ButtonType =
-    | 'Save'
-    | 'Cancel'
-    | 'Edit'
-    | 'Delete'
-    | 'Confirm'
-    | 'Close'
-    | 'Select'
-    | 'Add'
-    | 'Reset'
-    | 'Review'
-    | 'Reject'
-    | 'Approve'
+}>()
 
-const props = withDefaults(defineProps<Props>(), {
-    title: '',
-    closeOnClickModal: false,
-    closeOnPressEscape: false,
-    destroyOnClose: true,
-    showClose: false,
-    draggable: false,
-})
 const {
+    modelValue,
     title,
     description,
-    maxHeight,
-    width,
-    height,
-    buttonTypes,
-    modelValue,
     isEdit,
-    hideHeader,
-    dialogClass,
+    buttonTypes,
+    width = '550px',
+    height = 'auto',
+    maxHeight,
+    dialogClass = 'common-dialog',
     headerClass,
+    footerCenter,
     fullscreen,
     closeOnClickModal,
     closeOnPressEscape,
     destroyOnClose,
-    showClose,
+    showClose = false,
     draggable,
 } = toRefs(props)
+
 const emits = defineEmits([
     'update:modelValue',
     'closed',
@@ -180,52 +162,75 @@ const onApprove = () => {
     emits('onApprove')
 }
 </script>
+
 <style lang="scss" scoped>
+.dialog-header {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding-bottom: 4px;
+
+    :deep(.el-icon) {
+        width: 24px;
+        height: 24px;
+        flex-shrink: 0;
+
+        svg {
+            width: 24px;
+            height: 24px;
+        }
+    }
+}
+
+.dialog-header-content {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    align-items: flex-start;
+    min-width: 0;
+    flex: 1;
+    padding-right: 16px;
+}
+
 .dialog-header-title {
-    font-size: 24px;
+    font-size: 20px;
     line-height: 24px;
-    font-weight: 600;
+    font-weight: 700;
     color: var(--text-color--primary);
 }
+
 .dialog-description {
-    font-size: 12px;
-    margin-left: 16px;
-    margin-bottom: 2px;
-    color: var(--text-color--muted);
+    font-size: 13px;
+    color: var(--text-color--secondary);
+    line-height: 18px;
+    white-space: normal;
+    word-break: break-word;
 }
+
 .dialog-footer {
     display: flex;
     justify-content: center;
     position: relative;
 }
+
 .delete-btn {
     position: absolute;
     left: 20px;
 }
-.dialog-header {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
-    :deep(.el-icon) {
-        width: 28px;
-        height: 28px;
-        svg {
-            width: 28px;
-            height: 28px;
-        }
-    }
-}
+
 .dialog-footer :deep(.el-button.el-button--primary) {
     background: var(--primary-color);
     border-color: var(--primary-color);
     color: var(--button-primary-text-color);
 }
+
 .dialog-footer :deep(.el-button:not(.el-button--primary)) {
     background: var(--common-control-bg-color);
     border-color: var(--common-control-border-color);
     color: var(--text-color--secondary);
 }
+
 .dialog-footer :deep(.el-button) {
     border-radius: 999px;
     min-width: 90px;

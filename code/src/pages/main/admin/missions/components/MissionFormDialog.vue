@@ -13,10 +13,13 @@
                 <el-input v-model="form.name" placeholder="예: [융합] 폐기물 이송 및 장입 미션" />
             </el-form-item>
             <el-form-item label="미션 유형" required>
-                <el-radio-group v-model="form.missionType" class="mission-type-radio-group">
-                    <el-radio-button value="CONVERGENCE">융합 미션</el-radio-button>
-                    <el-radio-button value="SINGLE">단일 로봇 미션</el-radio-button>
-                </el-radio-group>
+                <RadioToggleGroup
+                    v-model="form.missionType"
+                    :options="[
+                        { label: '융합 미션', value: 'CONVERGENCE' },
+                        { label: '단일 로봇 미션', value: 'SINGLE' },
+                    ]"
+                />
             </el-form-item>
 
             <!-- 포함 Task 순서 구성 -->
@@ -70,6 +73,7 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
 import BaseDialog from '@/components/BaseDialog.vue'
+import RadioToggleGroup from '@/components/RadioToggleGroup.vue'
 import { Trash2 } from '@lucide/vue'
 import { ElMessage } from 'element-plus'
 import type { MissionItem, TaskItem } from '../service/missionManagement.types'
