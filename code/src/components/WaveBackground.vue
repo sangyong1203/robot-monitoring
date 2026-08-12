@@ -42,7 +42,7 @@ const props = withDefaults(
     }
 )
 
-const cssBgUrl = computed(() => `url("${props.bgImageUrl}")`)
+// const cssBgUrl = computed(() => `url("${props.bgImageUrl}")`)
 const isCanvasReady = ref(false)
 
 const waveCanvas = ref<HTMLCanvasElement | null>(null)
@@ -274,7 +274,7 @@ onUnmounted(() => {
 .static-bg-layer {
     position: absolute;
     inset: 0;
-    background: #040711 v-bind('cssBgUrl') center / cover no-repeat;
+    // background: #040711 v-bind('cssBgUrl') center / cover no-repeat;
     pointer-events: none;
     z-index: 1;
 }

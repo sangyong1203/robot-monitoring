@@ -274,13 +274,13 @@ const passwordReset = () => {
         pointer-events: none;
     }
 
-    &::before {
-        inset: -40px;
-        background: url('@/assets/images/login-bg-image.png') center / cover no-repeat;
-        filter: blur(28px) saturate(0.85) brightness(0.85);
-        opacity: 0.65;
-        transform: scale(1.04);
-    }
+    // &::before {
+    //     inset: -40px;
+    //     background: url('@/assets/images/login-bg-image.png') center / cover no-repeat;
+    //     filter: blur(28px) saturate(0.85) brightness(0.85);
+    //     opacity: 0.65;
+    //     transform: scale(1.04);
+    // }
 
     &::after {
         inset: 0;
