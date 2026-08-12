@@ -15,7 +15,7 @@
             <el-form-item label="미션 유형" required>
                 <el-radio-group v-model="form.missionType" class="mission-type-radio-group">
                     <el-radio-button value="CONVERGENCE">융합 미션</el-radio-button>
-                    <el-radio-button value="SINGLE">단일 미션</el-radio-button>
+                    <el-radio-button value="SINGLE">단일 로봇 미션</el-radio-button>
                 </el-radio-group>
             </el-form-item>
 

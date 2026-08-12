@@ -19,7 +19,7 @@
                         <el-table-column label="미션 유형" width="130">
                             <template #default="{ row }">
                                 <StatusBadge
-                                    :label="row.missionType === 'CONVERGENCE' ? '융합 미션' : '단일 미션'"
+                                    :label="row.missionType === 'CONVERGENCE' ? '융합 미션' : '단일 로봇 미션'"
                                     :variant="row.missionType === 'CONVERGENCE' ? 'warning' : 'info'"
                                 />
                             </template>
