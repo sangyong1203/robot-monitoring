@@ -1,15 +1,15 @@
 <template>
     <div class="mission-management-page">
-        <Panel title="미션 및 스케줄 관리" subtitle="Activity, Task, 융합 Mission 및 자동 수행 스케줄 관리" fill>
+        <Panel title="미션 및 스케줄 관리" subtitle="Activity, Task, Mission 및 자동 수행 스케줄 관리" fill>
             <el-tabs v-model="activeTab" class="mission-tabs">
-                <!-- 1. 융합 Mission 관리 탭 -->
-                <el-tab-pane label="융합 Mission 관리" name="missions">
+                <!-- 1. Mission 관리 탭 -->
+                <el-tab-pane label="Mission 관리" name="missions">
                     <TableToolbar>
                         <template #left>
                             <SearchText v-model="searchQuery" placeholder="미션 이름 / 코드 검색" @search="onSearch" />
                         </template>
                         <template #right>
-                            <el-button type="primary" @click="openMissionDialog()">신규 융합 Mission 등록</el-button>
+                            <el-button type="primary" @click="openMissionDialog()">신규 Mission 등록</el-button>
                         </template>
                     </TableToolbar>
 
@@ -171,7 +171,7 @@
         <!-- 1. Mission Form Dialog -->
         <BaseDialog
             v-model="missionDialogVisible"
-            :title="editingMissionId ? '융합 Mission 수정' : '신규 융합 Mission 등록'"
+            :title="editingMissionId ? 'Mission 수정' : '신규 Mission 등록'"
             width="680px"
         >
             <el-form label-position="top">
@@ -183,7 +183,7 @@
                 </el-form-item>
                 <el-form-item label="미션 유형" required>
                     <el-radio-group v-model="missionForm.missionType">
-                        <el-radio-button value="CONVERGENCE">2종 이상 이기종 융합 미션</el-radio-button>
+                        <el-radio-button value="CONVERGENCE">2종 이상 이기종 미션</el-radio-button>
                         <el-radio-button value="SINGLE">단일 로봇 미션</el-radio-button>
                     </el-radio-group>
                 </el-form-item>
@@ -206,8 +206,8 @@
                     <el-button type="primary" plain size="small" style="margin-top: 8px" @click="addMissionTask">+ Task 추가</el-button>
                 </el-form-item>
 
-                <!-- 선행 조건 설정 (융합 시나리오) -->
-                <el-form-item label="Task 간 선행 조건 (융합 트리거 시나리오)">
+                <!-- 선행 조건 설정 (미션 시나리오) -->
+                <el-form-item label="Task 간 선행 조건 (미션 트리거 시나리오)">
                     <div v-for="(cItem, cIdx) in missionForm.selectedConditions" :key="cIdx" class="builder-row">
                         <el-select v-model="cItem.precedingTaskId" placeholder="선행 Task" style="flex:1">
                             <el-option v-for="tk in tasks" :key="tk.id" :label="tk.name" :value="tk.id" />
@@ -671,7 +671,7 @@ const saveMission = () => {
             status: 'ACTIVE',
             createdAt: new Date().toISOString().replace('T', ' ').slice(0, 19),
         })
-        ElMessage.success('신규 융합 미션이 등록되었습니다.')
+        ElMessage.success('신규 미션이 등록되었습니다.')
     }
     missionDialogVisible.value = false
 }
