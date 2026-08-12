@@ -95,7 +95,11 @@ export const routes: RouteRecordRaw[] = [
                 path: 'admin/missions',
                 name: 'missions',
                 component: () => import('@/pages/main/admin/missions/MissionManagementPage.vue'),
-                meta: { screenId: 'IRCS_MS_01_P', title: '미션 및 임무 관리' },
+                meta: {
+                    screenId: 'IRCS_MS_01_P',
+                    title: '미션 관리',
+                    description: 'Activity, Task, Mission 및 자동 수행 스케줄 관리',
+                },
             },
         ],
     },

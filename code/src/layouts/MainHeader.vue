@@ -14,9 +14,10 @@
                     <el-icon class="header-user-icon"><UserRound /></el-icon>
                     <span class="header-user-name">{{ userName }}</span>
                 </div>
-                <el-button type="primary" circle class="logout" @click="emit('logout')">
-                    <el-icon><LogOut /></el-icon>
-                </el-button>
+                <button type="button" class="logout-btn" @click="emit('logout')">
+                    <el-icon class="logout-icon"><LogOut /></el-icon>
+                    <span>로그아웃</span>
+                </button>
             </div>
         </el-col>
     </el-row>
@@ -80,7 +81,7 @@ const emit = defineEmits<{
     margin-left: 16px;
     padding-left: 16px;
     overflow: hidden;
-    border-left: 1px solid var(--border-color);
+    border-left: 1px solid var(--header-title-text-color);
     color: var(--text-color--secondary);
     font-size: 14px;
     font-weight: 400;
@@ -95,7 +96,7 @@ const emit = defineEmits<{
     display: flex;
     align-items: center;
     justify-content: flex-end;
-    gap: 4px;
+    gap: 8px;
 }
 
 .header-user {
@@ -134,26 +135,32 @@ const emit = defineEmits<{
     letter-spacing: 0;
 }
 
-.logout {
-    border: 1px solid var(--border-color);
-    background-color: var(--surface-control-color);
-    color: var(--text-color--white);
-}
-
-.logout:hover {
-    background-color: var(--layout-menu-active-bg-color);
-    border-color: var(--accent-color);
-    color: var(--accent-color);
+.logout-btn {
+    height: 36px;
+    padding: 0 14px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    border: 1px solid var(--primary-color);
+    border-radius: 999px;
+    background: var(--surface-control-color);
+    color: var(--primary-color);
+    font-size: 13px;
+    font-weight: 500;
     cursor: pointer;
-}
+    transition: all 0.2s ease;
 
-.logout .el-icon {
-    width: 18px;
-    height: 18px;
-}
+    .logout-icon {
+        font-size: 15px;
+        color: var(--primary-color);
+        transition: color 0.2s ease;
+    }
 
-.logout .el-icon svg {
-    width: 18px;
-    height: 18px;
+    &:hover {
+        background: var(--primary-color-1);
+        .logout-icon {
+            color: var(--primary-color);
+        }
+    }
 }
 </style>

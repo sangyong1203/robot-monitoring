@@ -87,7 +87,7 @@ const KORAD_MENUS: Menu[] = [
     {
         id: 40,
         parentId: 0,
-        title: '미션 및 임무 관리',
+        title: '미션 관리',
         path: '/admin/missions',
         icon: 'IconSetting',
         useYn: 'Y',

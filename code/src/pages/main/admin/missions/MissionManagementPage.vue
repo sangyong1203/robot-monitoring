@@ -1,6 +1,6 @@
 <template>
     <div class="management-page">
-        <Panel class="management-page__panel" title="미션 및 스케줄 관리" subtitle="Activity, Task, Mission 및 자동 수행 스케줄 관리" fill>
+        <Panel class="management-page__panel" fill>
             <el-tabs v-model="activeTab" class="mission-tabs">
                 <!-- 1. Mission 관리 탭 -->
                 <el-tab-pane label="Mission 관리" name="missions">
