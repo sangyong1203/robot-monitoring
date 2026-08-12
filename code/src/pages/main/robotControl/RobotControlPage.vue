@@ -128,7 +128,7 @@
 
                             <!-- 5. 운영 모드 선택 -->
                             <el-form-item v-else-if="executionUnit === 'SET_MODE'" label="운영 모드 변경">
-                                <el-radio-group v-model="targetMode">
+                                <el-radio-group v-model="targetMode" class="unit-radio-group mode-radio-group">
                                     <el-radio-button value="AUTO">자동 (AUTO)</el-radio-button>
                                     <el-radio-button value="MANUAL">수동 (MANUAL)</el-radio-button>
                                     <el-radio-button value="PAUSED">일시정지 (PAUSED)</el-radio-button>
@@ -164,7 +164,7 @@
                             <el-table-column prop="commandType" label="명령 유형" width="130" />
                             <el-table-column prop="payloadSummary" label="세부 내용" min-width="220" show-overflow-tooltip />
                             <el-table-column prop="requestedBy" label="요청자" width="120" />
-                            <el-table-column label="상태" width="90" align="center">
+                            <el-table-column label="상태" width="120" align="center">
                                 <template #default="{ row }">
                                     <StatusBadge :label="row.status" :variant="row.status === 'APPLIED' ? 'success' : 'info'" />
                                 </template>
@@ -811,6 +811,22 @@ onMounted(() => {
         color: #000000 !important;
         font-weight: 700;
         box-shadow: 0 0 8px rgba(21, 224, 183, 0.35);
+    }
+}
+
+.mode-radio-group {
+    width: 100%;
+    display: flex;
+
+    :deep(.el-radio-button) {
+        flex: 1;
+
+        .el-radio-button__inner {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
     }
 }
 
