@@ -20,6 +20,7 @@ export { default as StatusBadge } from './StatusBadge.vue'
 export { default as TableRowActions } from './TableRowActions.vue'
 export { default as TableToolbar } from './TableToolbar.vue'
 export { default as ToolTip } from './ToolTip.vue'
+export { default as WaveBackground } from './WaveBackground.vue'
 
 export { default as DonutStatusChart } from './charts/DonutStatusChart.vue'
 export { default as TrendAreaChart } from './charts/TrendAreaChart.vue'
