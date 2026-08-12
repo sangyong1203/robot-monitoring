@@ -1,5 +1,6 @@
 <template>
     <div class="layout-login">
+        <canvas ref="waveCanvas" class="wave-canvas"></canvas>
         <div class="login-block fade-in">
             <div class="login-block-content">
                 <div class="login-header">
@@ -94,7 +95,7 @@
 
 <script lang="ts" setup>
 import { LoaderCircle, LockKeyhole, UserRound } from '@lucide/vue'
-import { ref, onMounted, reactive } from 'vue'
+import { ref, onMounted, onUnmounted, reactive } from 'vue'
 import type { FormRules, FormInstance } from 'element-plus'
 import { ElNotification } from 'element-plus'
 import { useRouter } from 'vue-router'
@@ -143,7 +144,201 @@ const rules: FormRules = {
     ],
 }
 
-onMounted(async () => {})
+const waveCanvas = ref<HTMLCanvasElement | null>(null)
+let animFrameId: number | null = null
+let cleanupWave: (() => void) | null = null
+
+interface WaveConfig {
+    yRatio: number
+    amplitude: number
+    frequency: number
+    speed: number
+    offset: number
+    colorStops: { offset: number; color: string }[]
+    strokeColor: string
+}
+
+const setupWaveAnimation = () => {
+    const canvas = waveCanvas.value
+    if (!canvas) {
+        return null
+    }
+    const ctx = canvas.getContext('2d')
+    if (!ctx) {
+        return null
+    }
+
+    let width = 0
+    let height = 0
+
+    const resize = () => {
+        width = canvas.width = window.innerWidth
+        height = canvas.height = window.innerHeight
+    }
+    resize()
+    window.addEventListener('resize', resize)
+
+    const waves: WaveConfig[] = [
+        {
+            yRatio: 0.55,
+            amplitude: 110,
+            frequency: 0.0012,
+            speed: 0.005,
+            offset: 0,
+            colorStops: [
+                { offset: 0, color: 'rgba(180, 40, 220, 0)' },
+                { offset: 0.35, color: 'rgba(180, 40, 220, 0.32)' },
+                { offset: 0.7, color: 'rgba(30, 210, 245, 0.22)' },
+                { offset: 1, color: 'rgba(10, 20, 50, 0)' },
+            ],
+            strokeColor: 'rgba(210, 120, 255, 0.75)',
+        },
+        {
+            yRatio: 0.42,
+            amplitude: 145,
+            frequency: 0.0009,
+            speed: -0.004,
+            offset: 2.2,
+            colorStops: [
+                { offset: 0, color: 'rgba(235, 30, 180, 0)' },
+                { offset: 0.45, color: 'rgba(235, 30, 180, 0.28)' },
+                { offset: 0.8, color: 'rgba(120, 40, 230, 0.18)' },
+                { offset: 1, color: 'rgba(5, 15, 35, 0)' },
+            ],
+            strokeColor: 'rgba(255, 130, 240, 0.85)',
+        },
+        {
+            yRatio: 0.65,
+            amplitude: 95,
+            frequency: 0.0015,
+            speed: 0.007,
+            offset: 4.1,
+            colorStops: [
+                { offset: 0, color: 'rgba(20, 210, 240, 0)' },
+                { offset: 0.4, color: 'rgba(20, 210, 240, 0.38)' },
+                { offset: 0.75, color: 'rgba(150, 40, 220, 0.15)' },
+                { offset: 1, color: 'rgba(5, 10, 30, 0)' },
+            ],
+            strokeColor: 'rgba(50, 235, 255, 0.9)',
+        },
+        {
+            yRatio: 0.32,
+            amplitude: 160,
+            frequency: 0.0007,
+            speed: -0.003,
+            offset: 1.1,
+            colorStops: [
+                { offset: 0, color: 'rgba(140, 30, 220, 0)' },
+                { offset: 0.5, color: 'rgba(140, 30, 220, 0.25)' },
+                { offset: 1, color: 'rgba(0, 180, 230, 0)' },
+            ],
+            strokeColor: 'rgba(190, 140, 255, 0.65)',
+        },
+    ]
+
+    const draw = () => {
+        ctx.clearRect(0, 0, width, height)
+
+        // Deep space gradient background
+        const bgGrad = ctx.createLinearGradient(0, 0, width, height)
+        bgGrad.addColorStop(0, '#040711')
+        bgGrad.addColorStop(0.5, '#0b0616')
+        bgGrad.addColorStop(1, '#030a16')
+        ctx.fillStyle = bgGrad
+        ctx.fillRect(0, 0, width, height)
+
+        // Ambient floating glow orbs
+        const time = Date.now() * 0.0006
+        const orb1X = width * 0.7 + Math.sin(time) * 110
+        const orb1Y = height * 0.3 + Math.cos(time * 0.8) * 70
+        const radGrad1 = ctx.createRadialGradient(orb1X, orb1Y, 10, orb1X, orb1Y, width * 0.45)
+        radGrad1.addColorStop(0, 'rgba(180, 40, 220, 0.32)')
+        radGrad1.addColorStop(0.6, 'rgba(40, 180, 230, 0.1)')
+        radGrad1.addColorStop(1, 'transparent')
+        ctx.fillStyle = radGrad1
+        ctx.fillRect(0, 0, width, height)
+
+        const orb2X = width * 0.25 + Math.cos(time * 0.7) * 130
+        const orb2Y = height * 0.7 + Math.sin(time * 0.9) * 90
+        const radGrad2 = ctx.createRadialGradient(orb2X, orb2Y, 10, orb2X, orb2Y, width * 0.4)
+        radGrad2.addColorStop(0, 'rgba(25, 200, 240, 0.28)')
+        radGrad2.addColorStop(0.5, 'rgba(140, 30, 210, 0.14)')
+        radGrad2.addColorStop(1, 'transparent')
+        ctx.fillStyle = radGrad2
+        ctx.fillRect(0, 0, width, height)
+
+        ctx.globalCompositeOperation = 'screen'
+
+        // Render smooth silk wave fills + luminous edge glows
+        waves.forEach((wave) => {
+            wave.offset += wave.speed
+
+            const points: { x: number; y: number }[] = []
+            const baseY = height * wave.yRatio
+
+            for (let x = -50; x <= width + 50; x += 12) {
+                const y =
+                    baseY +
+                    Math.sin(x * wave.frequency + wave.offset) * wave.amplitude +
+                    Math.cos(x * wave.frequency * 0.4 + wave.offset * 0.6) * (wave.amplitude * 0.6)
+                points.push({ x, y })
+            }
+
+            // Draw filled wave silk
+            ctx.beginPath()
+            ctx.moveTo(points[0].x, points[0].y)
+            for (let i = 1; i < points.length; i++) {
+                ctx.lineTo(points[i].x, points[i].y)
+            }
+            ctx.lineTo(width + 50, height + 150)
+            ctx.lineTo(-50, height + 150)
+            ctx.closePath()
+
+            const waveGrad = ctx.createLinearGradient(0, baseY - wave.amplitude, 0, baseY + wave.amplitude * 2.5)
+            wave.colorStops.forEach((cs) => {
+                waveGrad.addColorStop(cs.offset, cs.color)
+            })
+            ctx.fillStyle = waveGrad
+            ctx.fill()
+
+            // Draw luminous wave crest highlight line
+            ctx.beginPath()
+            ctx.moveTo(points[0].x, points[0].y)
+            for (let i = 1; i < points.length; i++) {
+                ctx.lineTo(points[i].x, points[i].y)
+            }
+            ctx.strokeStyle = wave.strokeColor
+            ctx.lineWidth = 2.5
+            ctx.shadowBlur = 25
+            ctx.shadowColor = wave.strokeColor
+            ctx.stroke()
+            ctx.shadowBlur = 0
+        })
+
+        ctx.globalCompositeOperation = 'source-over'
+
+        animFrameId = requestAnimationFrame(draw)
+    }
+
+    draw()
+
+    return () => {
+        window.removeEventListener('resize', resize)
+        if (animFrameId !== null) {
+            cancelAnimationFrame(animFrameId)
+        }
+    }
+}
+
+onMounted(() => {
+    cleanupWave = setupWaveAnimation()
+})
+
+onUnmounted(() => {
+    if (cleanupWave) {
+        cleanupWave()
+    }
+})
 
 const message = ref('')
 const isLoading = ref(false)
@@ -262,9 +457,7 @@ const passwordReset = () => {
     width: 100%;
     height: 100%;
     overflow: hidden;
-    background:
-        linear-gradient(120deg, rgba(234, 220, 190, 0.28), rgba(8, 18, 32, 0.58)),
-        url('@/assets/images/login-bg-image.png') center / cover no-repeat;
+    background: #060913;
 
     &::before,
     &::after {
@@ -275,16 +468,17 @@ const passwordReset = () => {
 
     &::before {
         inset: -24px;
-        background: url('@/assets/images/login-bg-image.png') center / cover no-repeat;
-        filter: blur(10px) saturate(0.95);
-        opacity: 0.72;
-        transform: scale(1.02);
+        background: radial-gradient(circle at 70% 30%, rgba(195, 55, 235, 0.25), transparent 45%),
+            radial-gradient(circle at 20% 80%, rgba(35, 195, 225, 0.2), transparent 40%);
+        filter: blur(20px);
+        opacity: 0.8;
     }
 
     &::after {
         inset: 0;
-        background: radial-gradient(circle at 58% 35%, rgba(255, 255, 255, 0.18), transparent 26%),
-            radial-gradient(circle at 30% 72%, rgba(42, 15, 66, 0.38), transparent 38%), rgba(4, 9, 17, 0.32);
+        z-index: 1;
+        background: radial-gradient(circle at 58% 35%, rgba(255, 255, 255, 0.1), transparent 26%),
+            radial-gradient(circle at 30% 72%, rgba(42, 15, 66, 0.25), transparent 38%), rgba(4, 9, 17, 0.2);
     }
 
     :deep(input:-webkit-autofill),
@@ -295,6 +489,16 @@ const passwordReset = () => {
         -webkit-text-fill-color: var(--input-text-color) !important;
         transition: background-color 9999s ease-in-out 0s;
     }
+}
+
+.wave-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 0;
 }
 
 .login-autofill-blocker {
