@@ -53,6 +53,12 @@
 
   /* Element Plus theme */
   --el-color-primary: var(--primary-color) !important;
+  --el-color-primary-light-3: #f08dff !important;
+  --el-color-primary-light-5: #f7b2ff !important;
+  --el-color-primary-light-7: #fad6ff !important;
+  --el-color-primary-light-8: #fce8ff !important;
+  --el-color-primary-light-9: #fef5ff !important;
+  --el-color-primary-dark-2: #c64ce0 !important;
   --el-datepicker-border-color: none !important;
 
   /* Menu */
@@ -158,4 +164,26 @@
   --pagination-active-text-color: var(--primary-color);
   --pagination-active-bg-color: none;
   --descriptions-bordered-label-background: var(--surface-color);
+}
+
+/* Element Plus Theme Variables Global Overrides (Option B) */
+:root,
+html,
+html.dark,
+body {
+  --el-color-primary: #e76dff !important;
+  --el-color-primary-light-3: #f08dff !important;
+  --el-color-primary-light-5: #f7b2ff !important;
+  --el-color-primary-light-7: #fad6ff !important;
+  --el-color-primary-light-8: #fce8ff !important;
+  --el-color-primary-light-9: #fef5ff !important;
+  --el-color-primary-dark-2: #c64ce0 !important;
+
+  --el-button-bg-color: var(--primary-color) !important;
+  --el-button-border-color: var(--primary-color) !important;
+  --el-button-hover-bg-color: #f08dff !important;
+  --el-button-hover-border-color: #f08dff !important;
+  --el-button-hover-text-color: var(--text-color--white, #ffffff) !important;
+  --el-button-active-bg-color: #c64ce0 !important;
+  --el-button-active-border-color: #c64ce0 !important;
 }

@@ -655,11 +655,16 @@
   --el-button-active-bg-color: var(--primary-color-1) !important;
   --el-button-active-border-color: var(--primary-color) !important;
   --el-button-text-color: var(--button-primary-text-color) !important;
-  // border:none !important;
+  color: var(--button-primary-text-color) !important;
 }
 
-.el-button--primary:hover,
-.el-button--primary:focus {
+.el-button--primary:focus:not(:hover) {
+  color: var(--button-primary-text-color) !important;
+  background-color: var(--primary-color) !important;
+  border-color: var(--primary-color) !important;
+}
+
+.el-button--primary:hover {
   color: var(--text-color--white) !important;
 }
 
