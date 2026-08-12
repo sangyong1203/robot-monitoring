@@ -71,9 +71,30 @@
                         </el-table-column>
                         <el-table-column label="포함 Activity" min-width="240">
                             <template #default="{ row }">
-                                <span v-for="act in row.activities" :key="act.sequence" class="task-act-tag">
-                                    {{ act.sequence }}. {{ act.activityName }}
-                                </span>
+                                <el-tooltip v-if="row.activities && row.activities.length" placement="top" effect="dark" :show-after="100">
+                                    <template #content>
+                                        <div class="act-tooltip-container">
+                                            <div class="act-tooltip-title">포함 Activity 순서 목록 (총 {{ row.activities.length }}개)</div>
+                                            <div v-for="act in row.activities" :key="act.sequence" class="act-tooltip-row">
+                                                <span class="seq">{{ act.sequence }}.</span>
+                                                <span class="name">{{ act.activityName }}</span>
+                                            </div>
+                                        </div>
+                                    </template>
+                                    <div class="task-act-tags-wrapper">
+                                        <span
+                                            v-for="act in row.activities.slice(0, 2)"
+                                            :key="act.sequence"
+                                            class="task-act-tag"
+                                        >
+                                            {{ act.sequence }}. {{ act.activityName }}
+                                        </span>
+                                        <span v-if="row.activities.length > 2" class="task-act-more">
+                                            +{{ row.activities.length - 2 }}
+                                        </span>
+                                    </div>
+                                </el-tooltip>
+                                <span v-else class="text-muted">-</span>
                             </template>
                         </el-table-column>
                         <el-table-column prop="createdAt" label="등록일시" width="170" />
@@ -911,14 +932,75 @@ const deleteSchedule = async (row: ScheduleItem) => {
     }
 }
 
+.task-act-tags-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
 .task-act-tag {
     display: inline-block;
     background: rgba(255, 255, 255, 0.08);
     padding: 2px 8px;
     border-radius: 4px;
-    margin-right: 6px;
-    margin-bottom: 4px;
     font-size: 13px;
+    white-space: nowrap;
+    max-width: 150px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    transition: background 0.18s ease;
+
+    &:hover {
+        background: rgba(231, 109, 255, 0.2);
+    }
+}
+
+.task-act-more {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--primary-color);
+    font-size: 12px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.act-tooltip-container {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 2px 4px;
+    min-width: 180px;
+
+    .act-tooltip-title {
+        font-size: 12px;
+        font-weight: 700;
+        color: var(--primary-color);
+        margin-bottom: 2px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+        padding-bottom: 4px;
+    }
+
+    .act-tooltip-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 13px;
+        color: var(--text-color--white);
+
+        .seq {
+            font-weight: 700;
+            color: var(--secondary-color);
+            min-width: 18px;
+        }
+
+        .name {
+            white-space: nowrap;
+        }
+    }
 }
 
 .builder-row {
