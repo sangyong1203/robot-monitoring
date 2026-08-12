@@ -574,6 +574,7 @@ onMounted(() => {
     flex-direction: column;
     gap: 12px;
     flex: 1;
+    min-height: 0;
 }
 
 .robots-overview-section {
@@ -709,24 +710,69 @@ onMounted(() => {
 .control-main-tabs {
     margin-top: 0;
     flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+
+    :deep(.el-tabs__content) {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
+    }
+
+    :deep(.el-tab-pane) {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
+    }
 }
 
 .control-grid {
-    display: grid;
-    grid-template-columns: 460px 1fr;
+    display: flex;
     gap: 20px;
+    flex: 1;
+    min-height: 0;
 }
 
-.control-card, .control-logs-card {
+.control-card {
+    flex: 0 0 460px;
     background: rgba(255, 255, 255, 0.03);
     border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 8px;
     padding: 20px;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
 
     h4 {
         margin-top: 0;
         margin-bottom: 16px;
         font-size: 15px;
+    }
+}
+
+.control-logs-card {
+    flex: 1;
+    min-width: 0;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 8px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+
+    h4 {
+        margin-top: 0;
+        margin-bottom: 16px;
+        font-size: 15px;
+    }
+
+    :deep(.el-table) {
+        flex: 1;
+        min-height: 0;
     }
 }
 
@@ -776,8 +822,12 @@ onMounted(() => {
 }
 
 .grid-2col {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
+    display: flex;
     gap: 12px;
+
+    > * {
+        flex: 1;
+        min-width: 0;
+    }
 }
 </style>
