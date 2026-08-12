@@ -16,16 +16,12 @@
                     <el-table :data="filteredMissions" stripe style="width: 100%" height="100%">
                         <el-table-column label="미션 코드" width="160">
                             <template #default="{ row }">
-                                <el-tooltip :content="row.code" placement="top" effect="dark" :show-after="10">
-                                    <span class="cell-code-text">{{ row.code }}</span>
-                                </el-tooltip>
+                                <TableRowTooltip :content="row.code" />
                             </template>
                         </el-table-column>
                         <el-table-column label="미션 이름" min-width="220">
                             <template #default="{ row }">
-                                <el-tooltip :content="row.name" placement="top" effect="dark" :show-after="10">
-                                    <span class="cell-code-text">{{ row.name }}</span>
-                                </el-tooltip>
+                                <TableRowTooltip :content="row.name" />
                             </template>
                         </el-table-column>
                         <el-table-column label="미션 유형" width="130">
@@ -37,20 +33,14 @@
                             </template>
                         </el-table-column>
                         <el-table-column label="포함 Task 수" width="110">
-                            <template #default="{ row }">
-                                {{ row.tasks.length }}개
-                            </template>
+                            <template #default="{ row }"> {{ row.tasks.length }}개 </template>
                         </el-table-column>
                         <el-table-column label="연계 조건 수" width="110">
-                            <template #default="{ row }">
-                                {{ row.conditions.length }}개
-                            </template>
+                            <template #default="{ row }"> {{ row.conditions.length }}개 </template>
                         </el-table-column>
                         <el-table-column label="설명" min-width="200">
                             <template #default="{ row }">
-                                <el-tooltip v-if="row.description" :content="row.description" placement="top" effect="dark" :show-after="10">
-                                    <span class="cell-code-text">{{ row.description }}</span>
-                                </el-tooltip>
+                                <TableRowTooltip v-if="row.description" :content="row.description" />
                                 <span v-else class="text-muted">-</span>
                             </template>
                         </el-table-column>
@@ -80,9 +70,21 @@
                     </TableToolbar>
 
                     <el-table :data="filteredTasks" stripe style="width: 100%" height="100%">
-                        <el-table-column prop="code" label="Task 코드" width="160" />
-                        <el-table-column prop="name" label="Task 이름" min-width="180" />
-                        <el-table-column prop="robotModelName" label="대상 로봇 모델" width="140" />
+                        <el-table-column label="Task 코드" width="160">
+                            <template #default="{ row }">
+                                <TableRowTooltip :content="row.code" />
+                            </template>
+                        </el-table-column>
+                        <el-table-column label="Task 이름" min-width="180">
+                            <template #default="{ row }">
+                                <TableRowTooltip :content="row.name" />
+                            </template>
+                        </el-table-column>
+                        <el-table-column label="대상 로봇 모델" width="140">
+                            <template #default="{ row }">
+                                <TableRowTooltip :content="row.robotModelName" />
+                            </template>
+                        </el-table-column>
                         <el-table-column label="연동 목적지 (POI)" min-width="180">
                             <template #default="{ row }">
                                 <StatusBadge :label="row.destinationName || '지정 안됨'" variant="progress" />
@@ -90,11 +92,22 @@
                         </el-table-column>
                         <el-table-column label="포함 Activity" min-width="240">
                             <template #default="{ row }">
-                                <el-tooltip v-if="row.activities && row.activities.length" placement="top" effect="dark" :show-after="100">
+                                <el-tooltip
+                                    v-if="row.activities && row.activities.length"
+                                    placement="top"
+                                    effect="dark"
+                                    :show-after="100"
+                                >
                                     <template #content>
                                         <div class="act-tooltip-container">
-                                            <div class="act-tooltip-title">포함 Activity 순서 목록 (총 {{ row.activities.length }}개)</div>
-                                            <div v-for="act in row.activities" :key="act.sequence" class="act-tooltip-row">
+                                            <div class="act-tooltip-title">
+                                                포함 Activity 순서 목록 (총 {{ row.activities.length }}개)
+                                            </div>
+                                            <div
+                                                v-for="act in row.activities"
+                                                :key="act.sequence"
+                                                class="act-tooltip-row"
+                                            >
                                                 <span class="seq">{{ act.sequence }}.</span>
                                                 <span class="name">{{ act.activityName }}</span>
                                             </div>
@@ -142,8 +155,16 @@
                     </TableToolbar>
 
                     <el-table :data="filteredActivities" stripe style="width: 100%" height="100%">
-                        <el-table-column prop="code" label="Activity 코드" width="180" />
-                        <el-table-column prop="name" label="Activity 이름" min-width="180" />
+                        <el-table-column label="Activity 코드" width="180">
+                            <template #default="{ row }">
+                                <TableRowTooltip :content="row.code" />
+                            </template>
+                        </el-table-column>
+                        <el-table-column label="Activity 이름" min-width="180">
+                            <template #default="{ row }">
+                                <TableRowTooltip :content="row.name" />
+                            </template>
+                        </el-table-column>
                         <el-table-column prop="activityType" label="유형" width="120" />
                         <el-table-column label="대상 로봇 모델" width="140">
                             <template #default="{ row }">
@@ -155,7 +176,11 @@
                                 <StatusBadge :label="row.destinationName || '전역/미지정'" variant="success" />
                             </template>
                         </el-table-column>
-                        <el-table-column prop="description" label="설명" min-width="200" />
+                        <el-table-column label="설명" min-width="200">
+                            <template #default="{ row }">
+                                <TableRowTooltip :content="row.description" />
+                            </template>
+                        </el-table-column>
                         <el-table-column prop="createdAt" label="등록일시" width="170" />
                         <el-table-column label="관리" width="120" align="center">
                             <template #default="{ row }">
@@ -182,10 +207,26 @@
                     </TableToolbar>
 
                     <el-table :data="filteredSchedules" stripe style="width: 100%" height="100%">
-                        <el-table-column prop="code" label="스케줄 코드" width="150" />
-                        <el-table-column prop="name" label="스케줄 명칭" min-width="200" />
-                        <el-table-column prop="missionName" label="실행 대상 미션" min-width="220" />
-                        <el-table-column prop="robotName" label="배정 로봇" width="180" />
+                        <el-table-column label="스케줄 코드" width="150">
+                            <template #default="{ row }">
+                                <TableRowTooltip :content="row.code" />
+                            </template>
+                        </el-table-column>
+                        <el-table-column label="스케줄 명칭" min-width="200">
+                            <template #default="{ row }">
+                                <TableRowTooltip :content="row.name" />
+                            </template>
+                        </el-table-column>
+                        <el-table-column label="실행 대상 미션" min-width="220">
+                            <template #default="{ row }">
+                                <TableRowTooltip :content="row.missionName" />
+                            </template>
+                        </el-table-column>
+                        <el-table-column label="배정 로봇" width="180">
+                            <template #default="{ row }">
+                                <TableRowTooltip :content="row.robotName" />
+                            </template>
+                        </el-table-column>
                         <el-table-column prop="cronExpression" label="실행 주기/Cron" width="150" align="center" />
                         <el-table-column prop="nextRunAt" label="다음 실행 예정" width="170" align="center" />
                         <el-table-column label="상태" width="100" align="center">
@@ -250,6 +291,7 @@ import TableToolbar from '@/components/TableToolbar.vue'
 import SearchText from '@/components/SearchText.vue'
 import StatusBadge from '@/components/StatusBadge.vue'
 import TableRowActions from '@/components/TableRowActions.vue'
+import TableRowTooltip from '@/components/TableRowTooltip.vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { getActivities, getTasks, getMissions, getSchedules } from './service/missionManagement.api'
 import type { ActivityItem, TaskItem, MissionItem, ScheduleItem, ActivityType } from './service/missionManagement.types'
@@ -548,7 +590,7 @@ const deleteActivity = async (row: ActivityItem) => {
         await ElMessageBox.alert(
             `Activity [${row.name}]는 Task [${usedTask.name}]에서 참조되어 있어 삭제할 수 없습니다.`,
             '삭제 제한 안내',
-            { type: 'warning' }
+            { type: 'warning' },
         )
         return
     }
@@ -567,7 +609,7 @@ const deleteTask = async (row: TaskItem) => {
         await ElMessageBox.alert(
             `Task [${row.name}]는 미션 [${usedMission.name}]에서 참조되어 있어 삭제할 수 없습니다.`,
             '삭제 제한 안내',
-            { type: 'warning' }
+            { type: 'warning' },
         )
         return
     }
@@ -586,7 +628,7 @@ const deleteMission = async (row: MissionItem) => {
         await ElMessageBox.alert(
             `미션 [${row.name}]는 실행 스케줄 [${usedSched.name}]에 등록되어 있어 삭제할 수 없습니다.`,
             '삭제 제한 안내',
-            { type: 'warning' }
+            { type: 'warning' },
         )
         return
     }
@@ -721,12 +763,4 @@ const deleteSchedule = async (row: ScheduleItem) => {
     }
 }
 
-.cell-code-text {
-    display: inline-block;
-    vertical-align: middle;
-    max-width: 100%;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
 </style>

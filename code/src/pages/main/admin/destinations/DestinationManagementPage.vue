@@ -102,9 +102,17 @@
                         @row-click="(row: DestinationItem) => (selectedDestId = row.id)"
                         @row-dblclick="openEditDialog"
                     >
-                        <el-table-column prop="name" label="목적지 이름" min-width="170" show-overflow-tooltip />
+                        <el-table-column label="목적지 이름" min-width="170">
+                            <template #default="{ row }">
+                                <TableRowTooltip :content="row.name" />
+                            </template>
+                        </el-table-column>
 
-                        <el-table-column prop="code" label="목적지 코드" width="130" align="center" />
+                        <el-table-column label="목적지 코드" width="130" align="center">
+                            <template #default="{ row }">
+                                <TableRowTooltip :content="row.code" />
+                            </template>
+                        </el-table-column>
 
                         <el-table-column prop="type" label="타입" width="120" align="center">
                             <template #default="{ row }">
@@ -178,6 +186,7 @@ import StatusBadge from '@/components/StatusBadge.vue'
 import SearchBox from '@/components/SearchBox.vue'
 import SearchText from '@/components/SearchText.vue'
 import DropdownList from '@/components/DropdownList.vue'
+import TableRowTooltip from '@/components/TableRowTooltip.vue'
 import DestinationFormDialog from './components/DestinationFormDialog.vue'
 import { deleteDestination, getDestinations } from './service/destinations.api'
 import type { DestinationItem, DestinationType } from './service/destinations.types'

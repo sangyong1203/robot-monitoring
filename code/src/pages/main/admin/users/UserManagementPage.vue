@@ -57,11 +57,19 @@
                     </template>
                 </el-table-column>
 
-                <el-table-column prop="orgPath" label="소속 기관 / 부서" min-width="240" show-overflow-tooltip />
+                <el-table-column label="소속 기관 / 부서" min-width="240">
+                    <template #default="{ row }">
+                        <TableRowTooltip :content="row.orgPath" />
+                    </template>
+                </el-table-column>
 
                 <el-table-column prop="phone" label="연락처" width="150" align="center" />
 
-                <el-table-column prop="email" label="이메일 주소" width="200" align="center" show-overflow-tooltip />
+                <el-table-column label="이메일 주소" width="200" align="center">
+                    <template #default="{ row }">
+                        <TableRowTooltip :content="row.email" />
+                    </template>
+                </el-table-column>
 
                 <el-table-column prop="isActive" label="계정 상태" width="100" align="center">
                     <template #default="{ row }">
@@ -121,6 +129,7 @@ import StatusBadge from '@/components/StatusBadge.vue'
 import SearchBox from '@/components/SearchBox.vue'
 import SearchText from '@/components/SearchText.vue'
 import DropdownList from '@/components/DropdownList.vue'
+import TableRowTooltip from '@/components/TableRowTooltip.vue'
 import UserFormDialog from './components/UserFormDialog.vue'
 import { deleteUser, getUsers } from './service/users.api'
 import type { UserItem } from './service/users.types'

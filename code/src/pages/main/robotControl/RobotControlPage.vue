@@ -163,10 +163,22 @@
                         <h4>제어 명령 요청/응답 이력</h4>
                         <el-table :data="logs" stripe height="100%">
                             <el-table-column prop="requestedAt" label="요청시각" width="160" />
-                            <el-table-column prop="robotName" label="대상 로봇" width="140" />
+                            <el-table-column label="대상 로봇" width="140">
+                                <template #default="{ row }">
+                                    <TableRowTooltip :content="row.robotName" />
+                                </template>
+                            </el-table-column>
                             <el-table-column prop="commandType" label="명령 유형" width="130" />
-                            <el-table-column prop="payloadSummary" label="세부 내용" min-width="220" show-overflow-tooltip />
-                            <el-table-column prop="requestedBy" label="요청자" width="120" />
+                            <el-table-column label="세부 내용" min-width="220">
+                                <template #default="{ row }">
+                                    <TableRowTooltip :content="row.payloadSummary" />
+                                </template>
+                            </el-table-column>
+                            <el-table-column label="요청자" width="120">
+                                <template #default="{ row }">
+                                    <TableRowTooltip :content="row.requestedBy" />
+                                </template>
+                            </el-table-column>
                             <el-table-column label="상태" width="120" align="center">
                                 <template #default="{ row }">
                                     <StatusBadge :label="row.status" :variant="row.status === 'APPLIED' ? 'success' : 'info'" />
@@ -186,13 +198,23 @@
                 </TableToolbar>
 
                 <el-table :data="schedules" stripe style="width: 100%">
-                    <el-table-column prop="name" label="스케줄 명칭" min-width="200" />
-                    <el-table-column label="실행 대상 (Task/Mission)" min-width="220">
+                    <el-table-column label="스케줄 명칭" min-width="200">
                         <template #default="{ row }">
-                            {{ row.targetType === 'TASK' ? `[Task] ${row.taskName}` : `[Mission] ${row.missionName}` }}
+                            <TableRowTooltip :content="row.name" />
                         </template>
                     </el-table-column>
-                    <el-table-column prop="robotName" label="배정 로봇" width="170" />
+                    <el-table-column label="실행 대상 (Task/Mission)" min-width="220">
+                        <template #default="{ row }">
+                            <TableRowTooltip
+                                :content="row.targetType === 'TASK' ? `[Task] ${row.taskName}` : `[Mission] ${row.missionName}`"
+                            />
+                        </template>
+                    </el-table-column>
+                    <el-table-column label="배정 로봇" width="170">
+                        <template #default="{ row }">
+                            <TableRowTooltip :content="row.robotName" />
+                        </template>
+                    </el-table-column>
                     <el-table-column prop="cronExpression" label="실행 주기" width="140" align="center" />
                     <el-table-column prop="repeatCondition" label="반복 조건" width="160" align="center" />
                     <el-table-column label="연계 이벤트 코드" min-width="180">
@@ -359,6 +381,7 @@ import StatusBadge from '@/components/StatusBadge.vue'
 import BaseDialog from '@/components/BaseDialog.vue'
 import DaysCheckboxGroup from '@/components/DaysCheckboxGroup.vue'
 import RadioToggleGroup from '@/components/RadioToggleGroup.vue'
+import TableRowTooltip from '@/components/TableRowTooltip.vue'
 import { ElMessage } from 'element-plus'
 import { simulationService } from '@/services/simulation.service'
 import { getControlLogs, getControlSchedules } from './service/robotControl.api'

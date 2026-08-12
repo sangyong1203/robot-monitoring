@@ -47,7 +47,11 @@
                 class="management-page__table"
                 @row-dblclick="openEditDialog"
             >
-                <el-table-column prop="name" label="기관 / 사이트명" min-width="220" show-overflow-tooltip />
+                <el-table-column label="기관 / 사이트명" min-width="220">
+                    <template #default="{ row }">
+                        <TableRowTooltip :content="row.name" />
+                    </template>
+                </el-table-column>
 
                 <el-table-column prop="code" label="기관 코드" width="160" align="center" />
 
@@ -61,7 +65,11 @@
 
                 <el-table-column prop="registeredUserCount" label="등록 사용자" width="110" align="center" />
 
-                <el-table-column prop="vendorName" label="운영 관리 업체" width="160" align="center" show-overflow-tooltip />
+                <el-table-column label="운영 관리 업체" width="160" align="center">
+                    <template #default="{ row }">
+                        <TableRowTooltip :content="row.vendorName" />
+                    </template>
+                </el-table-column>
 
                 <el-table-column prop="vendorContactName" label="업체 담당자" width="130" align="center" />
 
@@ -123,6 +131,7 @@ import StatusBadge from '@/components/StatusBadge.vue'
 import SearchBox from '@/components/SearchBox.vue'
 import SearchText from '@/components/SearchText.vue'
 import DropdownList from '@/components/DropdownList.vue'
+import TableRowTooltip from '@/components/TableRowTooltip.vue'
 import OrganizationFormDialog from './components/OrganizationFormDialog.vue'
 import { deleteOrganization, getOrganizations } from './service/organizations.api'
 import type { OrganizationItem, OrgType } from './service/organizations.types'

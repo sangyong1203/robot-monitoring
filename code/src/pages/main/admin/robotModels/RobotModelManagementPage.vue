@@ -37,9 +37,17 @@
                 class="management-page__table"
                 @row-dblclick="openEditDialog"
             >
-                <el-table-column prop="modelName" label="로봇 모델명" min-width="260" show-overflow-tooltip />
+                <el-table-column label="로봇 모델명" min-width="260">
+                    <template #default="{ row }">
+                        <TableRowTooltip :content="row.modelName" />
+                    </template>
+                </el-table-column>
 
-                <el-table-column prop="modelCode" label="모델 코드" width="160" align="center" />
+                <el-table-column label="모델 코드" width="160" align="center">
+                    <template #default="{ row }">
+                        <TableRowTooltip :content="row.modelCode" />
+                    </template>
+                </el-table-column>
 
                 <el-table-column prop="robotType" label="로봇 종류" width="140" align="center">
                     <template #default="{ row }">
@@ -47,9 +55,17 @@
                     </template>
                 </el-table-column>
 
-                <el-table-column prop="manufacturer" label="제조사" width="150" align="center" show-overflow-tooltip />
+                <el-table-column label="제조사" width="150" align="center">
+                    <template #default="{ row }">
+                        <TableRowTooltip :content="row.manufacturer" />
+                    </template>
+                </el-table-column>
 
-                <el-table-column prop="os" label="OS / 플랫폼" width="180" align="center" />
+                <el-table-column label="OS / 플랫폼" width="180" align="center">
+                    <template #default="{ row }">
+                        <TableRowTooltip :content="row.os" />
+                    </template>
+                </el-table-column>
 
                 <el-table-column prop="registeredRobotCount" label="배치 운영 로봇 수" width="140" align="center" />
 
@@ -114,6 +130,7 @@ import StatusBadge from '@/components/StatusBadge.vue'
 import SearchBox from '@/components/SearchBox.vue'
 import SearchText from '@/components/SearchText.vue'
 import DropdownList from '@/components/DropdownList.vue'
+import TableRowTooltip from '@/components/TableRowTooltip.vue'
 import RobotModelFormDialog from './components/RobotModelFormDialog.vue'
 import { getRobotModels } from './service/robotModels.api'
 import type { RobotModelItem } from './service/robotModels.types'

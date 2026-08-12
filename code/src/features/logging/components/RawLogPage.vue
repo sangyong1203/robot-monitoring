@@ -85,13 +85,16 @@
                             <StatusBadge :label="row.level" :variant="levelVariant(row.level)" min-width="76px" />
                         </template>
                     </el-table-column>
-                    <el-table-column prop="source" label="출처" min-width="170" show-overflow-tooltip />
-                    <el-table-column
-                        prop="correlationId"
-                        label="Correlation ID"
-                        min-width="190"
-                        show-overflow-tooltip
-                    />
+                    <el-table-column label="출처" min-width="170">
+                        <template #default="{ row }">
+                            <TableRowTooltip :content="row.source" />
+                        </template>
+                    </el-table-column>
+                    <el-table-column label="Correlation ID" min-width="190">
+                        <template #default="{ row }">
+                            <TableRowTooltip :content="row.correlationId" />
+                        </template>
+                    </el-table-column>
                     <el-table-column label="명령·단계" min-width="170">
                         <template #default="{ row }">
                             <div class="raw-log-page__command-cell">
@@ -116,7 +119,11 @@
                             </div>
                         </template>
                     </el-table-column>
-                    <el-table-column prop="message" label="원본 메시지" min-width="300" show-overflow-tooltip />
+                    <el-table-column label="원본 메시지" min-width="300">
+                        <template #default="{ row }">
+                            <TableRowTooltip :content="row.message" />
+                        </template>
+                    </el-table-column>
                     <el-table-column label="원본 데이터" min-width="260">
                         <template #default="{ row }">
                             <code class="raw-log-page__payload">{{ row.payload }}</code>
@@ -146,6 +153,7 @@ import Pagination from '@/components/Pagination.vue'
 import Panel from '@/components/Panel.vue'
 import SearchBox from '@/components/SearchBox.vue'
 import SearchText from '@/components/SearchText.vue'
+import TableRowTooltip from '@/components/TableRowTooltip.vue'
 import { useAuthStore } from '@/stores/auth.store'
 import type { ScreenId } from '@/types/accessControl'
 import { formatDateTime } from '@/utils/date.util'

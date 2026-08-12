@@ -55,11 +55,23 @@
                     </template>
                 </el-table-column>
 
-                <el-table-column prop="name" label="지도 이름" min-width="200" show-overflow-tooltip />
+                <el-table-column label="지도 이름" min-width="200">
+                    <template #default="{ row }">
+                        <TableRowTooltip :content="row.name" />
+                    </template>
+                </el-table-column>
 
-                <el-table-column prop="code" label="지도 코드" width="160" align="center" />
+                <el-table-column label="지도 코드" width="160" align="center">
+                    <template #default="{ row }">
+                        <TableRowTooltip :content="row.code" />
+                    </template>
+                </el-table-column>
 
-                <el-table-column prop="zoneName" label="소속 구역" width="160" align="center" show-overflow-tooltip />
+                <el-table-column label="소속 구역" width="160" align="center">
+                    <template #default="{ row }">
+                        <TableRowTooltip :content="row.zoneName" />
+                    </template>
+                </el-table-column>
 
                 <el-table-column prop="mapType" label="구분" width="130" align="center">
                     <template #default="{ row }">
@@ -140,6 +152,7 @@ import StatusBadge from '@/components/StatusBadge.vue'
 import SearchBox from '@/components/SearchBox.vue'
 import SearchText from '@/components/SearchText.vue'
 import DropdownList from '@/components/DropdownList.vue'
+import TableRowTooltip from '@/components/TableRowTooltip.vue'
 import MapFormDialog from './components/MapFormDialog.vue'
 import { deleteMap, getMaps } from './service/maps.api'
 import type { MapItem, MapType } from './service/maps.types'

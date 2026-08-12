@@ -37,15 +37,35 @@
                 class="management-page__table"
                 @row-dblclick="openEditDialog"
             >
-                <el-table-column prop="name" label="운영 로봇 명칭" min-width="180" show-overflow-tooltip />
+                <el-table-column label="운영 로봇 명칭" min-width="180">
+                    <template #default="{ row }">
+                        <TableRowTooltip :content="row.name" />
+                    </template>
+                </el-table-column>
 
-                <el-table-column prop="robotCode" label="로봇 식별 ID" width="160" align="center" />
+                <el-table-column label="로봇 식별 ID" width="160" align="center">
+                    <template #default="{ row }">
+                        <TableRowTooltip :content="row.robotCode" />
+                    </template>
+                </el-table-column>
 
-                <el-table-column prop="modelName" label="연계 로봇 모델" min-width="200" show-overflow-tooltip />
+                <el-table-column label="연계 로봇 모델" min-width="200">
+                    <template #default="{ row }">
+                        <TableRowTooltip :content="row.modelName" />
+                    </template>
+                </el-table-column>
 
-                <el-table-column prop="manufacturer" label="제조사" width="140" align="center" />
+                <el-table-column label="제조사" width="140" align="center">
+                    <template #default="{ row }">
+                        <TableRowTooltip :content="row.manufacturer" />
+                    </template>
+                </el-table-column>
 
-                <el-table-column prop="orgPath" label="설치 기관 및 구역" min-width="220" show-overflow-tooltip />
+                <el-table-column label="설치 기관 및 구역" min-width="220">
+                    <template #default="{ row }">
+                        <TableRowTooltip :content="row.orgPath" />
+                    </template>
+                </el-table-column>
 
                 <el-table-column prop="communicationStatus" label="통신 상태" width="120" align="center">
                     <template #default="{ row }">
@@ -129,6 +149,7 @@ import MeterBar from '@/components/MeterBar.vue'
 import SearchBox from '@/components/SearchBox.vue'
 import SearchText from '@/components/SearchText.vue'
 import DropdownList from '@/components/DropdownList.vue'
+import TableRowTooltip from '@/components/TableRowTooltip.vue'
 import OperatingRobotFormDialog from './components/OperatingRobotFormDialog.vue'
 import { deleteOperatingRobot, getOperatingRobots } from './service/operatingRobots.api'
 import type { OperatingRobotItem } from './service/operatingRobots.types'
