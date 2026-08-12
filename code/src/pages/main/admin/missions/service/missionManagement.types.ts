@@ -6,6 +6,7 @@ export type ActivityItem = {
     code: string
     activityType: ActivityType
     targetRobotModelId?: number
+    targetRobotModelName?: string
     destinationId?: number
     destinationName?: string
     description?: string

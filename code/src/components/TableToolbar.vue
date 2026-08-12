@@ -1,10 +1,14 @@
 <template>
     <div class="table-toolbar">
-        <div class="table-toolbar__filters">
-            <slot />
+        <div v-if="$slots.default || $slots.left" class="table-toolbar__filters">
+            <slot name="left">
+                <slot />
+            </slot>
         </div>
-        <div v-if="$slots.actions" class="table-toolbar__actions">
-            <slot name="actions" />
+        <div v-if="$slots.actions || $slots.right" class="table-toolbar__actions">
+            <slot name="actions">
+                <slot name="right" />
+            </slot>
         </div>
     </div>
 </template>
