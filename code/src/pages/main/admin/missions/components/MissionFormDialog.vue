@@ -60,7 +60,7 @@
             </el-form-item>
 
             <el-form-item label="미션 설명">
-                <el-input v-model="form.description" type="textarea" :rows="2" />
+                <el-input v-model="form.description" type="textarea" :rows="5" />
             </el-form-item>
         </el-form>
         <template #footer>
