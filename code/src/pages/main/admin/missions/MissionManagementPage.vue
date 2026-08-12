@@ -14,8 +14,20 @@
                     </TableToolbar>
 
                     <el-table :data="filteredMissions" stripe style="width: 100%" height="100%">
-                        <el-table-column prop="code" label="미션 코드" width="180" />
-                        <el-table-column prop="name" label="미션 이름" min-width="220" />
+                        <el-table-column label="미션 코드" width="160">
+                            <template #default="{ row }">
+                                <el-tooltip :content="row.code" placement="top" effect="dark" :show-after="10">
+                                    <span class="cell-code-text">{{ row.code }}</span>
+                                </el-tooltip>
+                            </template>
+                        </el-table-column>
+                        <el-table-column label="미션 이름" min-width="220">
+                            <template #default="{ row }">
+                                <el-tooltip :content="row.name" placement="top" effect="dark" :show-after="10">
+                                    <span class="cell-code-text">{{ row.name }}</span>
+                                </el-tooltip>
+                            </template>
+                        </el-table-column>
                         <el-table-column label="미션 유형" width="130">
                             <template #default="{ row }">
                                 <StatusBadge
@@ -34,7 +46,14 @@
                                 {{ row.conditions.length }}개
                             </template>
                         </el-table-column>
-                        <el-table-column prop="description" label="설명" min-width="200" show-overflow-tooltip />
+                        <el-table-column label="설명" min-width="200">
+                            <template #default="{ row }">
+                                <el-tooltip v-if="row.description" :content="row.description" placement="top" effect="dark" :show-after="10">
+                                    <span class="cell-code-text">{{ row.description }}</span>
+                                </el-tooltip>
+                                <span v-else class="text-muted">-</span>
+                            </template>
+                        </el-table-column>
                         <el-table-column prop="createdAt" label="등록일시" width="180" />
                         <el-table-column label="관리" width="120" align="center">
                             <template #default="{ row }">
@@ -700,5 +719,14 @@ const deleteSchedule = async (row: ScheduleItem) => {
             white-space: nowrap;
         }
     }
+}
+
+.cell-code-text {
+    display: inline-block;
+    vertical-align: middle;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 </style>
