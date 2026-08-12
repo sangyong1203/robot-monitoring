@@ -182,9 +182,9 @@
                     <el-input v-model="missionForm.name" placeholder="예: [융합] 폐기물 이송 및 장입 미션" />
                 </el-form-item>
                 <el-form-item label="미션 유형" required>
-                    <el-radio-group v-model="missionForm.missionType">
-                        <el-radio-button value="CONVERGENCE">2종 이상 이기종 미션</el-radio-button>
-                        <el-radio-button value="SINGLE">단일 로봇 미션</el-radio-button>
+                    <el-radio-group v-model="missionForm.missionType" class="mission-type-radio-group">
+                        <el-radio-button value="CONVERGENCE">융합 미션</el-radio-button>
+                        <el-radio-button value="SINGLE">단일 미션</el-radio-button>
                     </el-radio-group>
                 </el-form-item>
 
@@ -201,7 +201,9 @@
                             />
                         </el-select>
                         <el-input v-model="tItem.robotName" placeholder="배정 로봇명 (예: 무인지게차 1호기)" style="flex:1" />
-                        <el-button type="danger" circle size="small" @click="removeMissionTask(tIdx)">✕</el-button>
+                        <button type="button" class="builder-delete-btn" circle title="삭제" @click="removeMissionTask(tIdx)">
+                            <el-icon><Trash2 /></el-icon>
+                        </button>
                     </div>
                     <el-button type="primary" plain size="small" style="margin-top: 8px" @click="addMissionTask">+ Task 추가</el-button>
                 </el-form-item>
@@ -216,7 +218,9 @@
                         <el-select v-model="cItem.triggerTaskId" placeholder="후속 Task 실행" style="flex:1">
                             <el-option v-for="tk in tasks" :key="tk.id" :label="tk.name" :value="tk.id" />
                         </el-select>
-                        <el-button type="danger" circle size="small" @click="removeMissionCondition(cIdx)">✕</el-button>
+                        <button type="button" class="builder-delete-btn" title="삭제" @click="removeMissionCondition(cIdx)">
+                            <el-icon><Trash2 /></el-icon>
+                        </button>
                     </div>
                     <el-button type="primary" plain size="small" style="margin-top: 8px" @click="addMissionCondition">+ 선행 조건 추가</el-button>
                 </el-form-item>
@@ -275,7 +279,9 @@
                                 :value="act.id"
                             />
                         </el-select>
-                        <el-button type="danger" circle size="small" @click="removeTaskActivity(aIdx)">✕</el-button>
+                        <button type="button" class="builder-delete-btn" title="삭제" @click="removeTaskActivity(aIdx)">
+                            <el-icon><Trash2 /></el-icon>
+                        </button>
                     </div>
                     <el-button type="primary" plain size="small" style="margin-top: 8px" @click="addTaskActivity">+ Activity 추가</el-button>
                 </el-form-item>
@@ -389,6 +395,7 @@ import StatusBadge from '@/components/StatusBadge.vue'
 import TableRowActions from '@/components/TableRowActions.vue'
 import BaseDialog from '@/components/BaseDialog.vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
+import { Trash2 } from '@lucide/vue'
 import { getActivities, getTasks, getMissions, getSchedules } from './service/missionManagement.api'
 import type { ActivityItem, TaskItem, MissionItem, ScheduleItem, ActivityType } from './service/missionManagement.types'
 import { fetchMockDestinations } from '../destinations/service/destinations.mock'
@@ -931,6 +938,60 @@ const deleteSchedule = async (row: ScheduleItem) => {
         font-size: 12px;
         color: var(--secondary-color);
         white-space: nowrap;
+    }
+}
+
+.mission-type-radio-group {
+    display: flex;
+    width: 100%;
+    background: rgba(0, 0, 0, 0.25);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    padding: 3px;
+
+    :deep(.el-radio-button) {
+        flex: 1;
+        display: flex;
+
+        .el-radio-button__inner {
+            width: 100%;
+            background: transparent;
+            border: 1px solid transparent !important;
+            border-radius: 6px;
+            color: var(--text-color--secondary);
+            box-shadow: none !important;
+            transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+            padding: 8px 16px;
+            font-weight: 500;
+        }
+
+        &.is-active .el-radio-button__inner {
+            background: var(--primary-color-1);
+            color: var(--primary-color);
+            border-color: var(--border-glass-color) !important;
+            font-weight: 700;
+        }
+    }
+}
+
+.builder-delete-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    border: 0;
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.04);
+    color: #ff7878;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background 0.18s ease, color 0.18s ease;
+
+    &:hover {
+        background: rgba(255, 107, 107, 0.18);
+        color: #ff4d4d;
     }
 }
 </style>
