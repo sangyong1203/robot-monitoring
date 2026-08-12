@@ -1287,3 +1287,52 @@
     font-weight: 600;
   }
 }
+
+/* Dark Cyber Control Time Picker Dropdown Overrides */
+.el-time-panel,
+.el-time-picker__popper .el-popper {
+  background: #111424 !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 15px rgba(231, 109, 255, 0.1) !important;
+  border-radius: 8px !important;
+  color: var(--text-color--primary) !important;
+
+  .el-time-panel__content::before,
+  .el-time-panel__content::after {
+    border-top-color: rgba(255, 255, 255, 0.12) !important;
+    border-bottom-color: rgba(255, 255, 255, 0.12) !important;
+  }
+
+  .el-time-spinner__item {
+    color: var(--text-color--secondary) !important;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.08) !important;
+      color: #ffffff !important;
+    }
+
+    &.is-active {
+      color: var(--primary-color) !important;
+      font-weight: 700 !important;
+      background: var(--primary-color-1) !important;
+    }
+  }
+
+  .el-time-panel__footer {
+    border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
+
+    .el-time-panel__btn {
+      color: var(--text-color--secondary) !important;
+
+      &.confirm {
+        color: var(--primary-color) !important;
+        font-weight: 700 !important;
+      }
+    }
+  }
+
+  .el-popper__arrow::before {
+    background: #111424 !important;
+    border-color: rgba(255, 255, 255, 0.15) !important;
+  }
+}

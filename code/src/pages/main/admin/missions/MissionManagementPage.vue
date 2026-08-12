@@ -483,7 +483,7 @@ const onSaveSchedule = (data: {
     id?: number
     name: string
     missionId: number
-    scheduleType: 'DAILY' | 'HOURLY' | 'WEEKLY'
+    scheduleType: 'DAILY' | 'HOURLY' | 'WEEKLY' | 'CUSTOM'
     cronExpression: string
 }) => {
     const mis = missions.value.find(m => m.id === data.missionId)
