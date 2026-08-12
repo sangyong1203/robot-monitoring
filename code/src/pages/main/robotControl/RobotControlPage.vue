@@ -730,13 +730,13 @@ onMounted(() => {
     transition: all 200ms ease;
 
     &:hover {
-        border-color: rgba(21, 224, 183, 0.4);
-        background: rgba(21, 224, 183, 0.05);
+        border-color: var(--primary-color);
+        background: var(--primary-color-1);
     }
 
     &.is-selected {
         border-color: var(--primary-color);
-        background: rgba(21, 224, 183, 0.12);
+        background: var(--primary-color-1);
         box-shadow: 0 0 4px rgba(21, 224, 183, 0.25);
     }
 
