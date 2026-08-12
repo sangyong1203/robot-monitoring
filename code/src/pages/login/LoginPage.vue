@@ -248,7 +248,7 @@ const passwordReset = () => {
 </script>
 
 <style lang="scss" scoped>
-
+$text-color: rgba(255, 255, 255, 0.92);
 .layout-login {
     --primary-color: #b446d2;
     --glass-border-color: rgba(180, 70, 210, 0.4);
@@ -278,7 +278,7 @@ const passwordReset = () => {
 
     &::before {
         inset: -24px;
-        background: url('@/assets/images/login-bg-image.png') center / cover no-repeat;
+        // background: url('@/assets/images/login-bg-image.png') center / cover no-repeat;
         filter: blur(10px) saturate(0.95);
         opacity: 0.72;
         transform: scale(1.02);
@@ -395,7 +395,7 @@ const passwordReset = () => {
 
 .login-header-content {
     width: 100%;
-    color: rgba(255, 255, 255, 0.92);
+    color: $text-color;
     font-size: 72px;
     text-align: center;
     text-shadow: 0 2px 18px rgba(0, 0, 0, 0.3);
@@ -496,7 +496,7 @@ const passwordReset = () => {
     width: 100%;
     height: 64px !important;
     margin-top: 40px;
-    color: var(--button-text-color) !important;
+    color: $text-color !important;
     font-size: 20px;
     font-weight: lighter;
     background: rgba(18, 2, 37, 0.58);
