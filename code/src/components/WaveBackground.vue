@@ -1,27 +1,18 @@
 <template>
     <div class="wave-background-container">
-        <!-- Static background image layer (Instant dark background on screen entrance) -->
-        <div class="static-bg-layer"></div>
-        <!-- WebGL Wave Effect canvas (Smooth fade-in on top) -->
+        <!-- WebGL Wave Effect canvas -->
         <canvas ref="waveCanvas" :class="['wave-canvas', { 'is-ready': isCanvasReady }]"></canvas>
     </div>
 </template>
 
 <script lang="ts" setup>
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import defaultBgImageUrl from '@/assets/images/login-bg-image.png'
 
 /**
- * offsetY (수직 시작 위치 오프셋):
-    - 기본값: 0
-      +0.02처럼 플러스(+) 값을 넣으면 파도 전체 시작 위치가 아래로 내려갑니다.
-      -0.02처럼 마이너스(-) 값을 넣으면 파도 전체 시작 위치가 위로 올라갑니다.
-    - phaseOffset (파도 시작 모양/위상 오프셋):
-      기본값: 0
-      1.57 ($\pi/2$), 3.14 ($\pi$) 등의 값을 넣으면 시작할 때 파도의 곡선 모양(마루와 골 지점)을 바꿀 수 있습니다.
-    - amplitude (파도 출렁임 진폭 배율):
-      기본값: 1.0
-      1.5로 높이면 파도의 높낮이가 커지고, 0.7로 줄이면 잔잔해집니다.
+ * WaveBackground Component:
+ * - Uses WebGL fragment shader for 60fps GPU-accelerated wave animation.
+ * - Works smoothly even on PCs without discrete GPUs (Intel/AMD integrated graphics).
  */
 const props = withDefaults(
     defineProps<{
@@ -41,8 +32,27 @@ const props = withDefaults(
         frequency: 20.0,
     }
 )
-
-// const cssBgUrl = computed(() => `url("${props.bgImageUrl}")`)
+/**
+ *  
+ *  - speed (파도 움직임 속도):
+      기본값: 0.0005
+      값이 커질수록 파도가 빠르게 움직입니다.
+    
+    - offsetY (수직 시작 위치 오프셋):
+      기본값: 0
+      +0.02처럼 플러스(+) 값을 넣으면 파도 전체 시작 위치가 아래로 내려갑니다.
+      -0.02처럼 마이너스(-) 값을 넣으면 파도 전체 시작 위치가 위로 올라갑니다.
+    - phaseOffset (파도 시작 모양/위상 오프셋):
+      기본값: 0
+      1.57 ($\pi/2$), 3.14 ($\pi$) 등의 값을 넣으면 시작할 때 파도의 곡선 모양(마루와 골 지점)을 바꿀 수 있습니다.
+    - amplitude (파도 출렁임 진폭 배율):
+      기본값: 1.0
+      1.5로 높이면 파도의 높낮이가 커지고, 0.7로 줄이면 잔잔해집니다.
+    - frequency (파도 굴곡 횟수/밀도):
+      기본값: 20.0
+      값이 커질수록(예: 30.0) 화면 전체에 파도 골이 더 촘촘하고 가늘게 나타나고,
+      값이 작아질수록(예: 10.0) 파도가 굵고 성글게 보입니다.
+ */
 const isCanvasReady = ref(false)
 
 const waveCanvas = ref<HTMLCanvasElement | null>(null)
@@ -59,6 +69,7 @@ const setupWaveAnimation = () => {
         (canvas.getContext('webgl') as WebGLRenderingContext | null) ||
         (canvas.getContext('experimental-webgl') as WebGLRenderingContext | null)
     if (!gl) {
+        console.warn('WebGL is not supported in this environment.')
         return null
     }
 
@@ -271,14 +282,6 @@ onUnmounted(() => {
     background-color: #040711;
 }
 
-.static-bg-layer {
-    position: absolute;
-    inset: 0;
-    // background: #040711 v-bind('cssBgUrl') center / cover no-repeat;
-    pointer-events: none;
-    z-index: 1;
-}
-
 .wave-canvas {
     position: absolute;
     top: 0;
@@ -286,9 +289,9 @@ onUnmounted(() => {
     width: 100%;
     height: 100%;
     pointer-events: none;
-    z-index: 2;
+    z-index: 1;
     opacity: 0;
-    transition: opacity 0.8s ease-in-out;
+    transition: opacity 0.5s ease-in-out;
 
     &.is-ready {
         opacity: 1;
