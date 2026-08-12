@@ -810,7 +810,6 @@ onMounted(() => {
         border-color: var(--primary-color) !important;
         color: #000000 !important;
         font-weight: 700;
-        box-shadow: 0 0 8px rgba(21, 224, 183, 0.35);
     }
 }
 

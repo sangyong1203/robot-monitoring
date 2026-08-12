@@ -1,6 +1,6 @@
 <template>
     <div class="mission-management-page">
-        <Panel title="미션 및 스케줄 관리" subtitle="Activity, Task, 융합 Mission 및 자동 수행 스케줄 관리">
+        <Panel title="미션 및 스케줄 관리" subtitle="Activity, Task, 융합 Mission 및 자동 수행 스케줄 관리" fill>
             <el-tabs v-model="activeTab" class="mission-tabs">
                 <!-- 1. 융합 Mission 관리 탭 -->
                 <el-tab-pane label="융합 Mission 관리" name="missions">
@@ -13,7 +13,7 @@
                         </template>
                     </TableToolbar>
 
-                    <el-table :data="filteredMissions" stripe style="width: 100%">
+                    <el-table :data="filteredMissions" stripe style="width: 100%" height="100%">
                         <el-table-column prop="code" label="미션 코드" width="180" />
                         <el-table-column prop="name" label="미션 이름" min-width="220" />
                         <el-table-column label="미션 유형" width="130">
@@ -60,7 +60,7 @@
                         </template>
                     </TableToolbar>
 
-                    <el-table :data="filteredTasks" stripe style="width: 100%">
+                    <el-table :data="filteredTasks" stripe style="width: 100%" height="100%">
                         <el-table-column prop="code" label="Task 코드" width="160" />
                         <el-table-column prop="name" label="Task 이름" min-width="180" />
                         <el-table-column prop="robotModelName" label="대상 로봇 모델" width="140" />
@@ -91,7 +91,7 @@
                         </template>
                     </TableToolbar>
 
-                    <el-table :data="filteredActivities" stripe style="width: 100%">
+                    <el-table :data="filteredActivities" stripe style="width: 100%" height="100%">
                         <el-table-column prop="code" label="Activity 코드" width="180" />
                         <el-table-column prop="name" label="Activity 이름" min-width="180" />
                         <el-table-column prop="activityType" label="유형" width="120" />
@@ -116,7 +116,7 @@
                         </template>
                     </TableToolbar>
 
-                    <el-table :data="filteredSchedules" stripe style="width: 100%">
+                    <el-table :data="filteredSchedules" stripe style="width: 100%" height="100%">
                         <el-table-column prop="code" label="스케줄 코드" width="150" />
                         <el-table-column prop="name" label="스케줄 명칭" min-width="200" />
                         <el-table-column prop="missionName" label="실행 대상 미션" min-width="220" />
@@ -541,6 +541,34 @@ const deleteMission = async (row: MissionItem) => {
     display: flex;
     flex-direction: column;
     gap: 16px;
+    flex: 1;
+    min-height: 0;
+}
+
+.mission-tabs {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+
+    :deep(.el-tabs__content) {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
+    }
+
+    :deep(.el-tab-pane) {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
+
+        .el-table {
+            flex: 1;
+            min-height: 0;
+        }
+    }
 }
 
 .task-act-tag {
