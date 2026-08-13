@@ -34,9 +34,7 @@
         <!-- 데이터 카드 & 테이블 패널 -->
         <Panel class="management-page__panel" title="지도 목록" :total="maps.length" fill>
             <template #headerRight>
-                <el-button type="primary" class="query-button" @click="openCreateDialog">
-                    신규 지도 등록
-                </el-button>
+                <el-button type="primary" @click="openCreateDialog"> 신규 지도 등록 </el-button>
             </template>
 
             <el-table
@@ -76,8 +74,16 @@
                 <el-table-column prop="mapType" label="구분" width="130" align="center">
                     <template #default="{ row }">
                         <StatusBadge
-                            :label="row.mapType === 'SITE_MAP' ? '종합 배치도' : row.mapType === 'INDOOR' ? '실내 지도' : '실외 지도'"
-                            :variant="row.mapType === 'SITE_MAP' ? 'progress' : row.mapType === 'INDOOR' ? 'info' : 'warning'"
+                            :label="
+                                row.mapType === 'SITE_MAP'
+                                    ? '종합 배치도'
+                                    : row.mapType === 'INDOOR'
+                                      ? '실내 지도'
+                                      : '실외 지도'
+                            "
+                            :variant="
+                                row.mapType === 'SITE_MAP' ? 'progress' : row.mapType === 'INDOOR' ? 'info' : 'warning'
+                            "
                         />
                     </template>
                 </el-table-column>
@@ -86,7 +92,10 @@
 
                 <el-table-column prop="isActive" label="사용 상태" width="100" align="center">
                     <template #default="{ row }">
-                        <StatusBadge :label="row.isActive ? '사용' : '미사용'" :variant="row.isActive ? 'success' : 'danger'" />
+                        <StatusBadge
+                            :label="row.isActive ? '사용' : '미사용'"
+                            :variant="row.isActive ? 'success' : 'danger'"
+                        />
                     </template>
                 </el-table-column>
 
@@ -98,35 +107,17 @@
 
                 <el-table-column label="작업" width="150" align="center" fixed="right">
                     <template #default="{ row }">
-                        <div class="table-actions">
-                            <el-button
-                                class="table-actions__icon-button"
-                                type="primary"
-                                text
-                                title="목적지 관리"
-                                @click="goDestinations(row)"
-                            >
+                        <TableActions>
+                            <el-button type="primary" text title="목적지 관리" @click="goDestinations(row)">
                                 <el-icon><MapPin /></el-icon>
                             </el-button>
-                            <el-button
-                                class="table-actions__icon-button"
-                                type="primary"
-                                text
-                                title="수정"
-                                @click="openEditDialog(row)"
-                            >
+                            <el-button type="primary" text title="수정" @click="openEditDialog(row)">
                                 <el-icon><Pencil /></el-icon>
                             </el-button>
-                            <el-button
-                                class="table-actions__icon-button"
-                                type="danger"
-                                text
-                                title="삭제"
-                                @click="confirmDelete(row)"
-                            >
+                            <el-button type="danger" text title="삭제" @click="confirmDelete(row)">
                                 <el-icon><Trash2 /></el-icon>
                             </el-button>
-                        </div>
+                        </TableActions>
                     </template>
                 </el-table-column>
             </el-table>
@@ -152,6 +143,7 @@ import StatusBadge from '@/components/StatusBadge.vue'
 import SearchBox from '@/components/SearchBox.vue'
 import SearchText from '@/components/SearchText.vue'
 import DropdownList from '@/components/DropdownList.vue'
+import TableActions from '@/components/TableActions.vue'
 import TableRowTooltip from '@/components/TableRowTooltip.vue'
 import MapFormDialog from './components/MapFormDialog.vue'
 import { deleteMap, getMaps } from './service/maps.api'
@@ -208,10 +200,14 @@ const openEditDialog = (row: MapItem) => {
 
 const confirmDelete = async (row: MapItem) => {
     if (row.isPrimary) {
-        ElMessageBox.alert('대표 지도는 삭제할 수 없습니다. 먼저 다른 지도를 대표 지도로 지정하세요.', '대표 지도 삭제 제한', {
-            confirmButtonText: '확인',
-            type: 'warning',
-        })
+        ElMessageBox.alert(
+            '대표 지도는 삭제할 수 없습니다. 먼저 다른 지도를 대표 지도로 지정하세요.',
+            '대표 지도 삭제 제한',
+            {
+                confirmButtonText: '확인',
+                type: 'warning',
+            },
+        )
         return
     }
 
@@ -243,27 +239,6 @@ onMounted(() => {
 </script>
 
 <style scoped lang="scss">
-.query-button {
-    height: 40px;
-    padding: 0 16px;
-    border-radius: 999px;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    flex-shrink: 0;
-    white-space: nowrap;
-}
-
-.icon-svg {
-    width: 18px;
-    height: 18px;
-}
-
-.icon-action {
-    width: 16px;
-    height: 16px;
-}
-
 .map-thumbnail-preview {
     width: 80px;
     height: 50px;

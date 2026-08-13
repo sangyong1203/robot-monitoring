@@ -24,9 +24,7 @@
         <!-- 메인 데이터 패널 -->
         <Panel class="management-page__panel" title="로봇 모델 목록" :total="models.length" fill>
             <template #headerRight>
-                <el-button type="primary" class="query-button" @click="openCreateDialog">
-                    신규 로봇 모델 등록
-                </el-button>
+                <el-button type="primary" @click="openCreateDialog"> 신규 로봇 모델 등록 </el-button>
             </template>
 
             <el-table
@@ -73,7 +71,9 @@
                     <template #default="{ row }">
                         <div style="display: flex; gap: 4px; flex-wrap: wrap">
                             <StatusBadge
-                                :label="row.monitoringOptions.supportDestinationControl ? '목적지제어' : '목적지제어불가'"
+                                :label="
+                                    row.monitoringOptions.supportDestinationControl ? '목적지제어' : '목적지제어불가'
+                                "
                                 :variant="row.monitoringOptions.supportDestinationControl ? 'success' : 'muted'"
                             />
                             <StatusBadge
@@ -90,23 +90,20 @@
 
                 <el-table-column prop="isActive" label="사용 상태" width="100" align="center">
                     <template #default="{ row }">
-                        <StatusBadge :label="row.isActive ? '사용' : '미사용'" :variant="row.isActive ? 'success' : 'danger'" />
+                        <StatusBadge
+                            :label="row.isActive ? '사용' : '미사용'"
+                            :variant="row.isActive ? 'success' : 'danger'"
+                        />
                     </template>
                 </el-table-column>
 
                 <el-table-column label="작업" width="90" align="center" fixed="right">
                     <template #default="{ row }">
-                        <div class="table-actions">
-                            <el-button
-                                class="table-actions__icon-button"
-                                type="primary"
-                                text
-                                title="상세 및 수정"
-                                @click="openEditDialog(row)"
-                            >
+                        <TableActions>
+                            <el-button type="primary" text title="상세 및 수정" @click="openEditDialog(row)">
                                 <el-icon><Pencil /></el-icon>
                             </el-button>
-                        </div>
+                        </TableActions>
                     </template>
                 </el-table-column>
             </el-table>
@@ -130,6 +127,7 @@ import StatusBadge from '@/components/StatusBadge.vue'
 import SearchBox from '@/components/SearchBox.vue'
 import SearchText from '@/components/SearchText.vue'
 import DropdownList from '@/components/DropdownList.vue'
+import TableActions from '@/components/TableActions.vue'
 import TableRowTooltip from '@/components/TableRowTooltip.vue'
 import RobotModelFormDialog from './components/RobotModelFormDialog.vue'
 import { getRobotModels } from './service/robotModels.api'
@@ -219,25 +217,4 @@ onMounted(() => {
 })
 </script>
 
-<style scoped lang="scss">
-.query-button {
-    height: 40px;
-    padding: 0 16px;
-    border-radius: 999px;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    flex-shrink: 0;
-    white-space: nowrap;
-}
-
-.icon-svg {
-    width: 18px;
-    height: 18px;
-}
-
-.icon-action {
-    width: 16px;
-    height: 16px;
-}
-</style>
+<style scoped lang="scss"></style>

@@ -34,9 +34,7 @@
         <!-- 데이터 테이블 패널 -->
         <Panel class="management-page__panel" title="사용자 계정 목록" :total="users.length" fill>
             <template #headerRight>
-                <el-button type="primary" class="query-button" @click="openCreateDialog">
-                    신규 사용자 등록
-                </el-button>
+                <el-button type="primary" @click="openCreateDialog"> 신규 사용자 등록 </el-button>
             </template>
 
             <el-table
@@ -73,7 +71,10 @@
 
                 <el-table-column prop="isActive" label="계정 상태" width="100" align="center">
                     <template #default="{ row }">
-                        <StatusBadge :label="row.isActive ? '사용' : '잠금'" :variant="row.isActive ? 'success' : 'danger'" />
+                        <StatusBadge
+                            :label="row.isActive ? '사용' : '잠금'"
+                            :variant="row.isActive ? 'success' : 'danger'"
+                        />
                     </template>
                 </el-table-column>
 
@@ -85,26 +86,14 @@
 
                 <el-table-column label="작업" width="120" align="center" fixed="right">
                     <template #default="{ row }">
-                        <div class="table-actions">
-                            <el-button
-                                class="table-actions__icon-button"
-                                type="primary"
-                                text
-                                title="수정"
-                                @click="openEditDialog(row)"
-                            >
+                        <TableActions>
+                            <el-button type="primary" text title="수정" @click="openEditDialog(row)">
                                 <el-icon><Pencil /></el-icon>
                             </el-button>
-                            <el-button
-                                class="table-actions__icon-button"
-                                type="danger"
-                                text
-                                title="삭제"
-                                @click="confirmDelete(row)"
-                            >
+                            <el-button type="danger" text title="삭제" @click="confirmDelete(row)">
                                 <el-icon><Trash2 /></el-icon>
                             </el-button>
-                        </div>
+                        </TableActions>
                     </template>
                 </el-table-column>
             </el-table>
@@ -129,6 +118,7 @@ import StatusBadge from '@/components/StatusBadge.vue'
 import SearchBox from '@/components/SearchBox.vue'
 import SearchText from '@/components/SearchText.vue'
 import DropdownList from '@/components/DropdownList.vue'
+import TableActions from '@/components/TableActions.vue'
 import TableRowTooltip from '@/components/TableRowTooltip.vue'
 import UserFormDialog from './components/UserFormDialog.vue'
 import { deleteUser, getUsers } from './service/users.api'
@@ -225,11 +215,15 @@ const openEditDialog = (row: UserItem) => {
 
 const confirmDelete = async (row: UserItem) => {
     try {
-        await ElMessageBox.confirm(`사용자 '${row.name} (${row.loginId})' 계정을 삭제하시겠습니까?`, '사용자 삭제 확인', {
-            confirmButtonText: '삭제',
-            cancelButtonText: '취소',
-            type: 'warning',
-        })
+        await ElMessageBox.confirm(
+            `사용자 '${row.name} (${row.loginId})' 계정을 삭제하시겠습니까?`,
+            '사용자 삭제 확인',
+            {
+                confirmButtonText: '삭제',
+                cancelButtonText: '취소',
+                type: 'warning',
+            },
+        )
         await deleteUser(row.id)
         ElMessage.success('사용자 계정이 삭제되었습니다.')
         await handleSearch()
@@ -243,25 +237,4 @@ onMounted(() => {
 })
 </script>
 
-<style scoped lang="scss">
-.query-button {
-    height: 40px;
-    padding: 0 16px;
-    border-radius: 999px;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    flex-shrink: 0;
-    white-space: nowrap;
-}
-
-.icon-svg {
-    width: 18px;
-    height: 18px;
-}
-
-.icon-action {
-    width: 16px;
-    height: 16px;
-}
-</style>
+<style scoped lang="scss"></style>

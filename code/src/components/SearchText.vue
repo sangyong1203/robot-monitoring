@@ -64,7 +64,6 @@ const onClear = () => {
     color: var(--text-color--primary);
     white-space: nowrap;
     font-size: 18px;
-    font-weight: 600;
     line-height: 20px;
 }
 .search-text_content {

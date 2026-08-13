@@ -34,9 +34,7 @@
         <!-- 데이터 목록 및 2D 위치 지도 뷰어 -->
         <Panel class="management-page__panel" title="지도 목적지 목록" :total="destinations.length" fill>
             <template #headerRight>
-                <el-button type="primary" class="query-button" @click="openCreateDialog()">
-                    신규 목적지 등록
-                </el-button>
+                <el-button type="primary" @click="openCreateDialog()"> 신규 목적지 등록 </el-button>
             </template>
 
             <div class="destination-layout">
@@ -51,19 +49,9 @@
                         </span>
                     </div>
                     <div class="destination-map-canvas" ref="canvasContainerRef">
-                        <svg
-                            ref="svgRef"
-                            :viewBox="viewBoxString"
-                            class="map-svg"
-                            @click="handleCanvasClick"
-                        >
+                        <svg ref="svgRef" :viewBox="viewBoxString" class="map-svg" @click="handleCanvasClick">
                             <rect width="100%" height="100%" fill="#080c14" />
-                            <image
-                                :href="mapImageSource"
-                                width="100%"
-                                height="100%"
-                                preserveAspectRatio="none"
-                            />
+                            <image :href="mapImageSource" width="100%" height="100%" preserveAspectRatio="none" />
 
                             <!-- 등록된 목적지 핀 & 방향 마커 -->
                             <g
@@ -123,8 +111,20 @@
                         <el-table-column label="적용 로봇" width="100" align="center">
                             <template #default="{ row }">
                                 <StatusBadge
-                                    :label="row.targetRobotType === 'WORK' ? '작업용' : row.targetRobotType === 'SURVEILLANCE' ? '감시용' : '공용'"
-                                    :variant="row.targetRobotType === 'WORK' ? 'info' : row.targetRobotType === 'SURVEILLANCE' ? 'warning' : 'muted'"
+                                    :label="
+                                        row.targetRobotType === 'WORK'
+                                            ? '작업용'
+                                            : row.targetRobotType === 'SURVEILLANCE'
+                                              ? '감시용'
+                                              : '공용'
+                                    "
+                                    :variant="
+                                        row.targetRobotType === 'WORK'
+                                            ? 'info'
+                                            : row.targetRobotType === 'SURVEILLANCE'
+                                              ? 'warning'
+                                              : 'muted'
+                                    "
                                 />
                             </template>
                         </el-table-column>
@@ -137,26 +137,14 @@
 
                         <el-table-column label="작업" width="100" align="center" fixed="right">
                             <template #default="{ row }">
-                                <div class="table-actions">
-                                    <el-button
-                                        class="table-actions__icon-button"
-                                        type="primary"
-                                        text
-                                        title="수정"
-                                        @click="openEditDialog(row)"
-                                    >
+                                <TableActions>
+                                    <el-button type="primary" text title="수정" @click="openEditDialog(row)">
                                         <el-icon><Pencil /></el-icon>
                                     </el-button>
-                                    <el-button
-                                        class="table-actions__icon-button"
-                                        type="danger"
-                                        text
-                                        title="삭제"
-                                        @click="confirmDelete(row)"
-                                    >
+                                    <el-button type="danger" text title="삭제" @click="confirmDelete(row)">
                                         <el-icon><Trash2 /></el-icon>
                                     </el-button>
-                                </div>
+                                </TableActions>
                             </template>
                         </el-table-column>
                     </el-table>
@@ -186,6 +174,7 @@ import StatusBadge from '@/components/StatusBadge.vue'
 import SearchBox from '@/components/SearchBox.vue'
 import SearchText from '@/components/SearchText.vue'
 import DropdownList from '@/components/DropdownList.vue'
+import TableActions from '@/components/TableActions.vue'
 import TableRowTooltip from '@/components/TableRowTooltip.vue'
 import DestinationFormDialog from './components/DestinationFormDialog.vue'
 import { deleteDestination, getDestinations } from './service/destinations.api'
@@ -232,7 +221,9 @@ const dialogIsEdit = ref(false)
 const selectedDest = ref<DestinationItem | null>(null)
 
 const selectedMapName = computed(() => currentMap.value?.name || '지도 선택 안됨')
-const selectedDestName = computed(() => destinations.value.find(d => d.id === selectedDestId.value)?.name || '선택 안됨')
+const selectedDestName = computed(
+    () => destinations.value.find(d => d.id === selectedDestId.value)?.name || '선택 안됨',
+)
 
 const typeLabel = (type: DestinationType) => {
     switch (type) {
@@ -283,11 +274,11 @@ const destTypeColor = (type: DestinationType) => {
 
 const markerTransform = (dest: DestinationItem) => {
     if (!currentMap.value) return `translate(${dest.x * 20}, ${dest.y * 20})`
-    
+
     const isSiteMap = currentMap.value.code === 'MAP-SITE-01'
-    const posX = isSiteMap ? (dest.siteX ?? dest.x) : dest.x
-    const posY = isSiteMap ? (dest.siteY ?? dest.y) : dest.y
-    
+    const posX = isSiteMap ? dest.siteX ?? dest.x : dest.x
+    const posY = isSiteMap ? dest.siteY ?? dest.y : dest.y
+
     const pt = worldToPixel({ x: posX, y: posY }, currentMap.value)
     return `translate(${pt.pixel_x}, ${pt.pixel_y})`
 }
@@ -297,9 +288,9 @@ const handleCanvasClick = (e: MouseEvent) => {
     const rect = svgRef.value.getBoundingClientRect()
     const pixelX = ((e.clientX - rect.left) / rect.width) * currentMap.value.width
     const pixelY = ((e.clientY - rect.top) / rect.height) * currentMap.value.height
-    
+
     const worldPoint = pixelToWorld({ pixel_x: pixelX, pixel_y: pixelY }, currentMap.value)
-    
+
     openCreateDialog({
         x: Number(worldPoint.x.toFixed(2)),
         y: Number(worldPoint.y.toFixed(2)),
@@ -336,9 +327,7 @@ const handleSearch = async () => {
 
 const openCreateDialog = (initialCoords?: { x: number; y: number }) => {
     dialogIsEdit.value = false
-    selectedDest.value = initialCoords
-        ? ({ x: initialCoords.x, y: initialCoords.y, heading: 0 } as any)
-        : null
+    selectedDest.value = initialCoords ? ({ x: initialCoords.x, y: initialCoords.y, heading: 0 } as any) : null
     dialogVisible.value = true
 }
 
@@ -370,17 +359,6 @@ onMounted(async () => {
 </script>
 
 <style scoped lang="scss">
-.query-button {
-    height: 40px;
-    padding: 0 16px;
-    border-radius: 999px;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    flex-shrink: 0;
-    white-space: nowrap;
-}
-
 .destination-layout {
     display: flex;
     gap: 20px;

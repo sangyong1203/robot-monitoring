@@ -34,9 +34,7 @@
         <!-- 데이터 카드 및 테이블 패널 -->
         <Panel class="management-page__panel" title="기관 및 사이트 목록" :total="organizations.length" fill>
             <template #headerRight>
-                <el-button type="primary" class="query-button" @click="openCreateDialog">
-                    신규 기관 등록
-                </el-button>
+                <el-button type="primary" @click="openCreateDialog"> 신규 기관 등록 </el-button>
             </template>
 
             <el-table
@@ -75,7 +73,10 @@
 
                 <el-table-column prop="isActive" label="운영 상태" width="110" align="center">
                     <template #default="{ row }">
-                        <StatusBadge :label="row.isActive ? '운영 중' : '비활성'" :variant="row.isActive ? 'success' : 'danger'" />
+                        <StatusBadge
+                            :label="row.isActive ? '운영 중' : '비활성'"
+                            :variant="row.isActive ? 'success' : 'danger'"
+                        />
                     </template>
                 </el-table-column>
 
@@ -87,26 +88,14 @@
 
                 <el-table-column label="작업" width="120" align="center" fixed="right">
                     <template #default="{ row }">
-                        <div class="table-actions">
-                            <el-button
-                                class="table-actions__icon-button"
-                                type="primary"
-                                text
-                                title="수정"
-                                @click="openEditDialog(row)"
-                            >
+                        <TableActions>
+                            <el-button type="primary" text title="수정" @click="openEditDialog(row)">
                                 <el-icon><Pencil /></el-icon>
                             </el-button>
-                            <el-button
-                                class="table-actions__icon-button"
-                                type="danger"
-                                text
-                                title="삭제"
-                                @click="confirmDelete(row)"
-                            >
+                            <el-button type="danger" text title="삭제" @click="confirmDelete(row)">
                                 <el-icon><Trash2 /></el-icon>
                             </el-button>
-                        </div>
+                        </TableActions>
                     </template>
                 </el-table-column>
             </el-table>
@@ -131,6 +120,7 @@ import StatusBadge from '@/components/StatusBadge.vue'
 import SearchBox from '@/components/SearchBox.vue'
 import SearchText from '@/components/SearchText.vue'
 import DropdownList from '@/components/DropdownList.vue'
+import TableActions from '@/components/TableActions.vue'
 import TableRowTooltip from '@/components/TableRowTooltip.vue'
 import OrganizationFormDialog from './components/OrganizationFormDialog.vue'
 import { deleteOrganization, getOrganizations } from './service/organizations.api'
@@ -218,11 +208,15 @@ const confirmDelete = async (row: OrganizationItem) => {
     }
 
     try {
-        await ElMessageBox.confirm(`기관 '${row.name}'을(를) 삭제하시겠습니까? 관련 하위 데이터가 영향받을 수 있습니다.`, '기관 삭제 확인', {
-            confirmButtonText: '삭제',
-            cancelButtonText: '취소',
-            type: 'warning',
-        })
+        await ElMessageBox.confirm(
+            `기관 '${row.name}'을(를) 삭제하시겠습니까? 관련 하위 데이터가 영향받을 수 있습니다.`,
+            '기관 삭제 확인',
+            {
+                confirmButtonText: '삭제',
+                cancelButtonText: '취소',
+                type: 'warning',
+            },
+        )
         await deleteOrganization(row.id)
         ElMessage.success('기관이 삭제되었습니다.')
         await handleSearch()
@@ -236,25 +230,4 @@ onMounted(() => {
 })
 </script>
 
-<style scoped lang="scss">
-.query-button {
-    height: 40px;
-    padding: 0 16px;
-    border-radius: 999px;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    flex-shrink: 0;
-    white-space: nowrap;
-}
-
-.icon-svg {
-    width: 18px;
-    height: 18px;
-}
-
-.icon-action {
-    width: 16px;
-    height: 16px;
-}
-</style>
+<style scoped lang="scss"></style>

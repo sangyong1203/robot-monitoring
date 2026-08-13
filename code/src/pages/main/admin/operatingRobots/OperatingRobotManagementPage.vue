@@ -24,9 +24,7 @@
         <!-- 메인 데이터 패널 -->
         <Panel class="management-page__panel" title="운영 로봇 목록" :total="robots.length" fill>
             <template #headerRight>
-                <el-button type="primary" class="query-button" @click="openCreateDialog">
-                    신규 운영 로봇 등록
-                </el-button>
+                <el-button type="primary" @click="openCreateDialog"> 신규 운영 로봇 등록 </el-button>
             </template>
 
             <el-table
@@ -70,32 +68,43 @@
                 <el-table-column prop="communicationStatus" label="통신 상태" width="120" align="center">
                     <template #default="{ row }">
                         <StatusBadge
-                            :label="row.communicationStatus === 'ONLINE' ? '정상' : row.communicationStatus === 'STALE' ? '지연' : '오프라인'"
-                            :variant="row.communicationStatus === 'ONLINE' ? 'success' : row.communicationStatus === 'STALE' ? 'warning' : 'danger'"
+                            :label="
+                                row.communicationStatus === 'ONLINE'
+                                    ? '정상'
+                                    : row.communicationStatus === 'STALE'
+                                      ? '지연'
+                                      : '오프라인'
+                            "
+                            :variant="
+                                row.communicationStatus === 'ONLINE'
+                                    ? 'success'
+                                    : row.communicationStatus === 'STALE'
+                                      ? 'warning'
+                                      : 'danger'
+                            "
                         />
                     </template>
                 </el-table-column>
 
                 <el-table-column prop="batteryPercent" label="배터리" width="130" align="center">
                     <template #default="{ row }">
-                        <MeterBar
-                            :percent="row.batteryPercent"
-                            :value="`${row.batteryPercent}%`"
-                        />
+                        <MeterBar :percent="row.batteryPercent" :value="`${row.batteryPercent}%`" />
                     </template>
                 </el-table-column>
 
                 <el-table-column prop="isOperating" label="운영 상태" width="100" align="center">
                     <template #default="{ row }">
-                        <StatusBadge :label="row.isOperating ? '운영 중' : '미운영'" :variant="row.isOperating ? 'success' : 'danger'" />
+                        <StatusBadge
+                            :label="row.isOperating ? '운영 중' : '미운영'"
+                            :variant="row.isOperating ? 'success' : 'danger'"
+                        />
                     </template>
                 </el-table-column>
 
                 <el-table-column label="작업" width="160" align="center" fixed="right">
                     <template #default="{ row }">
-                        <div class="table-actions">
+                        <TableActions>
                             <el-button
-                                class="table-actions__icon-button"
                                 type="success"
                                 text
                                 title="관제 모니터링"
@@ -104,25 +113,13 @@
                             >
                                 <el-icon><Tv /></el-icon>
                             </el-button>
-                            <el-button
-                                class="table-actions__icon-button"
-                                type="primary"
-                                text
-                                title="수정"
-                                @click="openEditDialog(row)"
-                            >
+                            <el-button type="primary" text title="수정" @click="openEditDialog(row)">
                                 <el-icon><Pencil /></el-icon>
                             </el-button>
-                            <el-button
-                                class="table-actions__icon-button"
-                                type="danger"
-                                text
-                                title="삭제"
-                                @click="confirmDelete(row)"
-                            >
+                            <el-button type="danger" text title="삭제" @click="confirmDelete(row)">
                                 <el-icon><Trash2 /></el-icon>
                             </el-button>
-                        </div>
+                        </TableActions>
                     </template>
                 </el-table-column>
             </el-table>
@@ -149,6 +146,7 @@ import MeterBar from '@/components/MeterBar.vue'
 import SearchBox from '@/components/SearchBox.vue'
 import SearchText from '@/components/SearchText.vue'
 import DropdownList from '@/components/DropdownList.vue'
+import TableActions from '@/components/TableActions.vue'
 import TableRowTooltip from '@/components/TableRowTooltip.vue'
 import OperatingRobotFormDialog from './components/OperatingRobotFormDialog.vue'
 import { deleteOperatingRobot, getOperatingRobots } from './service/operatingRobots.api'
@@ -223,17 +221,6 @@ onMounted(() => {
 </script>
 
 <style scoped lang="scss">
-.query-button {
-    height: 40px;
-    padding: 0 16px;
-    border-radius: 999px;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    flex-shrink: 0;
-    white-space: nowrap;
-}
-
 .icon-svg {
     width: 18px;
     height: 18px;

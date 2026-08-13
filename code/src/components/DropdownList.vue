@@ -194,7 +194,6 @@ const onChange = (value: any) => {
 .dropdown-list_label {
     color: var(--text-color--primary);
     white-space: nowrap;
-    font-weight: 500;
     line-height: 20px;
 }
 .dropdown-list :deep(.el-select) {
@@ -225,11 +224,11 @@ const onChange = (value: any) => {
     align-items: flex-start;
 }
 .dropdown-list :deep(.el-select__selected-item) {
-     .el-tag{
+    .el-tag {
         background-color: var(--primary-color-1) !important;
         border-radius: 20px;
-        color: white;
-     }
+        color: var(--text-color--white);
+    }
 }
 </style>
 

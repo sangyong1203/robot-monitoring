@@ -47,12 +47,14 @@
                         <el-table-column prop="createdAt" label="등록일시" width="180" />
                         <el-table-column label="관리" width="120" align="center">
                             <template #default="{ row }">
-                                <TableRowActions
-                                    :show-edit="true"
-                                    :show-delete="true"
-                                    @edit="openMissionDialog(row)"
-                                    @delete="deleteMission(row)"
-                                />
+                                <TableActions>
+                                    <el-button type="primary" text title="수정" @click="openMissionDialog(row)">
+                                        <el-icon><Pencil /></el-icon>
+                                    </el-button>
+                                    <el-button type="danger" text title="삭제" @click="deleteMission(row)">
+                                        <el-icon><Trash2 /></el-icon>
+                                    </el-button>
+                                </TableActions>
                             </template>
                         </el-table-column>
                     </el-table>
@@ -132,12 +134,14 @@
                         <el-table-column prop="createdAt" label="등록일시" width="170" />
                         <el-table-column label="관리" width="120" align="center">
                             <template #default="{ row }">
-                                <TableRowActions
-                                    :show-edit="true"
-                                    :show-delete="true"
-                                    @edit="openTaskDialog(row)"
-                                    @delete="deleteTask(row)"
-                                />
+                                <TableActions>
+                                    <el-button type="primary" text title="수정" @click="openTaskDialog(row)">
+                                        <el-icon><Pencil /></el-icon>
+                                    </el-button>
+                                    <el-button type="danger" text title="삭제" @click="deleteTask(row)">
+                                        <el-icon><Trash2 /></el-icon>
+                                    </el-button>
+                                </TableActions>
                             </template>
                         </el-table-column>
                     </el-table>
@@ -184,12 +188,14 @@
                         <el-table-column prop="createdAt" label="등록일시" width="170" />
                         <el-table-column label="관리" width="120" align="center">
                             <template #default="{ row }">
-                                <TableRowActions
-                                    :show-edit="true"
-                                    :show-delete="true"
-                                    @edit="openActivityDialog(row)"
-                                    @delete="deleteActivity(row)"
-                                />
+                                <TableActions>
+                                    <el-button type="primary" text title="수정" @click="openActivityDialog(row)">
+                                        <el-icon><Pencil /></el-icon>
+                                    </el-button>
+                                    <el-button type="danger" text title="삭제" @click="deleteActivity(row)">
+                                        <el-icon><Trash2 /></el-icon>
+                                    </el-button>
+                                </TableActions>
                             </template>
                         </el-table-column>
                     </el-table>
@@ -236,12 +242,14 @@
                         </el-table-column>
                         <el-table-column label="관리" width="120" align="center">
                             <template #default="{ row }">
-                                <TableRowActions
-                                    :show-edit="true"
-                                    :show-delete="true"
-                                    @edit="openScheduleDialog(row)"
-                                    @delete="deleteSchedule(row)"
-                                />
+                                <TableActions>
+                                    <el-button type="primary" text title="수정" @click="openScheduleDialog(row)">
+                                        <el-icon><Pencil /></el-icon>
+                                    </el-button>
+                                    <el-button type="danger" text title="삭제" @click="deleteSchedule(row)">
+                                        <el-icon><Trash2 /></el-icon>
+                                    </el-button>
+                                </TableActions>
                             </template>
                         </el-table-column>
                     </el-table>
@@ -290,8 +298,9 @@ import Panel from '@/components/Panel.vue'
 import TableToolbar from '@/components/TableToolbar.vue'
 import SearchText from '@/components/SearchText.vue'
 import StatusBadge from '@/components/StatusBadge.vue'
-import TableRowActions from '@/components/TableRowActions.vue'
+import TableActions from '@/components/TableActions.vue'
 import TableRowTooltip from '@/components/TableRowTooltip.vue'
+import { Pencil, Trash2 } from '@lucide/vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { getActivities, getTasks, getMissions, getSchedules } from './service/missionManagement.api'
 import type { ActivityItem, TaskItem, MissionItem, ScheduleItem, ActivityType } from './service/missionManagement.types'

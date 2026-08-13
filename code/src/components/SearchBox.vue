@@ -124,6 +124,17 @@ const { onSearch, extra, size, padding, gap, hideSearchButton = false, loading =
     align-items: center;
 }
 
+.query-button {
+    height: 40px;
+    padding: 0 16px;
+    border-radius: 999px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+    white-space: nowrap;
+}
+
 @media (max-width: 768px) {
     .search-box-content {
         align-items: stretch;
