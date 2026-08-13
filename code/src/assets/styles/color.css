@@ -1,7 +1,7 @@
 /**
  * ============================================================================
- * Login Image Primitive Color Scale System (color.css)
- * Extracted directly from the Login Background Image Identity
+ * Design System Primitive Color Scale System (color.css)
+ * Extracted directly from Design Identity & Standard Palette Scales
  * Scale: 1 (Lightest) ~ 10 (Darkest/Deepest)
  * ============================================================================
  */
@@ -62,4 +62,55 @@
   --slate-8: #171a24;  /* 8 - Control Input Surface Base */
   --slate-9: #151822;  /* 9 - Card Dark Glass Surface */
   --slate-10: #060814; /* 10 - Deep Midnight Void Background */
+
+  /* --------------------------------------------------------------------------
+     5. System Status Primitive Scales (Emerald, Amber, Rose, Sky)
+     -------------------------------------------------------------------------- */
+  /* Emerald / Success Scale */
+  --emerald-1: #f0fdf4;
+  --emerald-2: #dcfce7;
+  --emerald-3: #86efac;
+  --emerald-4: #4ade80;
+  --emerald-5: #22c55e;  /* 5 - Success Base Green */
+  --emerald-6: #16a34a;
+  --emerald-7: #15803d;
+  --emerald-8: #166534;
+  --emerald-9: #14532d;
+  --emerald-10: #052e16;
+
+  /* Amber / Warning Scale */
+  --amber-1: #fffbeb;
+  --amber-2: #fef3c7;
+  --amber-3: #fde68a;
+  --amber-4: #fcd34d;
+  --amber-5: #f6bd60;  /* 5 - Warning Base Amber */
+  --amber-6: #d97706;
+  --amber-7: #b45309;
+  --amber-8: #92400e;
+  --amber-9: #78350f;
+  --amber-10: #451a03;
+
+  /* Rose / Danger Scale */
+  --rose-1: #fff1f2;
+  --rose-2: #ffe4e6;
+  --rose-3: #fecdd3;
+  --rose-4: #fda4af;
+  --rose-5: #ff6b6b;  /* 5 - Danger Base Coral Red */
+  --rose-6: #e11d48;
+  --rose-7: #be123c;
+  --rose-8: #9f1239;
+  --rose-9: #881337;
+  --rose-10: #4c0519;
+
+  /* Sky / Info Scale */
+  --sky-1: #f0f9ff;
+  --sky-2: #e0f2fe;
+  --sky-3: #bae6fd;
+  --sky-4: #7dd3fc;
+  --sky-5: #8cc8ff;  /* 5 - Info Base Soft Blue */
+  --sky-6: #0284c7;
+  --sky-7: #0369a1;
+  --sky-8: #075985;
+  --sky-9: #0c4a6e;
+  --sky-10: #082f49;
 }

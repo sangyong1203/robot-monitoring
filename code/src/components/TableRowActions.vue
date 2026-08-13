@@ -60,14 +60,14 @@ const emit = defineEmits<{
 }
 
 .table-row-actions__button.is-danger {
-    color: #ff8a8a;
+    color: var(--danger-color);
 }
 
 .table-row-actions__button:hover {
-    background: rgba(21, 224, 183, 0.16);
+    background: color-mix(in srgb, var(--secondary-color) 16%, transparent);
 }
 
 .table-row-actions__button.is-danger:hover {
-    background: rgba(255, 107, 107, 0.16);
+    background: color-mix(in srgb, var(--danger-color) 16%, transparent);
 }
 </style>

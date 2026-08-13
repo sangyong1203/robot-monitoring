@@ -4,49 +4,115 @@
   --secondary-color: #15e0b7;
   --primary-color-1: color-mix(in srgb, var(--primary-color) 18%, transparent);
 
-  /* Text colors */
-  --text-color--primary: #f5f5f5;
-  --text-color--secondary: #c9c1d4;
-  --text-color--white: #ffffff;
-  --text-color--red: #ff383c;
-  --text-color--strong: #f4f1f8;
-  --text-color--body: #d8d1e0;
-  --text-color--muted: #9f98aa;
-  --text-color--placeholder: rgba(255, 255, 255, 0.38);
+  /* System Status & State Colors (Mapped to color.css Primitives) */
+  --success-color: var(--emerald-5, #22c55e);
+  --warning-color: var(--amber-5, #f6bd60);
+  --danger-color: var(--rose-5, #ff6b6b);
+  --info-color: var(--sky-5, #8cc8ff);
+  --success-color-soft: color-mix(in srgb, var(--success-color) 12%, transparent);
+  --warning-color-soft: color-mix(in srgb, var(--warning-color) 12%, transparent);
+  --danger-color-soft: color-mix(in srgb, var(--danger-color) 12%, transparent);
+  --info-color-soft: color-mix(in srgb, var(--info-color) 12%, transparent);
 
-  /* Surface and border colors */
-  --surface-color: #151822;
-  --border-color: rgba(255, 255, 255, 0.08);
-  --panel-border-color: rgba(61, 61, 61, 0.24);
-  --panel-bg-color: rgba(0, 0, 0, 0.25);
-  --panel-shadow:
-    0 7px 12px rgba(0, 0, 0, 0.28),
-    0 0 18px color-mix(in srgb, var(--primary-color) 8%, transparent),
-    inset 0 1px 0 color-mix(in srgb, var(--primary-color) 10%, transparent);
-  --main-page-bg-color: #272727;
+  /* Text Colors System (Mapped to color.css Primitives) */
+  --text-color--white:       var(--slate-1, #ffffff);     /* Pure White Text */
+  --text-color--strong:      var(--slate-2, #f4f1f8);     /* Emphasized Strong Heading Text */
+  --text-color--primary:     var(--slate-3, #f5f5f5);     /* Primary Heading / Title Text */
+  --text-color--secondary:   var(--slate-4, #c9c1d4);     /* Subtitle & Secondary Label Text */
+  --text-color--body:        var(--slate-4, #d8d1e0);     /* Main Body Content Text */
+  --text-color--muted:       var(--slate-5, #9f98aa);     /* Muted / Subdued Text */
+  --text-color--red:         var(--rose-5,  #ff383c);     /* Danger / Alert Red Text */
+  --text-color--placeholder: color-mix(in srgb, var(--slate-1) 38%, transparent); /* Form Placeholder */
+
+  /* ==========================================================================
+     Surface & Background Colors System
+     ========================================================================== */
+  /* 1. App & Canvas Dark Backgrounds */
+  --app-html-bg: #040711;                  /* Root HTML/Body Dark Void Background */
   --app-bg-color: #272727;
+  --main-page-bg-color: #272727;
   --app-bg-color-deep: #151821;
-  --surface-glass-color: #181b257a;
-  --surface-control-color: #171a24;
-  --surface-elevated-color: #1d2130;
+  --canvas-bg-void: #080c14;
+
+  /* Disabled State Controls */
+  --button-disabled-border-color: color-mix(in srgb, #ffffff 6%, transparent);
+  --button-disabled-bg-color: color-mix(in srgb, #ffffff 3.5%, transparent);
+
+  /* 2. Component & Card Surface Levels */
+  --surface-color: #151822;               /* Standard Dark Glass Surface */
+  --surface-control-color: #171a24;        /* Control Input & Sidebar Surface */
+  --surface-elevated-color: #1d2130;       /* Dialog, Dropdown & Tooltip Surface */
+  --surface-glass-color: rgba(24, 27, 37, 0.48); /* Translucent Card Glass */
+  --panel-bg-color: rgba(0, 0, 0, 0.25);   /* Panel Frame Background */
+
+  /* 3. Interactive State & Overlay Backgrounds */
   --surface-muted-color: rgba(255, 255, 255, 0.04);
   --surface-hover-color: rgba(255, 255, 255, 0.07);
+  --overlay-backdrop-bg: rgba(0, 0, 0, 0.50); /* Modal Backdrop Dark Overlay */
+  --overlay-media-bg: #111111;              /* Media Player Dark Background */
+  --danger-gradient: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+
+  /* ==========================================================================
+     Border Colors & Glassmorphism System
+     ========================================================================== */
+  /* 1. Neutral & Surface Borders */
+  --border-color: rgba(255, 255, 255, 0.08);
+  --border-subtle-color: rgba(255, 255, 255, 0.10);
+  --border-strong-color: rgba(255, 255, 255, 0.15);
+  --panel-border-color: rgba(61, 61, 61, 0.24);
+
+  /* 2. Brand & Glass Accent Borders */
   --border-glass-color: color-mix(in srgb, var(--primary-color) 22%, transparent);
+  --border-purple-glass: color-mix(in srgb, var(--primary-color) 40%, transparent);
+  --border-cyan-glass: color-mix(in srgb, var(--secondary-color) 30%, transparent);
+  --focus-border-color: var(--primary-color);
+
+  /* 3. Status Alert Borders */
+  --border-success-color: color-mix(in srgb, var(--success-color) 40%, transparent);
+  --border-warning-color: color-mix(in srgb, var(--warning-color) 44%, transparent);
+  --border-danger-color: color-mix(in srgb, var(--danger-color) 46%, transparent);
+  --border-info-color: color-mix(in srgb, var(--info-color) 38%, transparent);
+
+  /* Layout Overlays & Glows */
   --overlay-scrollbar-thumb-color: color-mix(in srgb, var(--primary-color) 36%, transparent);
-  --shadow-color: rgba(0, 0, 0, 0.42);
-  --focus-border-color: #dedede;
   --layout-header-bg-color: transparent;
   --layout-sidebar-bg-color: #171a24;
   --layout-overlay-color: rgba(0, 0, 0, 0.12);
   --layout-menu-active-bg-color: color-mix(in srgb, var(--primary-color) 16%, transparent);
   --layout-purple-glow-color: color-mix(in srgb, var(--primary-color) 26%, transparent);
   --layout-cyan-glow-color: color-mix(in srgb, var(--secondary-color) 18%, transparent);
-  --layout-header-shadow: none;
-  --layout-sidebar-shadow: none;
   --header-title-text-color: var(--primary-color);
   --chart-panel-bg-color: #181b25;
   --chart-panel-border-color: rgba(255, 255, 255, 0.08);
+
+  /* ==========================================================================
+     Box Shadows System
+     ========================================================================== */
+  /* 1. Panel & Container Glassmorphic Shadows */
+  --panel-shadow:
+    0 7px 12px rgba(0, 0, 0, 0.28),
+    0 0 18px color-mix(in srgb, var(--primary-color) 8%, transparent),
+    inset 0 1px 0 color-mix(in srgb, var(--primary-color) 10%, transparent);
+  --shadow-card-floating:
+    0 14px 28px rgba(0, 0, 0, 0.45),
+    0 0 24px color-mix(in srgb, var(--primary-color) 16%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+
+  /* 2. Accent & Status Glow Shadows */
+  --shadow-glow-primary: 0 0 14px color-mix(in srgb, var(--primary-color) 35%, transparent);
+  --shadow-glow-cyan: 0 0 14px color-mix(in srgb, var(--secondary-color) 40%, transparent);
+  --shadow-glow-success: 0 0 10px rgba(34, 197, 94, 0.5);
+  --shadow-glow-danger: 0 0 12px rgba(239, 68, 68, 0.6);
+
+  /* 3. Control, Focus & Inset Depth Shadows */
+  --shadow-focus-ring: 0 0 0 1px var(--primary-color) inset;
+  --shadow-inset-border: inset 0 0 0 1px var(--border-glass-color);
+  --shadow-inset-depth: inset 0 0 12px rgba(0, 0, 0, 0.5);
+  --table-fixed-column-shadow: inset -10px 0 10px -10px rgba(0, 0, 0, 0.35);
   --chart-panel-inner-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  --layout-header-shadow: none;
+  --layout-sidebar-shadow: none;
+  --shadow-color: rgba(0, 0, 0, 0.42);
 
   /* Element Plus theme */
   --el-color-primary: var(--primary-color) !important;

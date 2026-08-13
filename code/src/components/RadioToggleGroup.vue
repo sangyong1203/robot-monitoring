@@ -54,8 +54,8 @@ const onUpdate = (val: string | number | boolean | undefined) => {
 .radio-toggle-group__inner {
     display: flex;
     width: 100%;
-    background: rgba(0, 0, 0, 0.25);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: var(--panel-bg-color);
+    border: 1px solid var(--border-subtle-color);
     border-radius: 8px;
     padding: 3px;
 

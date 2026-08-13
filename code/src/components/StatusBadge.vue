@@ -42,37 +42,37 @@ const variantClass = computed(() => `is-${props.variant}`)
 
 .status-badge.is-success {
     color: var(--secondary-color);
-    border: 1px solid rgba(21, 224, 183, 0.42);
-    background: rgba(21, 224, 183, 0.1);
+    border: 1px solid color-mix(in srgb, var(--secondary-color) 42%, transparent);
+    background: color-mix(in srgb, var(--secondary-color) 10%, transparent);
 }
 
 .status-badge.is-warning {
-    color: #f6bd60;
-    border: 1px solid rgba(246, 189, 96, 0.44);
-    background: rgba(246, 189, 96, 0.1);
+    color: var(--warning-color);
+    border: 1px solid color-mix(in srgb, var(--warning-color) 44%, transparent);
+    background: color-mix(in srgb, var(--warning-color) 10%, transparent);
 }
 
 .status-badge.is-danger {
-    color: #ff6b6b;
-    border: 1px solid rgba(255, 107, 107, 0.46);
-    background: rgba(255, 107, 107, 0.1);
+    color: var(--danger-color);
+    border: 1px solid color-mix(in srgb, var(--danger-color) 46%, transparent);
+    background: color-mix(in srgb, var(--danger-color) 10%, transparent);
 }
 
 .status-badge.is-info {
-    color: #8cc8ff;
-    border: 1px solid rgba(140, 200, 255, 0.38);
-    background: rgba(140, 200, 255, 0.1);
+    color: var(--info-color);
+    border: 1px solid color-mix(in srgb, var(--info-color) 38%, transparent);
+    background: color-mix(in srgb, var(--info-color) 10%, transparent);
 }
 
 .status-badge.is-progress {
     color: var(--primary-color);
-    border: 1px solid rgba(231, 109, 255, 0.46);
-    background: rgba(231, 109, 255, 0.12);
+    border: 1px solid color-mix(in srgb, var(--primary-color) 46%, transparent);
+    background: color-mix(in srgb, var(--primary-color) 12%, transparent);
 }
 
 .status-badge.is-muted {
     color: var(--text-color--secondary);
-    border: 1px solid rgba(255, 255, 255, 0.18);
-    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid color-mix(in srgb, #ffffff 18%, transparent);
+    background: color-mix(in srgb, #ffffff 6%, transparent);
 }
 </style>

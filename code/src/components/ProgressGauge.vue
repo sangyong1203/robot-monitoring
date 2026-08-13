@@ -41,7 +41,7 @@ const boundedValue = computed(() => Math.min(100, Math.max(0, props.value || 0))
     height: 12px;
     border-radius: 999px;
     overflow: hidden;
-    background: rgba(255, 255, 255, 0.1);
+    background: var(--border-subtle-color);
 }
 
 .progress-gauge__bar {

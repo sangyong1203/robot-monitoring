@@ -42,7 +42,7 @@ const progressStore = useProgress()
     justify-content: center;
     width: 100vw;
     height: 100vh;
-    background-color: #00000080;
+    background-color: var(--overlay-backdrop-bg);
 }
 
 .fullscreen-progress__content {
