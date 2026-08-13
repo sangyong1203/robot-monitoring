@@ -117,7 +117,7 @@ const emit = defineEmits<{
     flex: 0 0 auto;
     width: 17px;
     height: 17px;
-    color: var(--accent-color);
+    color: var(--primary-color);
 }
 
 .header-user-icon svg {

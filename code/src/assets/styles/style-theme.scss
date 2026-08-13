@@ -3,9 +3,6 @@
   --primary-color: #e76dff;
   --secondary-color: #15e0b7;
   --primary-color-1: color-mix(in srgb, var(--primary-color) 18%, transparent);
-  --accent-color: var(--primary-color);
-  --accent-color-soft: color-mix(in srgb, var(--primary-color) 24%, transparent);
-  --accent-cyan-color: var(--secondary-color);
 
   /* Text colors */
   --text-color--primary: #f5f5f5;
@@ -75,7 +72,7 @@
 
   /* Shared components */
   --label-text-color: var(--text-color--primary);
-  --header-fresh-btn-color: var(--accent-color);
+  --header-fresh-btn-color: var(--primary-color);
   --search-box-bg-color: var(--surface-color);
   --block-header-color: var(--main-page-bg-color);
   --common-component-bg-color: var(--surface-glass-color);

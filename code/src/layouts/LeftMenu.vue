@@ -285,7 +285,7 @@ onMounted(() => {
 
 :deep(.el-menu-item.is-active),
 :deep(.el-sub-menu.is-active > .el-sub-menu__title) {
-    color: var(--accent-color) !important;
+    color: var(--primary-color) !important;
 }
 
 :deep(.el-menu-item.is-active) {

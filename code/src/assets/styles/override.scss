@@ -412,7 +412,7 @@
 
 .el-checkbox__inner:hover,
 .el-checkbox__input.is-focus .el-checkbox__inner {
-  border-color: var(--accent-color) !important;
+  border-color: var(--primary-color) !important;
 }
 
 .el-checkbox__input.is-checked+.el-checkbox__label {
@@ -421,8 +421,8 @@
 
 .el-checkbox__input.is-indeterminate .el-checkbox__inner,
 .el-checkbox__input.is-checked .el-checkbox__inner {
-  background-color: var(--accent-color) !important;
-  border-color: var(--accent-color) !important;
+  background-color: var(--primary-color) !important;
+  border-color: var(--primary-color) !important;
 }
 
 .el-checkbox__input.is-checked .el-checkbox__inner::after {
@@ -448,7 +448,7 @@
 
 .el-input-number__decrease:hover,
 .el-input-number__increase:hover {
-  color: var(--accent-color) !important;
+  color: var(--primary-color) !important;
 }
 
 .el-input-number__decrease.is-disabled,
@@ -490,7 +490,7 @@
 }
 
 .el-switch:hover .el-switch__core {
-  border-color: var(--accent-color) !important;
+  border-color: var(--primary-color) !important;
 }
 
 .el-slider {
@@ -515,7 +515,7 @@
 .el-slider__bar {
   height: 8px !important;
   border-radius: 999px !important;
-  background: rgba(231, 109, 255, 0.82) !important;
+  background: color-mix(in srgb, var(--primary-color) 82%, transparent) !important;
 }
 
 .el-slider__button {
@@ -529,7 +529,7 @@
 .el-slider__button.hover,
 .el-slider__button.dragging {
   transform: scale(1.04);
-  border-color: var(--accent-color) !important;
+  border-color: var(--primary-color) !important;
   box-shadow: none;
 }
 
@@ -1085,7 +1085,7 @@
 .el-select-dropdown__item.is-selected,
 .el-select-dropdown__item.selected {
   background: var(--layout-menu-active-bg-color) !important;
-  color: var(--accent-color) !important;
+  color: var(--primary-color) !important;
   font-weight: 700;
 }
 

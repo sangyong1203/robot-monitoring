@@ -226,7 +226,7 @@ const onChange = (value: any) => {
 }
 .dropdown-list :deep(.el-select__selected-item) {
      .el-tag{
-        background-color: var(--accent-color-soft) !important;
+        background-color: var(--primary-color-1) !important;
         border-radius: 20px;
         color: white;
      }
