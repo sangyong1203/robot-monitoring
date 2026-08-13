@@ -121,7 +121,7 @@ withDefaults(
     align-items: center;
     flex: 1 1 auto;
     min-width: 0;
-    min-height: 36px;
+    min-height: 24px;
 }
 
 .panel__heading--bottom {
@@ -132,7 +132,7 @@ withDefaults(
 
 .panel__heading--right {
     display: flex;
-    align-items: flex-end;
+    align-items: flex-start;
     gap: 10px;
     flex-wrap: wrap;
 }
