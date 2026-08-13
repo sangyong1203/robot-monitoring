@@ -254,7 +254,7 @@
                                         <span class="term-prompt">$</span>
                                         <span class="term-title">teleop.log -- stream</span>
                                     </span>
-                                    <button v-if="jogLogs.length > 0" type="button" class="clear-logs-btn" @click="jogLogs = []">
+                                    <button type="button" class="clear-logs-btn" @click="jogLogs = []">
                                         초기화
                                     </button>
                                 </div>
@@ -877,7 +877,7 @@ const executeCommand = () => {
 .unified-control-flex {
     display: flex;
     gap: 16px;
-    height: 572px;
+    height: 580px;
 
     .mini-map-panel {
         width: 520px;
@@ -1022,8 +1022,10 @@ const executeCommand = () => {
 
 .top-unit-panel {
     flex: 1;
+    min-height: 295px;
     padding: 14px 16px 6px 16px;
     background: rgba(15, 23, 42, 0.65);
+    overflow: hidden;
 
     :deep(.panel__header h2) {
         color: #38bdf8;
@@ -1071,7 +1073,7 @@ const executeCommand = () => {
 
 /* 고정 최소 높이 폼 영역으로 탭 변경 시 Teleop Jog 위치 이동 방지 */
 .unit-form-content-area {
-    min-height: 140px;
+    min-height: 135px;
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
@@ -1083,7 +1085,7 @@ const executeCommand = () => {
 
     :deep(.el-form-item) {
         flex: 1;
-        margin-bottom: 12px;
+        margin-bottom: 0;
     }
 }
 
@@ -1099,16 +1101,19 @@ const executeCommand = () => {
     margin-bottom: 16px;
 }
 
-/* Teleop Panel High-Tech Styling (헤더 간격 및 수직 위치 정돈) */
+/* Teleop Panel High-Tech Styling (높이 및 flex-grow 유연 배치) */
 .teleop-panel {
-    height: 254px;
+    height: 260px;
+    flex-shrink: 0;
     display: flex;
     flex-direction: column;
-    padding: 14px 16px;
+    padding: 12px 16px 14px 16px;
     background: rgba(15, 23, 42, 0.65);
+    overflow: hidden;
 
     :deep(.panel__header) {
-        margin-bottom: 12px;
+        margin-bottom: 10px;
+        flex-shrink: 0;
     }
 
     :deep(.panel__heading--bottom) {
@@ -1129,9 +1134,10 @@ const executeCommand = () => {
 
     .teleop-inline-layout {
         display: flex;
-        gap: 18px;
+        gap: 16px;
         align-items: stretch;
         flex: 1;
+        min-height: 0;
     }
 
     /* D-Pad Futuristic Gamepad Styling */
@@ -1140,7 +1146,7 @@ const executeCommand = () => {
         flex-direction: column;
         justify-content: center;
         gap: 6px;
-        width: 180px;
+        width: 175px;
         flex-shrink: 0;
         background: rgba(15, 23, 42, 0.75);
         border: 1px solid rgba(56, 189, 248, 0.2);
@@ -1207,11 +1213,13 @@ const executeCommand = () => {
     .teleop-compact-controls {
         flex: 1;
         min-width: 0;
+        min-height: 0;
         display: flex;
         flex-direction: column;
-        gap: 12px;
+        gap: 8px;
 
         .speed-slider-row {
+            flex-shrink: 0;
             display: flex;
             align-items: center;
             gap: 12px;
@@ -1240,10 +1248,11 @@ const executeCommand = () => {
             display: flex;
             flex-direction: column;
             flex: 1;
-            min-height: 140px;
+            min-height: 0;
             box-shadow: inset 0 0 12px rgba(0, 0, 0, 0.6);
 
             .terminal-header {
+                flex-shrink: 0;
                 display: flex;
                 align-items: center;
                 justify-content: space-between;
@@ -1298,11 +1307,26 @@ const executeCommand = () => {
 
             .terminal-body {
                 flex: 1;
+                min-height: 0;
                 overflow-y: auto;
                 padding: 8px 12px;
                 font-family: 'Consolas', 'Courier New', monospace;
                 font-size: 11px;
                 line-height: 1.6;
+
+                &::-webkit-scrollbar {
+                    width: 6px;
+                }
+                &::-webkit-scrollbar-track {
+                    background: rgba(15, 23, 42, 0.6);
+                }
+                &::-webkit-scrollbar-thumb {
+                    background: rgba(56, 189, 248, 0.3);
+                    border-radius: 3px;
+                    &:hover {
+                        background: rgba(56, 189, 248, 0.6);
+                    }
+                }
 
                 .log-empty {
                     color: #475569;
