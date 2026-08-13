@@ -28,7 +28,9 @@
                     </span>
                     <span class="location-chip">
                         <MapPin :size="14" class="loc-icon" />
-                        X: <strong class="coord-val">{{ robot.x.toFixed(2) }}</strong>m, Y: <strong class="coord-val">{{ robot.y.toFixed(2) }}</strong>m
+                        <span class="coord-item">X:<strong class="coord-val">{{ robot.x.toFixed(2) }}</strong>m</span>
+                        <span class="coord-sep">,</span>
+                        <span class="coord-item">Y:<strong class="coord-val">{{ robot.y.toFixed(2) }}</strong>m</span>
                     </span>
                 </div>
             </div>
@@ -811,7 +813,7 @@ const executeCommand = () => {
             &.offline { color: #f87171; background: rgba(248, 113, 113, 0.18); border: 1px solid rgba(248, 113, 113, 0.3); }
         }
 
-        .battery-chip, .location-chip {
+        .battery-chip {
             display: inline-flex;
             align-items: center;
             gap: 6px;
@@ -832,21 +834,40 @@ const executeCommand = () => {
                 font-variant-numeric: tabular-nums;
                 color: #ffffff;
             }
+        }
+
+        .location-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: rgba(30, 41, 59, 0.85);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            padding: 3px 10px;
+            border-radius: 4px;
+            color: #94a3b8;
+            font-size: 12px;
 
             .loc-icon {
                 color: #38bdf8;
+                margin-right: 2px;
+            }
+
+            .coord-item {
+                display: inline-flex;
+                align-items: center;
+                gap: 2px;
             }
 
             .coord-val {
-                display: inline-block;
-                min-width: 65px;
-                text-align: right;
-                font-variant-numeric: tabular-nums;
                 color: #ffffff;
+                font-weight: 700;
+                font-variant-numeric: tabular-nums;
+                margin-left: 2px;
             }
 
-            strong {
-                color: #ffffff;
+            .coord-sep {
+                color: #64748b;
+                margin: 0 3px 0 1px;
             }
         }
     }
