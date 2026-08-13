@@ -806,7 +806,6 @@ const executeCommand = () => {
 .telemetry-header-panel {
     margin-bottom: 12px;
     padding: 12px 16px;
-    background: rgba(15, 23, 42, 0.85);
 
     .telemetry-info-group {
         display: flex;
@@ -954,7 +953,6 @@ const executeCommand = () => {
         flex: 1;
         min-height: 0;
         padding: 14px;
-        background: #060911;
 
         :deep(.panel__header h2) {
             color: #38bdf8;
@@ -1081,7 +1079,6 @@ const executeCommand = () => {
         font-size: 12px;
         color: #cbd5e1;
         background: rgba(15, 23, 42, 0.9);
-        border-top: 1px solid var(--border-glass-color);
         margin-top: 8px;
         border-radius: 4px;
 
@@ -1098,8 +1095,6 @@ const executeCommand = () => {
     display: flex;
     flex-direction: column;
     padding: 12px 14px;
-    background: #060911;
-    border: 1px solid rgba(56, 189, 248, 0.2);
 
     :deep(.panel__header) {
         margin-bottom: 8px;
@@ -1289,7 +1284,6 @@ const executeCommand = () => {
     flex: 1;
     min-height: 295px;
     padding: 14px 16px 6px 16px;
-    background: rgba(15, 23, 42, 0.65);
     overflow: hidden;
 
     :deep(.panel__header h2) {
@@ -1373,7 +1367,6 @@ const executeCommand = () => {
     display: flex;
     flex-direction: column;
     padding: 12px 16px 14px 16px;
-    background: rgba(15, 23, 42, 0.65);
     overflow: hidden;
 
     :deep(.panel__header) {
