@@ -124,6 +124,10 @@ const openControlDialogWithRobot = (robot: MonitoringRobot) => {
 }
 
 const openCameraModal = (robot: MonitoringRobot) => {
+    if (robot.robotType === 'WORK') {
+        ElMessage.warning('작업용 로봇에는 카메라가 탑재되어 있지 않습니다.')
+        return
+    }
     activeCameraRobot.value = robot
     cameraModalVisible.value = true
 }

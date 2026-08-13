@@ -43,7 +43,14 @@
                     <el-button size="small" type="primary" plain @click.stop="$emit('openControl', robot)">
                         수동 제어
                     </el-button>
-                    <el-button size="small" type="primary" plain @click.stop="$emit('openCamera', robot)">
+                    <el-button
+                        size="small"
+                        type="primary"
+                        plain
+                        :disabled="robot.robotType === 'WORK'"
+                        :title="robot.robotType === 'WORK' ? '작업용 로봇은 카메라가 탑재되어 있지 않습니다' : '실시간 카메라 모니터링'"
+                        @click.stop="robot.robotType !== 'WORK' && $emit('openCamera', robot)"
+                    >
                         <Camera :size="13" /> 카메라
                     </el-button>
                     <el-button size="small" type="danger" class="btn-estop-card" @click.stop="$emit('triggerEstop', robot)">
@@ -197,6 +204,20 @@ const statusTag = (status: CommunicationStatus) =>
         font-size: 11px;
         height: 26px !important;
         padding: 4px !important;
+
+        &.is-disabled, &:disabled {
+            background: rgba(51, 65, 85, 0.4) !important;
+            border-color: rgba(148, 163, 184, 0.25) !important;
+            color: var(--text-color--placeholder) !important;
+            opacity: 0.85 !important;
+            cursor: not-allowed !important;
+            box-shadow: none !important;
+
+            :deep(svg) {
+                color: var(--text-color--placeholder) !important;
+                stroke: var(--text-color--placeholder) !important;
+            }
+        }
     }
 }
 
