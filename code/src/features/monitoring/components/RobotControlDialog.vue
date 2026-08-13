@@ -36,7 +36,7 @@
 
         <!-- 한 화면에 통합된 2D 지도 + 지정 제어 + 원격 조종 대시보드 Flex 레이아웃 -->
         <div class="unified-control-flex">
-            <!-- 2. [Panel 2] 좌측 2D 인터랙티브 실시간 지도 패널 -->
+            <!-- 2. [Panel 2] 좌측 2D 인터랙티브 실시간 지도 패널 (Wheel Zoom & Drag Pan 지원) -->
             <Panel :title="`지도: ${currentMap?.name || '관제 2D 지도'}`" class="mini-map-panel">
                 <template #headerRight>
                     <button type="button" class="zoom-reset-btn" @click="resetMapZoom">
@@ -44,7 +44,15 @@
                     </button>
                 </template>
 
-                <div class="map-interactive-container" @click="handleMapClick">
+                <div
+                    class="map-interactive-container"
+                    @wheel.prevent="handleWheel"
+                    @mousedown="handleMouseDown"
+                    @mousemove="handleMouseMove"
+                    @mouseup="handleMouseUp"
+                    @mouseleave="handleMouseUp"
+                    @click="handleMapClick"
+                >
                     <svg class="dialog-map-svg" :viewBox="mapViewBox" role="img">
                         <defs>
                             <pattern id="mini-map-grid" width="40" height="40" patternUnits="userSpaceOnUse">
@@ -52,52 +60,60 @@
                             </pattern>
                         </defs>
 
-                        <!-- Background & Map Image -->
-                        <rect x="-1000" y="-1000" width="4000" height="4000" fill="#060911" />
-                        <image
-                            v-if="mapImageSource && !mapImageFailed"
-                            :href="mapImageSource"
-                            x="0"
-                            y="0"
-                            :width="mapWidth"
-                            :height="mapHeight"
-                            preserveAspectRatio="none"
-                            opacity="0.95"
-                            @error="mapImageFailed = true"
-                        />
-                        <rect x="-1000" y="-1000" width="4000" height="4000" fill="url(#mini-map-grid)" opacity="0.5" />
+                        <!-- Main Map Layer Group with Zoom & Pan transform -->
+                        <g class="map-transformed-group" :transform="`translate(${mapPanX}, ${mapPanY}) scale(${mapZoomScale})`">
+                            <!-- Background & Map Image (Unstretched Aspect Ratio) -->
+                            <rect x="-1000" y="-1000" width="4000" height="4000" fill="#060911" />
+                            <image
+                                v-if="mapImageSource && !mapImageFailed"
+                                :href="mapImageSource"
+                                x="0"
+                                y="0"
+                                :width="mapWidth"
+                                :height="mapHeight"
+                                preserveAspectRatio="xMidYMid meet"
+                                opacity="0.95"
+                                @error="mapImageFailed = true"
+                            />
+                            <rect x="-1000" y="-1000" width="4000" height="4000" fill="url(#mini-map-grid)" opacity="0.5" />
 
-                        <!-- POI Markers -->
-                        <g
-                            v-for="poi in filteredDestinations"
-                            :key="`poi-${poi.id}`"
-                            class="poi-marker"
-                            :transform="poiTransform(poi)"
-                            @click.stop="selectPoiDestination(poi)"
-                        >
-                            <circle r="6" fill="#38bdf8" stroke="#ffffff" stroke-width="1.5" />
-                            <text x="9" y="3" class="poi-label">{{ poi.name }}</text>
-                        </g>
+                            <!-- POI Markers -->
+                            <g
+                                v-for="poi in filteredDestinations"
+                                :key="`poi-${poi.id}`"
+                                class="poi-marker"
+                                :transform="poiTransform(poi)"
+                                @click.stop="selectPoiDestination(poi)"
+                            >
+                                <circle r="6" fill="#38bdf8" stroke="#ffffff" stroke-width="1.5" />
+                                <text x="10" y="4" class="poi-label">{{ poi.name }}</text>
+                            </g>
 
-                        <!-- Current Robot Marker (Pulsing Aura & Heading Arrow) -->
-                        <g v-if="robot" class="robot-marker" :transform="robotMarkerTransform">
-                            <circle class="pulse-aura" r="22" stroke="#4ade80" />
-                            <circle r="12" fill="#22c55e" stroke="#ffffff" stroke-width="2" />
-                            <path d="M 0 -8 L 4 3 L 0 0 L -4 3 Z" fill="#ffffff" :transform="`rotate(${robot.heading || 0})`" />
-                            <text x="16" y="4" class="robot-map-name">{{ robot.name }} (현재)</text>
-                        </g>
+                            <!-- Current Robot Marker (Pulsing Aura & Heading Arrow) -->
+                            <g v-if="robot" class="robot-marker" :transform="robotMarkerTransform">
+                                <circle class="pulse-aura" r="22" stroke="#4ade80" />
+                                <circle r="12" fill="#22c55e" stroke="#ffffff" stroke-width="2" />
+                                <path d="M 0 -8 L 4 3 L 0 0 L -4 3 Z" fill="#ffffff" :transform="`rotate(${robot.heading || 0})`" />
+                                <text x="18" y="4" class="robot-map-name">{{ robot.name }} (현재)</text>
+                            </g>
 
-                        <!-- Target Destination Click Marker (Crosshair) -->
-                        <g v-if="executionUnit === 'DESTINATION'" class="target-click-marker" :transform="targetMarkerTransform">
-                            <circle class="target-ring" r="16" stroke="#ef4444" stroke-width="2" fill="none" />
-                            <line x1="-12" y1="0" x2="12" y2="0" stroke="#ef4444" stroke-width="2" />
-                            <line x1="0" y1="-12" x2="0" y2="12" stroke="#ef4444" stroke-width="2" />
-                            <text x="14" y="-8" class="target-coord-text">목표: ({{ commandForm.x }}, {{ commandForm.y }})</text>
+                            <!-- Target Destination Click Marker (Crosshair & Offset Text) -->
+                            <g v-if="executionUnit === 'DESTINATION'" class="target-click-marker" :transform="targetMarkerTransform">
+                                <circle class="target-ring" r="16" stroke="#ef4444" stroke-width="2" fill="none" />
+                                <line x1="-12" y1="0" x2="12" y2="0" stroke="#ef4444" stroke-width="2" />
+                                <line x1="0" y1="-12" x2="0" y2="12" stroke="#ef4444" stroke-width="2" />
+                                <text x="22" y="4" class="target-coord-text">목표: ({{ commandForm.x.toFixed(2) }}, {{ commandForm.y.toFixed(2) }})</text>
+                            </g>
                         </g>
                     </svg>
+
+                    <!-- Zoom Level Indicator Badge -->
+                    <div class="zoom-indicator-badge">
+                        Zoom: {{ (mapZoomScale * 100).toFixed(0) }}%
+                    </div>
                 </div>
                 <div class="map-hint-footer">
-                    <strong>지도를 마우스로 클릭</strong>하면 해당 위치로 목표 좌표(X, Y)가 자동 설정되며, 수동 조종 시에도 실시간 위치 변화를 직접 관제할 수 있습니다.
+                    <strong>마우스 휠 스크롤</strong>로 확대/축소 및 <strong>드래그</strong> 이동이 가능하며, 지도를 클릭하면 해당 위치로 목표 좌표가 설정됩니다.
                 </div>
             </Panel>
 
@@ -194,7 +210,7 @@
                     </el-form>
                 </Panel>
 
-                <!-- 4. [Panel 4] 우측 하단 원격 미세 조종 (Teleop Jog Control) 패널 (헤더 위치 및 간격 최적화) -->
+                <!-- 4. [Panel 4] 우측 하단 원격 미세 조종 (Teleop Jog Control) 패널 -->
                 <Panel
                     title="원격 미세 조종 (Teleop Jog)"
                     subtitle="실시간 위치 관제 및 모션 제어"
@@ -370,6 +386,14 @@ const jogSpeed = ref(0.5)
 const jogLogs = ref<JogLogItem[]>([])
 const jogLogContainer = ref<HTMLElement | null>(null)
 
+// Map Zoom & Drag-Pan state
+const mapZoomScale = ref(1.0)
+const mapPanX = ref(0)
+const mapPanY = ref(0)
+const isDraggingMap = ref(false)
+const dragStart = ref({ x: 0, y: 0 })
+const hasDragged = ref(false)
+
 const mapImageFailed = ref(false)
 
 const commandForm = reactive({
@@ -449,15 +473,89 @@ watch(() => props.visible, (val) => {
     }
 })
 
-// Map click to target coordinate conversion
-const handleMapClick = (e: MouseEvent) => {
-    if (executionUnit.value !== 'DESTINATION') return
-    const container = (e.currentTarget as HTMLElement).querySelector('.dialog-map-svg')
-    if (!container || !currentMap.value) return
+// Map Zoom Reset
+const resetMapZoom = () => {
+    mapZoomScale.value = 1.0
+    mapPanX.value = 0
+    mapPanY.value = 0
+    ElMessage.success('지도 뷰어 (Zoom & Pan)가 초기화되었습니다.')
+}
 
-    const rect = container.getBoundingClientRect()
-    const clickPixelX = (e.clientX - rect.left) * (mapWidth.value / rect.width)
-    const clickPixelY = (e.clientY - rect.top) * (mapHeight.value / rect.height)
+// Wheel Scroll Zoom Centered at Mouse Cursor
+const handleWheel = (e: WheelEvent) => {
+    const zoomFactor = e.deltaY < 0 ? 1.15 : 0.85
+    const newScale = Math.min(Math.max(0.5, mapZoomScale.value * zoomFactor), 6.0)
+
+    const svg = (e.currentTarget as HTMLElement).querySelector('svg.dialog-map-svg') as SVGSVGElement | null
+    const targetGroup = (e.currentTarget as HTMLElement).querySelector('g.map-transformed-group') as SVGGElement | null
+    if (!svg || !targetGroup) return
+
+    const pt = svg.createSVGPoint()
+    pt.x = e.clientX
+    pt.y = e.clientY
+    const groupCTM = targetGroup.getScreenCTM()
+    if (!groupCTM) return
+
+    const cursor = pt.matrixTransform(groupCTM.inverse())
+
+    const scaleRatio = newScale / mapZoomScale.value
+    mapPanX.value = cursor.x - scaleRatio * (cursor.x - mapPanX.value)
+    mapPanY.value = cursor.y - scaleRatio * (cursor.y - mapPanY.value)
+    mapZoomScale.value = newScale
+}
+
+// Mouse Drag to Pan Map
+const handleMouseDown = (e: MouseEvent) => {
+    if (e.button !== 0) return
+    isDraggingMap.value = true
+    hasDragged.value = false
+    dragStart.value = { x: e.clientX, y: e.clientY }
+}
+
+const handleMouseMove = (e: MouseEvent) => {
+    if (!isDraggingMap.value) return
+    const dx = e.clientX - dragStart.value.x
+    const dy = e.clientY - dragStart.value.y
+
+    if (Math.abs(dx) > 3 || Math.abs(dy) > 3) {
+        hasDragged.value = true
+    }
+
+    const svg = (e.currentTarget as HTMLElement).querySelector('svg.dialog-map-svg') as SVGSVGElement | null
+    if (!svg) return
+    const rect = svg.getBoundingClientRect()
+    const scaleFactorX = mapWidth.value / rect.width
+
+    mapPanX.value += (dx * scaleFactorX) / mapZoomScale.value
+    mapPanY.value += (dy * scaleFactorX) / mapZoomScale.value
+
+    dragStart.value = { x: e.clientX, y: e.clientY }
+}
+
+const handleMouseUp = () => {
+    isDraggingMap.value = false
+}
+
+// Map Click with Inner Group CTM Inverse (Silent, 100% Precision at ANY Zoom level & Pan position)
+const handleMapClick = (e: MouseEvent) => {
+    if (hasDragged.value) {
+        hasDragged.value = false
+        return
+    }
+    if (executionUnit.value !== 'DESTINATION') return
+    const targetGroup = (e.currentTarget as HTMLElement).querySelector('g.map-transformed-group') as SVGGElement | null
+    const svg = (e.currentTarget as HTMLElement).querySelector('svg.dialog-map-svg') as SVGSVGElement | null
+    if (!targetGroup || !svg || !currentMap.value) return
+
+    const pt = svg.createSVGPoint()
+    pt.x = e.clientX
+    pt.y = e.clientY
+    const groupCTM = targetGroup.getScreenCTM()
+    if (!groupCTM) return
+
+    const cursorPoint = pt.matrixTransform(groupCTM.inverse())
+    const clickPixelX = cursorPoint.x
+    const clickPixelY = cursorPoint.y
 
     const metadata = {
         width: currentMap.value.width,
@@ -471,11 +569,6 @@ const handleMapClick = (e: MouseEvent) => {
     commandForm.x = Number(worldPoint.x.toFixed(2))
     commandForm.y = Number(worldPoint.y.toFixed(2))
     selectedDestinationId.value = null
-    ElMessage.info(`지도 클릭: 목표 좌표 (X: ${commandForm.x}m, Y: ${commandForm.y}m) 설정 완료`)
-}
-
-const resetMapZoom = () => {
-    ElMessage.success('지도 뷰어가 초기화되었습니다.')
 }
 
 const robotMarkerTransform = computed(() => {
@@ -823,8 +916,15 @@ const executeCommand = () => {
         position: relative;
         width: 100%;
         height: 100%;
-        cursor: crosshair;
+        cursor: grab;
         background: #060911;
+        overflow: hidden;
+        border-radius: 6px;
+        border: 1px solid rgba(56, 189, 248, 0.15);
+
+        &:active {
+            cursor: grabbing;
+        }
 
         .dialog-map-svg {
             width: 100%;
@@ -860,7 +960,27 @@ const executeCommand = () => {
                 font-size: 12px;
                 fill: #f87171;
                 font-weight: bold;
+                paint-order: stroke;
+                stroke: #060911;
+                stroke-width: 3px;
+                stroke-linecap: round;
+                stroke-linejoin: round;
             }
+        }
+
+        .zoom-indicator-badge {
+            position: absolute;
+            bottom: 12px;
+            right: 12px;
+            background: rgba(15, 23, 42, 0.85);
+            border: 1px solid rgba(56, 189, 248, 0.3);
+            color: #38bdf8;
+            font-size: 11px;
+            font-weight: bold;
+            padding: 3px 8px;
+            border-radius: 4px;
+            pointer-events: none;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
         }
     }
 
@@ -908,7 +1028,6 @@ const executeCommand = () => {
         &:hover {
             background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
         }
-
     }
 }
 
