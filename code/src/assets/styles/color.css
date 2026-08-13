@@ -1,0 +1,65 @@
+/**
+ * ============================================================================
+ * Login Image Primitive Color Scale System (color.css)
+ * Extracted directly from the Login Background Image Identity
+ * Scale: 1 (Lightest) ~ 10 (Darkest/Deepest)
+ * ============================================================================
+ */
+
+:root {
+  /* --------------------------------------------------------------------------
+     1. Purple / Magenta Scale (Left/Bottom Wave, Glow, Find PW Link)
+     -------------------------------------------------------------------------- */
+  --purple-1: #fae8ff;  /* 1 - Ultra Light Glow Tint */
+  --purple-2: #f5d0fe;  /* 2 - Soft Pastel Purple */
+  --purple-3: #f0abfc;  /* 3 - Light Lavender */
+  --purple-4: #e879f9;  /* 4 - Bright Magenta */
+  --purple-5: #e76dff;  /* 5 - Electric Pink-Magenta (Primary) */
+  --purple-6: #d946ef;  /* 6 - Neon Purple Wave Highlight */
+  --purple-7: #c026d3;  /* 7 - Rich Deep Wave Violet */
+  --purple-8: #9333ea;  /* 8 - Deep Violet Shadow */
+  --purple-9: #6b21a8;  /* 9 - Dark Purple Base */
+  --purple-10: #2e0b59; /* 10 - Deepest Purple Void */
+
+  /* --------------------------------------------------------------------------
+     2. Cyan / Teal Scale (Top-Right Ribbon, Card Right Light Reflection)
+     -------------------------------------------------------------------------- */
+  --cyan-1: #ecfeff;   /* 1 - Ultra Light Cyan Tint */
+  --cyan-2: #cffafe;   /* 2 - Soft Cyan Highlight */
+  --cyan-3: #a5f3fc;   /* 3 - Ice Cyan */
+  --cyan-4: #67e8f9;   /* 4 - High-Tech Cyan */
+  --cyan-5: #00efff;   /* 5 - Vibrant Cyber Cyan Light (Secondary) */
+  --cyan-6: #15e0b7;   /* 6 - Mint Cyan Accent */
+  --cyan-7: #0284c7;   /* 7 - Electric Cyan Blue */
+  --cyan-8: #0369a1;   /* 8 - Deep Wave Cyan */
+  --cyan-9: #075985;   /* 9 - Dark Blue Cyan */
+  --cyan-10: #082f49;  /* 10 - Deepest Cyan Shadow */
+
+  /* --------------------------------------------------------------------------
+     3. Blue / Indigo Scale (Center Wave, Input Box Fill, Card Gradient)
+     -------------------------------------------------------------------------- */
+  --blue-1: #eef2ff;   /* 1 - Soft Ice Blue */
+  --blue-2: #e0e7ff;   /* 2 - Light Indigo Tint */
+  --blue-3: #c7d2fe;   /* 3 - Soft Lavender Blue */
+  --blue-4: #93c5fd;   /* 4 - Electric Sky Blue */
+  --blue-5: #3b82f6;   /* 5 - Vibrant Control Blue */
+  --blue-6: #2563eb;   /* 6 - Input Box Gradient Fill */
+  --blue-7: #1d4ed8;   /* 7 - Royal Blue Wave */
+  --blue-8: #0b3288;   /* 8 - Center Wave Royal Blue Base */
+  --blue-9: #0b1d4f;   /* 9 - Dark Indigo Shadow */
+  --blue-10: #040918;  /* 10 - Deepest Blue Void */
+
+  /* --------------------------------------------------------------------------
+     4. Dark Neutral Slate Scale (Void Background & Card Surface Scale)
+     -------------------------------------------------------------------------- */
+  --slate-1: #ffffff;  /* 1 - Pure White Text */
+  --slate-2: #f8fafc;  /* 2 - Off White Light */
+  --slate-3: #f1f5f9;  /* 3 - Soft Primary Text (#f5f5f5) */
+  --slate-4: #cbd5e1;  /* 4 - Body Secondary Text (#c9c1d4) */
+  --slate-5: #94a3b8;  /* 5 - Muted Text (#9f98aa) */
+  --slate-6: #475569;  /* 6 - Border & Muted Controls */
+  --slate-7: #1d2130;  /* 7 - Elevated Surface / Tooltip Base */
+  --slate-8: #171a24;  /* 8 - Control Input Surface Base */
+  --slate-9: #151822;  /* 9 - Card Dark Glass Surface */
+  --slate-10: #060814; /* 10 - Deep Midnight Void Background */
+}
