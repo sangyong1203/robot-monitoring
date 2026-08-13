@@ -2,10 +2,10 @@
   /* Brand colors */
   --primary-color: #e76dff;
   --secondary-color: #15e0b7;
-  --primary-color-1: rgba(231, 109, 255, 0.18);
-  --accent-color: #e76dff;
-  --accent-color-soft: rgba(231, 109, 255, 0.24);
-  --accent-cyan-color: #15e0b7;
+  --primary-color-1: color-mix(in srgb, var(--primary-color) 18%, transparent);
+  --accent-color: var(--primary-color);
+  --accent-color-soft: color-mix(in srgb, var(--primary-color) 24%, transparent);
+  --accent-cyan-color: var(--secondary-color);
 
   /* Text colors */
   --text-color--primary: #f5f5f5;
@@ -21,11 +21,11 @@
   --surface-color: #151822;
   --border-color: rgba(255, 255, 255, 0.08);
   --panel-border-color: rgba(61, 61, 61, 0.24);
-  --panel-bg-color:rgba(0, 0, 0, 0.25);
+  --panel-bg-color: rgba(0, 0, 0, 0.25);
   --panel-shadow:
-      0 7px 12px rgba(0, 0, 0, 0.28),
-        0 0 18px rgba(231, 109, 255, 0.08),
-        inset 0 1px 0 rgb(231 109 255 / 10%);
+    0 7px 12px rgba(0, 0, 0, 0.28),
+    0 0 18px color-mix(in srgb, var(--primary-color) 8%, transparent),
+    inset 0 1px 0 color-mix(in srgb, var(--primary-color) 10%, transparent);
   --main-page-bg-color: #272727;
   --app-bg-color: #272727;
   --app-bg-color-deep: #151821;
@@ -34,16 +34,16 @@
   --surface-elevated-color: #1d2130;
   --surface-muted-color: rgba(255, 255, 255, 0.04);
   --surface-hover-color: rgba(255, 255, 255, 0.07);
-  --border-glass-color: rgba(231, 109, 255, 0.22);
-  --overlay-scrollbar-thumb-color: rgba(231, 109, 255, 0.36);
+  --border-glass-color: color-mix(in srgb, var(--primary-color) 22%, transparent);
+  --overlay-scrollbar-thumb-color: color-mix(in srgb, var(--primary-color) 36%, transparent);
   --shadow-color: rgba(0, 0, 0, 0.42);
   --focus-border-color: #dedede;
   --layout-header-bg-color: transparent;
   --layout-sidebar-bg-color: #171a24;
   --layout-overlay-color: rgba(0, 0, 0, 0.12);
-  --layout-menu-active-bg-color: rgba(231, 109, 255, 0.16);
-  --layout-purple-glow-color: rgba(231, 109, 255, 0.26);
-  --layout-cyan-glow-color: rgba(21, 224, 183, 0.18);
+  --layout-menu-active-bg-color: color-mix(in srgb, var(--primary-color) 16%, transparent);
+  --layout-purple-glow-color: color-mix(in srgb, var(--primary-color) 26%, transparent);
+  --layout-cyan-glow-color: color-mix(in srgb, var(--secondary-color) 18%, transparent);
   --layout-header-shadow: none;
   --layout-sidebar-shadow: none;
   --header-title-text-color: var(--primary-color);
@@ -53,12 +53,12 @@
 
   /* Element Plus theme */
   --el-color-primary: var(--primary-color) !important;
-  --el-color-primary-light-3: #f08dff !important;
-  --el-color-primary-light-5: #f7b2ff !important;
-  --el-color-primary-light-7: #fad6ff !important;
-  --el-color-primary-light-8: #fce8ff !important;
-  --el-color-primary-light-9: #fef5ff !important;
-  --el-color-primary-dark-2: #c64ce0 !important;
+  --el-color-primary-light-3: color-mix(in srgb, var(--primary-color) 70%, #ffffff) !important;
+  --el-color-primary-light-5: color-mix(in srgb, var(--primary-color) 50%, #ffffff) !important;
+  --el-color-primary-light-7: color-mix(in srgb, var(--primary-color) 30%, #ffffff) !important;
+  --el-color-primary-light-8: color-mix(in srgb, var(--primary-color) 20%, #ffffff) !important;
+  --el-color-primary-light-9: color-mix(in srgb, var(--primary-color) 10%, #ffffff) !important;
+  --el-color-primary-dark-2: color-mix(in srgb, var(--primary-color) 80%, #000000) !important;
   --el-datepicker-border-color: none !important;
 
   /* Menu */
@@ -94,8 +94,8 @@
   --tag-default-bg-color: rgba(255, 255, 255, 0.06);
   --tag-default-border-color: rgba(255, 255, 255, 0.14);
   --tag-default-text-color: var(--text-color--secondary);
-  --tag-active-bg-color: rgba(21, 224, 183, 0.12);
-  --tag-active-border-color: rgba(21, 224, 183, 0.34);
+  --tag-active-bg-color: color-mix(in srgb, var(--secondary-color) 12%, transparent);
+  --tag-active-border-color: color-mix(in srgb, var(--secondary-color) 34%, transparent);
   --tag-active-text-color: var(--secondary-color);
   --tag-inactive-bg-color: rgba(255, 255, 255, 0.06);
   --tag-inactive-border-color: rgba(255, 255, 255, 0.14);
@@ -112,12 +112,12 @@
   --table-noborder-cell-border-bottom-color: var(--border-color);
   --table-sort-caret-color: #c0c4cc;
   --table-sort-active-color: var(--text-color--strong);
-  --table-row-hover-bg-color: #12353b;
+  --table-row-hover-bg-color: color-mix(in srgb, var(--secondary-color) 16%, var(--surface-color));
   --table-row-hover-border-color: var(--secondary-color);
-  --table-current-row-bg-color: #2d1f3d;
-  --table-current-row-hover-bg-color: #2d1f3d;
+  --table-current-row-bg-color: color-mix(in srgb, var(--primary-color) 18%, var(--surface-color));
+  --table-current-row-hover-bg-color: color-mix(in srgb, var(--primary-color) 24%, var(--surface-color));
   --table-fixed-column-bg-color: #171a24;
-  --table-fixed-column-shadow: inset -10px 0 10px -10px rgba(0,0,0,0.35);
+  --table-fixed-column-shadow: inset -10px 0 10px -10px rgba(0, 0, 0, 0.35);
   --table-fixed-column-header-bg-color: #151624;
   --table-fixed-column-striped-bg-color: #1b202b;
   --table-fixed-column-hover-bg-color: var(--table-row-hover-bg-color);
@@ -138,18 +138,18 @@
   /* Buttons and messages */
   --button-primary-text-color: black;
   --button-plain-bg-color: rgba(255, 255, 255, 0.02);
-  --button-plain-border-color: rgba(231, 109, 255, 0.42);
+  --button-plain-border-color: color-mix(in srgb, var(--primary-color) 42%, transparent);
   --button-plain-text-color: var(--text-color--white);
-  --button-plain-hover-bg-color: rgba(231, 109, 255, 0.14);
+  --button-plain-hover-bg-color: color-mix(in srgb, var(--primary-color) 14%, transparent);
   --button-plain-hover-border-color: var(--primary-color);
   --button-plain-hover-text-color: var(--text-color--white);
-  --button-plain-active-bg-color: rgba(231, 109, 255, 0.22);
+  --button-plain-active-bg-color: color-mix(in srgb, var(--primary-color) 22%, transparent);
   --button-plain-active-border-color: var(--primary-color);
   --button-plain-active-text-color: var(--text-color--white);
-  --button-primary-plain-bg-color: rgba(231, 109, 255, 0.14);
-  --button-primary-plain-border-color: rgba(231, 109, 255, 0.72);
+  --button-primary-plain-bg-color: color-mix(in srgb, var(--primary-color) 14%, transparent);
+  --button-primary-plain-border-color: color-mix(in srgb, var(--primary-color) 72%, transparent);
   --button-primary-plain-text-color: var(--text-color--white);
-  --button-primary-plain-hover-bg-color: rgba(231, 109, 255, 0.28);
+  --button-primary-plain-hover-bg-color: color-mix(in srgb, var(--primary-color) 28%, transparent);
   --button-primary-plain-hover-border-color: var(--primary-color);
   --button-primary-plain-hover-text-color: var(--text-color--white);
   --button-primary-plain-active-bg-color: var(--primary-color);
@@ -166,24 +166,24 @@
   --descriptions-bordered-label-background: var(--surface-color);
 }
 
-/* Element Plus Theme Variables Global Overrides (Option B) */
+/* Element Plus Theme Variables Global Overrides */
 :root,
 html,
 html.dark,
 body {
-  --el-color-primary: #e76dff !important;
-  --el-color-primary-light-3: #f08dff !important;
-  --el-color-primary-light-5: #f7b2ff !important;
-  --el-color-primary-light-7: #fad6ff !important;
-  --el-color-primary-light-8: #fce8ff !important;
-  --el-color-primary-light-9: #fef5ff !important;
-  --el-color-primary-dark-2: #c64ce0 !important;
+  --el-color-primary: var(--primary-color) !important;
+  --el-color-primary-light-3: color-mix(in srgb, var(--primary-color) 70%, #ffffff) !important;
+  --el-color-primary-light-5: color-mix(in srgb, var(--primary-color) 50%, #ffffff) !important;
+  --el-color-primary-light-7: color-mix(in srgb, var(--primary-color) 30%, #ffffff) !important;
+  --el-color-primary-light-8: color-mix(in srgb, var(--primary-color) 20%, #ffffff) !important;
+  --el-color-primary-light-9: color-mix(in srgb, var(--primary-color) 10%, #ffffff) !important;
+  --el-color-primary-dark-2: color-mix(in srgb, var(--primary-color) 80%, #000000) !important;
 
   --el-button-bg-color: var(--primary-color) !important;
   --el-button-border-color: var(--primary-color) !important;
-  --el-button-hover-bg-color: #f08dff !important;
-  --el-button-hover-border-color: #f08dff !important;
+  --el-button-hover-bg-color: color-mix(in srgb, var(--primary-color) 70%, #ffffff) !important;
+  --el-button-hover-border-color: color-mix(in srgb, var(--primary-color) 70%, #ffffff) !important;
   --el-button-hover-text-color: var(--text-color--white, #ffffff) !important;
-  --el-button-active-bg-color: #c64ce0 !important;
-  --el-button-active-border-color: #c64ce0 !important;
+  --el-button-active-bg-color: color-mix(in srgb, var(--primary-color) 80%, #000000) !important;
+  --el-button-active-border-color: color-mix(in srgb, var(--primary-color) 80%, #000000) !important;
 }
