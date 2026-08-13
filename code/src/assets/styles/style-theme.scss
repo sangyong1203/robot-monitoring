@@ -1,7 +1,9 @@
+@import url(color.css);
+
 :root {
   /* Brand colors */
-  --primary-color: #e76dff;
-  --secondary-color: #15e0b7;
+  --primary-color: var(--purple-5);
+  --secondary-color: var(--cyan-6);
   --primary-color-1: color-mix(in srgb, var(--primary-color) 18%, transparent);
 
   /* System Status & State Colors (Mapped to color.css Primitives) */
@@ -15,20 +17,29 @@
   --info-color-soft: color-mix(in srgb, var(--info-color) 12%, transparent);
 
   /* Text Colors System (Mapped to color.css Primitives) */
-  --text-color--white:       var(--slate-1, #ffffff);     /* Pure White Text */
-  --text-color--strong:      var(--slate-2, #f4f1f8);     /* Emphasized Strong Heading Text */
-  --text-color--primary:     var(--slate-3, #f5f5f5);     /* Primary Heading / Title Text */
-  --text-color--secondary:   var(--slate-4, #c9c1d4);     /* Subtitle & Secondary Label Text */
-  --text-color--body:        var(--slate-4, #d8d1e0);     /* Main Body Content Text */
-  --text-color--muted:       var(--slate-5, #9f98aa);     /* Muted / Subdued Text */
-  --text-color--red:         var(--rose-5,  #ff383c);     /* Danger / Alert Red Text */
-  --text-color--placeholder: color-mix(in srgb, var(--slate-1) 38%, transparent); /* Form Placeholder */
+  --text-color--white: var(--slate-1, #ffffff);
+  /* Pure White Text */
+  --text-color--strong: var(--slate-2, #f4f1f8);
+  /* Emphasized Strong Heading Text */
+  --text-color--primary: var(--slate-3, #f5f5f5);
+  /* Primary Heading / Title Text */
+  --text-color--secondary: var(--slate-4, #c9c1d4);
+  /* Subtitle & Secondary Label Text */
+  --text-color--body: var(--slate-4, #d8d1e0);
+  /* Main Body Content Text */
+  --text-color--muted: var(--slate-5, #9f98aa);
+  /* Muted / Subdued Text */
+  --text-color--red: var(--rose-5, #ff383c);
+  /* Danger / Alert Red Text */
+  --text-color--placeholder: color-mix(in srgb, var(--slate-1) 38%, transparent);
+  /* Form Placeholder */
 
   /* ==========================================================================
      Surface & Background Colors System
      ========================================================================== */
   /* 1. App & Canvas Dark Backgrounds */
-  --app-html-bg: #040711;                  /* Root HTML/Body Dark Void Background */
+  --app-html-bg: #040711;
+  /* Root HTML/Body Dark Void Background */
   --app-bg-color: #272727;
   --main-page-bg-color: #272727;
   --app-bg-color-deep: #151821;
@@ -39,17 +50,24 @@
   --button-disabled-bg-color: color-mix(in srgb, #ffffff 3.5%, transparent);
 
   /* 2. Component & Card Surface Levels */
-  --surface-color: #151822;               /* Standard Dark Glass Surface */
-  --surface-control-color: #171a24;        /* Control Input & Sidebar Surface */
-  --surface-elevated-color: #1d2130;       /* Dialog, Dropdown & Tooltip Surface */
-  --surface-glass-color: rgba(24, 27, 37, 0.48); /* Translucent Card Glass */
-  --panel-bg-color: rgba(0, 0, 0, 0.25);   /* Panel Frame Background */
+  --surface-color: #151822;
+  /* Standard Dark Glass Surface */
+  --surface-control-color: #171a24;
+  /* Control Input & Sidebar Surface */
+  --surface-elevated-color: #1d2130;
+  /* Dialog, Dropdown & Tooltip Surface */
+  --surface-glass-color: rgba(24, 27, 37, 0.48);
+  /* Translucent Card Glass */
+  --panel-bg-color: rgba(0, 0, 0, 0.25);
+  /* Panel Frame Background */
 
   /* 3. Interactive State & Overlay Backgrounds */
   --surface-muted-color: rgba(255, 255, 255, 0.04);
   --surface-hover-color: rgba(255, 255, 255, 0.07);
-  --overlay-backdrop-bg: rgba(0, 0, 0, 0.50); /* Modal Backdrop Dark Overlay */
-  --overlay-media-bg: #111111;              /* Media Player Dark Background */
+  --overlay-backdrop-bg: rgba(0, 0, 0, 0.50);
+  /* Modal Backdrop Dark Overlay */
+  --overlay-media-bg: #111111;
+  /* Media Player Dark Background */
   --danger-gradient: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
 
   /* ==========================================================================
@@ -154,18 +172,18 @@
   --tag-border-radius: 999px;
   --tag-font-size: 12px;
   --tag-font-weight: 700;
-  --tag-default-bg-color: rgba(255, 255, 255, 0.06);
-  --tag-default-border-color: rgba(255, 255, 255, 0.14);
+  --tag-default-bg-color: color-mix(in srgb, var(--slate-1) 6%, transparent);
+  --tag-default-border-color: color-mix(in srgb, var(--slate-1) 14%, transparent);
   --tag-default-text-color: var(--text-color--secondary);
   --tag-active-bg-color: color-mix(in srgb, var(--secondary-color) 12%, transparent);
   --tag-active-border-color: color-mix(in srgb, var(--secondary-color) 34%, transparent);
   --tag-active-text-color: var(--secondary-color);
-  --tag-inactive-bg-color: rgba(255, 255, 255, 0.06);
-  --tag-inactive-border-color: rgba(255, 255, 255, 0.14);
+  --tag-inactive-bg-color: color-mix(in srgb, var(--slate-1) 6%, transparent);
+  --tag-inactive-border-color: color-mix(in srgb, var(--slate-1) 14%, transparent);
   --tag-inactive-text-color: var(--text-color--secondary);
-  --tag-locked-bg-color: rgba(255, 56, 60, 0.12);
-  --tag-locked-border-color: rgba(255, 56, 60, 0.32);
-  --tag-locked-text-color: #ff7478;
+  --tag-locked-bg-color: color-mix(in srgb, var(--rose-5) 12%, transparent);
+  --tag-locked-border-color: color-mix(in srgb, var(--rose-5) 32%, transparent);
+  --tag-locked-text-color: color-mix(in srgb, var(--rose-5) 85%, var(--slate-1));
 
   /* Table */
   --table-header-text-color: var(--text-color--primary);
