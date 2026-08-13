@@ -36,88 +36,131 @@
             </div>
         </Panel>
 
-        <!-- 한 화면에 통합된 2D 지도 + 지정 제어 + 원격 조종 대시보드 Flex 레이아웃 -->
-        <div class="unified-control-flex">
-            <!-- 2. [Panel 2] 좌측 2D 인터랙티브 실시간 지도 패널 (Wheel Zoom & Drag Pan 지원) -->
-            <Panel :title="`지도: ${currentMap?.name || '관제 2D 지도'}`" class="mini-map-panel">
-                <template #headerRight>
-                    <button type="button" class="zoom-reset-btn" @click="resetMapZoom">
-                        <RotateCcw :size="13" /> Zoom 초기화
-                    </button>
-                </template>
+        <!-- 한 화면에 통합된 2D 지도 + (감시 로봇 시 카메라 영상) + 지정 제어 + 원격 조종 대시보드 Flex 레이아웃 -->
+        <div class="unified-control-flex" :class="{ 'has-camera-layout': hasCamera }">
+            <!-- [좌측] 2D 지도 + (감시용 로봇 시) 실시간 카메라 영상 패널 스택 -->
+            <div class="left-map-stack">
+                <!-- 2. [Panel 2] 좌측 2D 인터랙티브 실시간 지도 패널 (Wheel Zoom & Drag Pan 지원) -->
+                <Panel :title="`지도: ${currentMap?.name || '관제 2D 지도'}`" class="mini-map-panel">
+                    <template #headerRight>
+                        <button type="button" class="zoom-reset-btn" @click="resetMapZoom">
+                            <RotateCcw :size="13" /> Zoom 초기화
+                        </button>
+                    </template>
 
-                <div
-                    class="map-interactive-container"
-                    @wheel.prevent="handleWheel"
-                    @mousedown="handleMouseDown"
-                    @mousemove="handleMouseMove"
-                    @mouseup="handleMouseUp"
-                    @mouseleave="handleMouseUp"
-                    @click="handleMapClick"
-                >
-                    <svg class="dialog-map-svg" :viewBox="mapViewBox" role="img">
-                        <defs>
-                            <pattern id="mini-map-grid" width="40" height="40" patternUnits="userSpaceOnUse">
-                                <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#334155" stroke-width="1" />
-                            </pattern>
-                        </defs>
+                    <div
+                        class="map-interactive-container"
+                        @wheel.prevent="handleWheel"
+                        @mousedown="handleMouseDown"
+                        @mousemove="handleMouseMove"
+                        @mouseup="handleMouseUp"
+                        @mouseleave="handleMouseUp"
+                        @click="handleMapClick"
+                    >
+                        <svg class="dialog-map-svg" :viewBox="mapViewBox" role="img">
+                            <defs>
+                                <pattern id="mini-map-grid" width="40" height="40" patternUnits="userSpaceOnUse">
+                                    <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#334155" stroke-width="1" />
+                                </pattern>
+                            </defs>
 
-                        <!-- Main Map Layer Group with Zoom & Pan transform -->
-                        <g class="map-transformed-group" :transform="`translate(${mapPanX}, ${mapPanY}) scale(${mapZoomScale})`">
-                            <!-- Background & Map Image (Unstretched Aspect Ratio) -->
-                            <rect x="-1000" y="-1000" width="4000" height="4000" fill="#060911" />
-                            <image
-                                v-if="mapImageSource && !mapImageFailed"
-                                :href="mapImageSource"
-                                x="0"
-                                y="0"
-                                :width="mapWidth"
-                                :height="mapHeight"
-                                preserveAspectRatio="xMidYMid meet"
-                                opacity="0.95"
-                                @error="mapImageFailed = true"
-                            />
-                            <rect x="-1000" y="-1000" width="4000" height="4000" fill="url(#mini-map-grid)" opacity="0.5" />
+                            <!-- Main Map Layer Group with Zoom & Pan transform -->
+                            <g class="map-transformed-group" :transform="`translate(${mapPanX}, ${mapPanY}) scale(${mapZoomScale})`">
+                                <!-- Background & Map Image (Unstretched Aspect Ratio) -->
+                                <rect x="-1000" y="-1000" width="4000" height="4000" fill="#060911" />
+                                <image
+                                    v-if="mapImageSource && !mapImageFailed"
+                                    :href="mapImageSource"
+                                    x="0"
+                                    y="0"
+                                    :width="mapWidth"
+                                    :height="mapHeight"
+                                    preserveAspectRatio="xMidYMid meet"
+                                    opacity="0.95"
+                                    @error="mapImageFailed = true"
+                                />
+                                <rect x="-1000" y="-1000" width="4000" height="4000" fill="url(#mini-map-grid)" opacity="0.5" />
 
-                            <!-- POI Markers -->
-                            <g
-                                v-for="poi in filteredDestinations"
-                                :key="`poi-${poi.id}`"
-                                class="poi-marker"
-                                :transform="poiTransform(poi)"
-                                @click.stop="selectPoiDestination(poi)"
-                            >
-                                <circle r="6" fill="#38bdf8" stroke="#ffffff" stroke-width="1.5" />
-                                <text x="10" y="4" class="poi-label">{{ poi.name }}</text>
+                                <!-- POI Markers -->
+                                <g
+                                    v-for="poi in filteredDestinations"
+                                    :key="`poi-${poi.id}`"
+                                    class="poi-marker"
+                                    :transform="poiTransform(poi)"
+                                    @click.stop="selectPoiDestination(poi)"
+                                >
+                                    <circle r="6" fill="#38bdf8" stroke="#ffffff" stroke-width="1.5" />
+                                    <text x="10" y="4" class="poi-label">{{ poi.name }}</text>
+                                </g>
+
+                                <!-- Current Robot Marker (Pulsing Aura & Heading Arrow) -->
+                                <g v-if="robot" class="robot-marker" :transform="robotMarkerTransform">
+                                    <circle class="pulse-aura" r="22" stroke="#4ade80" />
+                                    <circle r="12" fill="#22c55e" stroke="#ffffff" stroke-width="2" />
+                                    <path d="M 0 -8 L 4 3 L 0 0 L -4 3 Z" fill="#ffffff" :transform="`rotate(${robot.heading || 0})`" />
+                                    <text x="18" y="4" class="robot-map-name">{{ robot.name }} (현재)</text>
+                                </g>
+
+                                <!-- Target Destination Click Marker (Crosshair & Offset Text) -->
+                                <g v-if="executionUnit === 'DESTINATION'" class="target-click-marker" :transform="targetMarkerTransform">
+                                    <circle class="target-ring" r="16" stroke="#ef4444" stroke-width="2" fill="none" />
+                                    <line x1="-12" y1="0" x2="12" y2="0" stroke="#ef4444" stroke-width="2" />
+                                    <line x1="0" y1="-12" x2="0" y2="12" stroke="#ef4444" stroke-width="2" />
+                                    <text x="22" y="4" class="target-coord-text">목표: ({{ commandForm.x.toFixed(2) }}, {{ commandForm.y.toFixed(2) }})</text>
+                                </g>
                             </g>
+                        </svg>
 
-                            <!-- Current Robot Marker (Pulsing Aura & Heading Arrow) -->
-                            <g v-if="robot" class="robot-marker" :transform="robotMarkerTransform">
-                                <circle class="pulse-aura" r="22" stroke="#4ade80" />
-                                <circle r="12" fill="#22c55e" stroke="#ffffff" stroke-width="2" />
-                                <path d="M 0 -8 L 4 3 L 0 0 L -4 3 Z" fill="#ffffff" :transform="`rotate(${robot.heading || 0})`" />
-                                <text x="18" y="4" class="robot-map-name">{{ robot.name }} (현재)</text>
-                            </g>
-
-                            <!-- Target Destination Click Marker (Crosshair & Offset Text) -->
-                            <g v-if="executionUnit === 'DESTINATION'" class="target-click-marker" :transform="targetMarkerTransform">
-                                <circle class="target-ring" r="16" stroke="#ef4444" stroke-width="2" fill="none" />
-                                <line x1="-12" y1="0" x2="12" y2="0" stroke="#ef4444" stroke-width="2" />
-                                <line x1="0" y1="-12" x2="0" y2="12" stroke="#ef4444" stroke-width="2" />
-                                <text x="22" y="4" class="target-coord-text">목표: ({{ commandForm.x.toFixed(2) }}, {{ commandForm.y.toFixed(2) }})</text>
-                            </g>
-                        </g>
-                    </svg>
-
-                    <!-- Zoom Level Indicator Badge -->
-                    <div class="zoom-indicator-badge">
-                        Zoom: {{ (mapZoomScale * 100).toFixed(0) }}%
+                        <!-- Zoom Level Indicator Badge -->
+                        <div class="zoom-indicator-badge">
+                            Zoom: {{ (mapZoomScale * 100).toFixed(0) }}%
+                        </div>
                     </div>
-                </div>
-                <div class="map-hint-footer">
-                    <strong>마우스 휠 스크롤</strong>로 확대/축소 및 <strong>드래그</strong> 이동이 가능하며, 지도를 클릭하면 해당 위치로 목표 좌표가 설정됩니다.
-                </div>
-            </Panel>
+                    <div class="map-hint-footer">
+                        <strong>마우스 휠 스크롤</strong>로 확대/축소 및 <strong>드래그</strong> 이동이 가능하며, 지도를 클릭하면 해당 위치로 목표 좌표가 설정됩니다.
+                    </div>
+                </Panel>
+
+                <!-- 5. [Panel 5] (감시용 로봇 전용) 지도 아래 실시간 카메라 영상 패널 (원격 조종 패널과 동일 높이 260px) -->
+                <Panel
+                    v-if="hasCamera"
+                    title="실시간 카메라 영상"
+                    subtitle="HD-PTZ 360° 광학 영상 피드"
+                    subtitle-position="right"
+                    class="camera-feed-panel"
+                >
+                    <template #headerRight>
+                        <span class="live-status-badge">
+                            <span class="live-dot"></span> LIVE 1080p
+                        </span>
+                    </template>
+
+                    <div class="camera-stream-container">
+                        <div class="camera-viewport" :class="{ 'is-thermal-mode': isThermal }">
+                            <div class="camera-scanlines"></div>
+                            <div class="hud-overlay">
+                                <div class="hud-top-row">
+                                    <span class="cam-id">CAM-SURV-01 [HD-PTZ]</span>
+                                    <span class="cam-fps">60 FPS</span>
+                                    <span class="rec-dot">● REC</span>
+                                    <span class="cam-time">{{ currentTimeStr }}</span>
+                                </div>
+                                <div class="hud-center-crosshair">
+                                    <div class="ch-line-h"></div>
+                                    <div class="ch-line-v"></div>
+                                    <div class="ch-box"></div>
+                                </div>
+                                <div class="hud-bottom-row">
+                                    <span class="hud-tag">PTZ: ACTIVE</span>
+                                    <button type="button" class="cam-tool-btn" title="야간 열화상 모드 전환" @click="isThermal = !isThermal">
+                                        <Eye :size="13" /> {{ isThermal ? '일반 모드' : '열화상 모드' }}
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </Panel>
+            </div>
 
             <!-- [우측] 상하 분할 통합 제어 패널 스택 -->
             <div class="right-control-panel-stack">
@@ -292,7 +335,7 @@
             </el-button>
         </template>
 
-        <!-- 5. 비상정지(E-STOP) / 중요 모드 비밀번호 확인 다이얼로그 (비상정지 안내문 포함) -->
+        <!-- 6. 비상정지(E-STOP) / 중요 모드 비밀번호 확인 다이얼로그 (비상정지 안내문 포함) -->
         <BaseDialog
             v-model="passwordConfirmVisible"
             :title="isEstopConfirm ? '개별 비상정지 (E-STOP) 집행 확인' : '제어 명령 전송 비밀번호 재확인'"
@@ -336,7 +379,7 @@ import BaseDialog from '@/components/BaseDialog.vue'
 import Panel from '@/components/Panel.vue'
 import StatusBadge from '@/components/StatusBadge.vue'
 import RadioToggleGroup from '@/components/RadioToggleGroup.vue'
-import { RotateCcw, Battery, MapPin } from '@lucide/vue'
+import { RotateCcw, Battery, MapPin, Eye } from '@lucide/vue'
 import { simulationService } from '@/services/simulation.service'
 import type { MonitoringRobot } from '../service/integrated/integratedMonitoring.types'
 import { fetchMockDestinations } from '@/pages/main/admin/destinations/service/destinations.mock'
@@ -387,6 +430,20 @@ const confirmPassword = ref('')
 const jogSpeed = ref(0.5)
 const jogLogs = ref<JogLogItem[]>([])
 const jogLogContainer = ref<HTMLElement | null>(null)
+
+// Camera Feed State (Surveillance Robot Only)
+const isThermal = ref(false)
+const currentTimeStr = ref('')
+
+const hasCamera = computed(() => {
+    if (!props.robot) return false
+    return props.robot.robotType === 'SURVEILLANCE'
+})
+
+const updateTime = () => {
+    const now = new Date()
+    currentTimeStr.value = now.toLocaleTimeString('ko-KR', { hour12: false })
+}
 
 // Map Zoom & Drag-Pan state
 const mapZoomScale = ref(1.0)
@@ -461,6 +518,8 @@ const loadData = async () => {
 
 onMounted(() => {
     void loadData()
+    updateTime()
+    setInterval(updateTime, 1000)
 })
 
 watch(() => props.visible, (val) => {
@@ -876,12 +935,24 @@ const executeCommand = () => {
 /* Flexbox Unified Control Layout */
 .unified-control-flex {
     display: flex;
-    gap: 16px;
+    gap: 12px;
     height: 580px;
 
-    .mini-map-panel {
+    &.has-camera-layout {
+        height: 640px;
+    }
+
+    .left-map-stack {
         width: 520px;
         flex-shrink: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .mini-map-panel {
+        flex: 1;
+        min-height: 0;
         padding: 14px;
         background: #060911;
 
@@ -897,7 +968,7 @@ const executeCommand = () => {
         min-width: 0;
         display: flex;
         flex-direction: column;
-        gap: 14px;
+        gap: 12px;
     }
 }
 
@@ -1016,6 +1087,200 @@ const executeCommand = () => {
 
         strong {
             color: #38bdf8;
+        }
+    }
+}
+
+/* 5. Camera Feed Panel Styling (Surveillance Robot Only - Height 260px matching Teleop Panel) */
+.camera-feed-panel {
+    height: 260px;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    padding: 12px 14px;
+    background: #060911;
+    border: 1px solid rgba(56, 189, 248, 0.2);
+
+    :deep(.panel__header) {
+        margin-bottom: 8px;
+        flex-shrink: 0;
+    }
+
+    :deep(.panel__heading h2) {
+        color: #38bdf8;
+        font-size: 14px;
+        font-weight: 700;
+        margin: 0;
+    }
+
+    :deep(.panel__heading span) {
+        color: #94a3b8;
+        font-size: 12px;
+    }
+
+    .live-status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        font-size: 11px;
+        font-weight: bold;
+        color: #ef4444;
+        background: rgba(239, 68, 68, 0.15);
+        border: 1px solid rgba(239, 68, 68, 0.4);
+        padding: 2px 8px;
+        border-radius: 4px;
+
+        .live-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #ef4444;
+            box-shadow: 0 0 6px #ef4444;
+            animation: liveBlink 1.2s infinite alternate;
+        }
+    }
+
+    .camera-stream-container {
+        flex: 1;
+        min-height: 0;
+        position: relative;
+        border-radius: 6px;
+        overflow: hidden;
+        border: 1px solid rgba(56, 189, 248, 0.2);
+        background: #000000;
+    }
+
+    .camera-viewport {
+        width: 100%;
+        height: 100%;
+        position: relative;
+        background: radial-gradient(circle at center, #0f172a 0%, #020617 100%);
+        transition: background 0.3s ease;
+
+        &.is-thermal-mode {
+            background: radial-gradient(circle at center, #450a0a 0%, #020617 100%);
+            .hud-overlay {
+                color: #fca5a5;
+                .cam-id { color: #f87171; }
+                .hud-center-crosshair {
+                    .ch-line-h, .ch-line-v { background: #ef4444; }
+                    .ch-box { border-color: #ef4444; }
+                }
+            }
+        }
+    }
+
+    .camera-scanlines {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(
+            rgba(18, 16, 16, 0) 50%, 
+            rgba(0, 0, 0, 0.25) 50%
+        ), linear-gradient(
+            90deg,
+            rgba(255, 0, 0, 0.03),
+            rgba(0, 255, 0, 0.01),
+            rgba(0, 0, 255, 0.03)
+        );
+        background-size: 100% 3px, 6px 100%;
+        pointer-events: none;
+    }
+
+    /* High-Tech CCTV Camera HUD Overlay */
+    .hud-overlay {
+        position: absolute;
+        inset: 0;
+        padding: 10px 12px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        pointer-events: none;
+        color: #38bdf8;
+        font-family: 'Consolas', 'Courier New', monospace;
+        font-size: 11px;
+
+        .hud-top-row, .hud-bottom-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 2;
+        }
+
+        .cam-id {
+            font-weight: bold;
+            color: #ffffff;
+        }
+
+        .cam-fps {
+            margin-left: 8px;
+            color: #4ade80;
+        }
+
+        .rec-dot {
+            color: #ef4444;
+            font-weight: bold;
+            animation: liveBlink 1s infinite alternate;
+        }
+
+        .cam-time {
+            color: #cbd5e1;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .hud-center-crosshair {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 70px;
+            height: 70px;
+            pointer-events: none;
+            opacity: 0.5;
+
+            .ch-line-h {
+                position: absolute;
+                top: 50%;
+                left: 0;
+                right: 0;
+                height: 1px;
+                background: #38bdf8;
+            }
+
+            .ch-line-v {
+                position: absolute;
+                left: 50%;
+                top: 0;
+                bottom: 0;
+                width: 1px;
+                background: #38bdf8;
+            }
+
+            .ch-box {
+                position: absolute;
+                inset: 15px;
+                border: 1px dashed #38bdf8;
+            }
+        }
+
+        .cam-tool-btn {
+            pointer-events: auto;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: rgba(15, 23, 42, 0.85);
+            border: 1px solid rgba(56, 189, 248, 0.35);
+            color: #38bdf8;
+            font-size: 11px;
+            padding: 3px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+
+            &:hover {
+                background: rgba(56, 189, 248, 0.25);
+                color: #ffffff;
+                border-color: #38bdf8;
+            }
         }
     }
 }
