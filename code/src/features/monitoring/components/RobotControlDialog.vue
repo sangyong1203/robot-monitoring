@@ -107,7 +107,7 @@
                 <Panel title="지정 명령 및 미션/Task 제어" class="top-unit-panel">
                     <template #headerRight>
                         <button type="button" class="single-estop-trigger-btn" @click="triggerEStopClick">
-                            개별 E-STOP (비상정지)
+                            E-STOP (비상정지)
                         </button>
                     </template>
 
@@ -763,6 +763,7 @@ const executeCommand = () => {
 .unified-control-flex {
     display: flex;
     gap: 16px;
+    height: 572px;
 
     .mini-map-panel {
         width: 520px;
@@ -821,7 +822,7 @@ const executeCommand = () => {
     .map-interactive-container {
         position: relative;
         width: 100%;
-        height: 440px;
+        height: 100%;
         cursor: crosshair;
         background: #060911;
 
@@ -879,7 +880,8 @@ const executeCommand = () => {
 }
 
 .top-unit-panel {
-    padding: 14px 16px;
+    flex: 1;
+    padding: 14px 16px 6px 16px;
     background: rgba(15, 23, 42, 0.65);
 
     :deep(.panel__header h2) {
@@ -901,18 +903,12 @@ const executeCommand = () => {
         border: 1px solid #f87171;
         border-radius: 6px;
         cursor: pointer;
-        box-shadow: 0 0 10px rgba(239, 68, 68, 0.35);
         transition: all 0.2s ease;
 
         &:hover {
             background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
-            box-shadow: 0 0 16px rgba(239, 68, 68, 0.6);
-            transform: translateY(-1px);
         }
 
-        &:active {
-            transform: scale(0.96);
-        }
     }
 }
 
@@ -965,7 +961,7 @@ const executeCommand = () => {
 
 /* Teleop Panel High-Tech Styling (헤더 간격 및 수직 위치 정돈) */
 .teleop-panel {
-    flex: 1;
+    height: 254px;
     display: flex;
     flex-direction: column;
     padding: 14px 16px;
