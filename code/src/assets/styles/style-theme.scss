@@ -142,11 +142,8 @@
   --menu-item-color: var(--surface-color);
   --menu-hover-bg-color: var(--primary-color-1);
   --menu-hover-sub-bg-color: var(--primary-color-1);
-  --memu-activate-text-color: var(--text-color--white);
   --sub-menu-text-color: var(--text-color--primary);
   --el-menu-hover-bg-color: var(--menu-hover-bg-color) !important;
-  --menu-switch-color-on: none;
-  --menu-switch-color-off: none;
 
   /* Shared components */
   --label-text-color: var(--text-color--primary);
@@ -202,6 +199,14 @@
   --button-plain-active-bg-color: color-mix(in srgb, var(--primary-color) 22%, transparent);
   --button-plain-active-border-color: var(--primary-color);
   --button-plain-active-text-color: var(--text-color--white);
+  --button-primary-bg-color: var(--primary-color);
+  --button-primary-border-color: var(--primary-color);
+  --button-primary-hover-bg-color: color-mix(in srgb, var(--primary-color) 80%, var(--slate-1));
+  --button-primary-hover-border-color: var(--primary-color);
+  --button-primary-hover-text-color: var(--text-color--white);
+  --button-primary-active-bg-color: var(--primary-color-1);
+  --button-primary-active-border-color: var(--primary-color);
+  --button-primary-active-text-color: var(--button-primary-text-color);
   --button-primary-plain-bg-color: color-mix(in srgb, var(--primary-color) 14%, transparent);
   --button-primary-plain-border-color: color-mix(in srgb, var(--primary-color) 72%, transparent);
   --button-primary-plain-text-color: var(--text-color--white);
@@ -214,7 +219,42 @@
   --button-disabled-text-color: var(--text-color--secondary);
   --button-primary-disabled-bg-color: color-mix(in srgb, var(--purple-10) 36%, transparent);
   --messageBox-button-bg-color: var(--primary-color);
-  --messageBox-button-text-color: var(--text-color--white);
+  --messageBox-button-text-color: var(--purple-10);
+  --messageBox-button-hover-bg-color: var(--button-primary-hover-bg-color);
+  --messageBox-button-hover-text-color: var(--purple-10);
+  --messageBox-danger-button-bg-color: var(--danger-color);
+  --messageBox-danger-button-text-color: var(--text-color--white);
+  --messageBox-danger-button-hover-bg-color: color-mix(in srgb, var(--danger-color) 72%, var(--slate-1));
+  --messageBox-danger-button-hover-text-color: var(--text-color--white);
+  --messageBox-secondary-button-border-color: color-mix(in srgb, var(--slate-1) 14%, transparent);
+  --messageBox-secondary-button-bg-color: var(--surface-muted-color);
+  --messageBox-secondary-button-text-color: var(--text-color--secondary);
+  --messageBox-secondary-button-hover-border-color: color-mix(in srgb, var(--primary-color) 46%, transparent);
+  --messageBox-secondary-button-hover-bg-color: color-mix(in srgb, var(--primary-color) 12%, transparent);
+  --messageBox-secondary-button-hover-text-color: var(--text-color--primary);
+
+  /* Element Plus switch, slider, progress, date picker */
+  --switch-on-color: color-mix(in srgb, var(--primary-color) 82%, transparent);
+  --switch-off-color: var(--surface-control-color);
+  --switch-action-bg-color: var(--text-color--strong);
+  --switch-action-off-bg-color: var(--common-control-border-color);
+  --switch-action-checked-bg-color: var(--primary-color);
+  --slider-main-bg-color: var(--primary-color);
+  --slider-runway-bg-color: var(--surface-control-color);
+  --slider-stop-bg-color: var(--primary-color);
+  --slider-disabled-color: var(--text-color--muted);
+  --slider-bar-bg-color: color-mix(in srgb, var(--primary-color) 82%, transparent);
+  --slider-button-bg-color: var(--primary-color);
+  --progress-bar-bg-color: linear-gradient(90deg, var(--purple-7) 0%, var(--primary-color) 100%);
+  --progress-bar-shadow: 0 0 8px color-mix(in srgb, var(--primary-color) 32%, transparent);
+  --datepicker-disabled-bg-color: var(--surface-muted-color);
+  --datepicker-disabled-text-color: color-mix(in srgb, var(--slate-1) 28%, transparent);
+  --datepicker-hover-bg-color: color-mix(in srgb, var(--primary-color) 14%, transparent);
+  --datepicker-range-bg-color: color-mix(in srgb, var(--primary-color) 16%, transparent);
+  --datepicker-selected-text-color: var(--text-color--white);
+  --datepicker-selected-bg-color: var(--primary-color);
+  --datepicker-current-text-color: var(--primary-color);
+  --datepicker-current-bg-color: color-mix(in srgb, var(--primary-color) 22%, transparent);
 
   /* Pagination and descriptions */
   --pagination-active-text-color: var(--primary-color);
