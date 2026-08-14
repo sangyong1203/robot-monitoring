@@ -168,7 +168,7 @@ const completeLogin = async (signinData: SigninData, loginId: string) => {
     const userLevel = normalizeRoleLevel(userInfo.userLevel)
     const permissions = userInfo.permissions ?? []
 
-    const landingPage = signinData.landingPage || userInfo.landingPage || '/admin/organizations'
+    const landingPage = '/dashboard'
 
     authStore.setSession({
         tokens: {
