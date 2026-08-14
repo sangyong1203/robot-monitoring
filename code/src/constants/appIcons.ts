@@ -8,6 +8,9 @@ import {
     ScrollText,
     Settings,
     Wrench,
+    UserRound,
+    GamepadDirectional,
+    ListTodo
 } from '@lucide/vue'
 import IconAlignHorizontal from '@/assets/icons/IconAlignHorizontal.svg'
 import IconAlignVertical from '@/assets/icons/IconAlignVertical.svg'
@@ -28,6 +31,9 @@ export const AppIcons = {
     IconAlignVertical,
     IconDistributeHorizontal,
     IconDistributeVertical,
+    IconUserManagement: UserRound,
+    IconRobotContrl: GamepadDirectional,
+    IconMission: ListTodo
 } as const
 
 export type AppIconName = keyof typeof AppIcons
