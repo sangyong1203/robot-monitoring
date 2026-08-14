@@ -4,7 +4,10 @@
             <div v-for="item in kpiItems" :key="item.label" class="kpi-strip-item">
                 <component :is="item.icon" class="kpi-strip-icon" :size="24" />
                 <span class="kpi-strip-label">{{ item.label }}</span>
-                <strong class="kpi-strip-value">{{ item.value }}</strong>
+                <strong class="kpi-strip-value">
+                    <span>{{ item.value }}</span>
+                    <small>{{ item.unit }}</small>
+                </strong>
                 <span class="kpi-strip-note" :class="item.variant">{{ item.note }}</span>
             </div>
         </section>
@@ -473,29 +476,32 @@ const operationRate = computed(() => {
 })
 
 const kpiItems = computed(() => [
-    { label: '전체 로봇', value: `${robots.value.length}대`, note: '실시간', icon: Bot, variant: 'info' },
+    { label: '전체 로봇', value: robots.value.length, unit: '대', note: '실시간', icon: Bot, variant: 'info' },
     {
         label: '정상 통신',
-        value: `${communicationCounts.value.online}대`,
+        value: communicationCounts.value.online,
+        unit: '대',
         note: `${communicationRate.value}%`,
         icon: Radio,
         variant: 'success',
     },
     {
         label: '진행 미션',
-        value: `${runningMissions.value.filter(mission => mission.status === 'RUNNING').length}건`,
+        value: runningMissions.value.filter(mission => mission.status === 'RUNNING').length,
+        unit: '건',
         note: '진행 중',
         icon: Workflow,
         variant: 'info',
     },
     {
         label: '미확인 알림',
-        value: `${safetyEvents.value.filter(event => event.statusLabel !== '완료').length}건`,
+        value: safetyEvents.value.filter(event => event.statusLabel !== '완료').length,
+        unit: '건',
         note: '확인 필요',
         icon: BellRing,
         variant: 'warning',
     },
-    { label: '오늘 처리 드럼', value: '72드럼', note: '목표대비 80%', icon: PackageCheck, variant: 'success' },
+    { label: '오늘 처리 드럼', value: 72, unit: '드럼', note: '목표대비 80%', icon: PackageCheck, variant: 'success' },
 ])
 
 const communicationLabel = (status: CommunicationStatus) =>
@@ -634,10 +640,23 @@ const goToMonitoring = (robot: MonitoringRobot) => {
 
 .kpi-strip-value {
     grid-area: value;
+    display: inline-flex;
+    align-items: baseline;
+    gap: 2px;
     color: var(--text-color--primary, #f8fafc);
-    font-size: 26px;
     font-weight: 800;
     white-space: nowrap;
+
+    span {
+        font-size: 38px;
+        line-height: 1;
+    }
+
+    small {
+        color: var(--text-color--secondary);
+        font-size: 16px;
+        font-weight: 800;
+    }
 }
 
 .kpi-strip-note {
