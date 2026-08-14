@@ -2,7 +2,7 @@
     <div class="dashboard-page">
         <section class="dashboard-kpi-strip" aria-label="핵심 운영 지표">
             <div v-for="item in kpiItems" :key="item.label" class="kpi-strip-item">
-                <component :is="item.icon" class="kpi-strip-icon" :size="17" />
+                <component :is="item.icon" class="kpi-strip-icon" :size="24" />
                 <span class="kpi-strip-label">{{ item.label }}</span>
                 <strong class="kpi-strip-value">{{ item.value }}</strong>
                 <span class="kpi-strip-note" :class="item.variant">{{ item.note }}</span>
@@ -603,8 +603,8 @@ const goToMonitoring = (robot: MonitoringRobot) => {
     align-items: center;
     column-gap: 8px;
     min-width: 0;
-    min-height: 58px;
-    padding: 9px 12px;
+    min-height: 66px;
+    padding: 12px;
     border: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
     border-radius: 8px;
     background: var(--panel-bg-color);
@@ -618,7 +618,7 @@ const goToMonitoring = (robot: MonitoringRobot) => {
 .kpi-strip-label {
     grid-area: label;
     color: var(--text-color--secondary, #94a3b8);
-    font-size: 12px;
+    font-size: 14px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -627,7 +627,7 @@ const goToMonitoring = (robot: MonitoringRobot) => {
 .kpi-strip-value {
     grid-area: value;
     color: var(--text-color--primary, #f8fafc);
-    font-size: 22px;
+    font-size: 26px;
     font-weight: 800;
     white-space: nowrap;
 }
