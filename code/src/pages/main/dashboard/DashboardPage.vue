@@ -101,7 +101,9 @@
                                 <small>{{ robot.robotType === 'WORK' ? '작업' : '감시' }}</small>
                             </span>
                             <span class="robot-card-head-actions" @click.stop>
-                                <button type="button" class="robot-action-btn" @click="goToMonitoring(robot)">관제</button>
+                                <button type="button" class="robot-action-btn" @click="goToMonitoring(robot)">
+                                    관제
+                                </button>
                                 <button
                                     v-if="robot.robotType === 'SURVEILLANCE'"
                                     type="button"
@@ -793,19 +795,20 @@ const goToMonitoring = (robot: MonitoringRobot) => {
 }
 
 .robot-action-btn {
-    height: 22px;
-    padding: 0 6px;
-    border: 1px solid color-mix(in srgb, var(--primary-color, #d946ef) 42%, transparent);
-    border-radius: 5px;
-    background: transparent;
-    color: var(--text-color--primary, #f8fafc);
+    height: 24px;
+    padding: 0 7px;
+    border: 1px solid color-mix(in srgb, var(--primary-color, #e76dff) 70%, transparent);
+    border-radius: 999px;
+    background: var(--primary-color, #e76dff);
+    color: #1b0d24;
     font-size: 11px;
     font-weight: 700;
     line-height: 1;
     cursor: pointer;
 
     &:hover {
-        background: color-mix(in srgb, var(--primary-color, #d946ef) 18%, transparent);
+        background: color-mix(in srgb, var(--primary-color, #e76dff) 82%, #ffffff);
+        border-color: color-mix(in srgb, var(--primary-color, #e76dff) 82%, #ffffff);
     }
 }
 
