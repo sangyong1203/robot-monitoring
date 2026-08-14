@@ -17,7 +17,10 @@
                     <span class="robot-id-tag">(ID: {{ robot.id }})</span>
                 </div>
                 <div class="telemetry-badges">
-                    <StatusBadge :label="stateLabel(robot.status || 'RUNNING')" :variant="stateVariant(robot.status || 'RUNNING')" />
+                    <StatusBadge
+                        :label="stateLabel(robot.status || 'RUNNING')"
+                        :variant="stateVariant(robot.status || 'RUNNING')"
+                    />
                     <span class="comm-status-chip" :class="robot.communicationStatus.toLowerCase()">
                         <span class="status-dot"></span>
                         {{ robot.communicationStatus }}
@@ -28,9 +31,15 @@
                     </span>
                     <span class="location-chip">
                         <MapPin :size="14" class="loc-icon" />
-                        <span class="coord-item">X:<strong class="coord-val">{{ robot.x.toFixed(2) }}</strong>m</span>
+                        <span class="coord-item"
+                            >X:<strong class="coord-val">{{ robot.x.toFixed(2) }}</strong
+                            >m</span
+                        >
                         <span class="coord-sep">,</span>
-                        <span class="coord-item">Y:<strong class="coord-val">{{ robot.y.toFixed(2) }}</strong>m</span>
+                        <span class="coord-item"
+                            >Y:<strong class="coord-val">{{ robot.y.toFixed(2) }}</strong
+                            >m</span
+                        >
                     </span>
                 </div>
             </div>
@@ -65,7 +74,10 @@
                             </defs>
 
                             <!-- Main Map Layer Group with Zoom & Pan transform -->
-                            <g class="map-transformed-group" :transform="`translate(${mapPanX}, ${mapPanY}) scale(${mapZoomScale})`">
+                            <g
+                                class="map-transformed-group"
+                                :transform="`translate(${mapPanX}, ${mapPanY}) scale(${mapZoomScale})`"
+                            >
                                 <!-- Background & Map Image (Unstretched Aspect Ratio) -->
                                 <rect x="-1000" y="-1000" width="4000" height="4000" fill="#060911" />
                                 <image
@@ -79,7 +91,14 @@
                                     opacity="0.95"
                                     @error="mapImageFailed = true"
                                 />
-                                <rect x="-1000" y="-1000" width="4000" height="4000" fill="url(#mini-map-grid)" opacity="0.5" />
+                                <rect
+                                    x="-1000"
+                                    y="-1000"
+                                    width="4000"
+                                    height="4000"
+                                    fill="url(#mini-map-grid)"
+                                    opacity="0.5"
+                                />
 
                                 <!-- POI Markers -->
                                 <g
@@ -97,27 +116,36 @@
                                 <g v-if="robot" class="robot-marker" :transform="robotMarkerTransform">
                                     <circle class="pulse-aura" r="22" stroke="#4ade80" />
                                     <circle r="12" fill="#22c55e" stroke="#ffffff" stroke-width="2" />
-                                    <path d="M 0 -8 L 4 3 L 0 0 L -4 3 Z" fill="#ffffff" :transform="`rotate(${robot.heading || 0})`" />
+                                    <path
+                                        d="M 0 -8 L 4 3 L 0 0 L -4 3 Z"
+                                        fill="#ffffff"
+                                        :transform="`rotate(${robot.heading || 0})`"
+                                    />
                                     <text x="18" y="4" class="robot-map-name">{{ robot.name }} (현재)</text>
                                 </g>
 
                                 <!-- Target Destination Click Marker (Crosshair & Offset Text) -->
-                                <g v-if="executionUnit === 'DESTINATION'" class="target-click-marker" :transform="targetMarkerTransform">
+                                <g
+                                    v-if="executionUnit === 'DESTINATION'"
+                                    class="target-click-marker"
+                                    :transform="targetMarkerTransform"
+                                >
                                     <circle class="target-ring" r="16" stroke="#ef4444" stroke-width="2" fill="none" />
                                     <line x1="-12" y1="0" x2="12" y2="0" stroke="#ef4444" stroke-width="2" />
                                     <line x1="0" y1="-12" x2="0" y2="12" stroke="#ef4444" stroke-width="2" />
-                                    <text x="22" y="4" class="target-coord-text">목표: ({{ commandForm.x.toFixed(2) }}, {{ commandForm.y.toFixed(2) }})</text>
+                                    <text x="22" y="4" class="target-coord-text">
+                                        목표: ({{ commandForm.x.toFixed(2) }}, {{ commandForm.y.toFixed(2) }})
+                                    </text>
                                 </g>
                             </g>
                         </svg>
 
                         <!-- Zoom Level Indicator Badge -->
-                        <div class="zoom-indicator-badge">
-                            Zoom: {{ (mapZoomScale * 100).toFixed(0) }}%
-                        </div>
+                        <div class="zoom-indicator-badge">Zoom: {{ (mapZoomScale * 100).toFixed(0) }}%</div>
                     </div>
                     <div class="map-hint-footer">
-                        <strong>마우스 휠 스크롤</strong>로 확대/축소 및 <strong>드래그</strong> 이동이 가능하며, 지도를 클릭하면 해당 위치로 목표 좌표가 설정됩니다.
+                        <strong>마우스 휠 스크롤</strong>로 확대/축소 및 <strong>드래그</strong> 이동이 가능하며, 지도를
+                        클릭하면 해당 위치로 목표 좌표가 설정됩니다.
                     </div>
                 </Panel>
 
@@ -130,9 +158,7 @@
                     class="camera-feed-panel"
                 >
                     <template #headerRight>
-                        <span class="live-status-badge">
-                            <span class="live-dot"></span> LIVE 1080p
-                        </span>
+                        <span class="live-status-badge"> <span class="live-dot"></span> LIVE 1080p </span>
                     </template>
 
                     <div class="camera-stream-container">
@@ -152,7 +178,12 @@
                                 </div>
                                 <div class="hud-bottom-row">
                                     <span class="hud-tag">PTZ: ACTIVE</span>
-                                    <button type="button" class="cam-tool-btn" title="야간 열화상 모드 전환" @click="isThermal = !isThermal">
+                                    <button
+                                        type="button"
+                                        class="cam-tool-btn"
+                                        title="야간 열화상 모드 전환"
+                                        @click="isThermal = !isThermal"
+                                    >
                                         <Eye :size="13" /> {{ isThermal ? '일반 모드' : '열화상 모드' }}
                                     </button>
                                 </div>
@@ -167,6 +198,9 @@
                 <!-- 3. [Panel 3] 우측 상단 지정 명령 및 미션/Task 제어 패널 -->
                 <Panel title="지정 명령 및 미션/Task 제어" class="top-unit-panel">
                     <template #headerRight>
+                        <button type="button" class="execute-btn" :loading="saving" @click="handleCommandSubmit">
+                            명령 집행
+                        </button>
                         <button type="button" class="single-estop-trigger-btn" @click="triggerEStopClick">
                             E-STOP (비상정지)
                         </button>
@@ -208,16 +242,20 @@
                                 </el-form-item>
                                 <div class="flex-2col">
                                     <el-form-item label="목적지 X 좌표 (m)" required>
-                                        <el-input-number v-model="commandForm.x" :precision="2" style="width:100%" />
+                                        <el-input-number v-model="commandForm.x" :precision="2" style="width: 100%" />
                                     </el-form-item>
                                     <el-form-item label="목적지 Y 좌표 (m)" required>
-                                        <el-input-number v-model="commandForm.y" :precision="2" style="width:100%" />
+                                        <el-input-number v-model="commandForm.y" :precision="2" style="width: 100%" />
                                     </el-form-item>
                                 </div>
                             </template>
 
                             <!-- 2. ACTIVITY (단위 작업 선택) -->
-                            <el-form-item v-else-if="executionUnit === 'ACTIVITY'" label="실행할 Activity 선택" required>
+                            <el-form-item
+                                v-else-if="executionUnit === 'ACTIVITY'"
+                                label="실행할 Activity 선택"
+                                required
+                            >
                                 <el-select v-model="selectedActivityId" placeholder="Activity 선택" style="width: 100%">
                                     <el-option
                                         v-for="act in activities"
@@ -242,7 +280,11 @@
 
                             <!-- 4. MISSION (복합 융합 미션 선택) -->
                             <el-form-item v-else-if="executionUnit === 'MISSION'" label="실행할 Mission 선택" required>
-                                <el-select v-model="commandForm.missionId" placeholder="Mission 선택" style="width: 100%">
+                                <el-select
+                                    v-model="commandForm.missionId"
+                                    placeholder="Mission 선택"
+                                    style="width: 100%"
+                                >
                                     <el-option
                                         v-for="mis in missions"
                                         :key="mis.id"
@@ -267,17 +309,52 @@
                         <div class="dpad-compact-flex">
                             <div class="dpad-row">
                                 <div class="jog-placeholder"></div>
-                                <button type="button" class="jog-btn jog-up" title="전진" @click="sendJogCommand('FORWARD')">▲</button>
+                                <button
+                                    type="button"
+                                    class="jog-btn jog-up"
+                                    title="전진"
+                                    @click="sendJogCommand('FORWARD')"
+                                >
+                                    ▲
+                                </button>
                                 <div class="jog-placeholder"></div>
                             </div>
                             <div class="dpad-row">
-                                <button type="button" class="jog-btn jog-left" title="좌회전" @click="sendJogCommand('TURN_LEFT')">◀</button>
-                                <button type="button" class="jog-btn jog-stop" title="긴급 정지" @click="sendJogCommand('STOP')">■</button>
-                                <button type="button" class="jog-btn jog-right" title="우회전" @click="sendJogCommand('TURN_RIGHT')">▶</button>
+                                <button
+                                    type="button"
+                                    class="jog-btn jog-left"
+                                    title="좌회전"
+                                    @click="sendJogCommand('TURN_LEFT')"
+                                >
+                                    ◀
+                                </button>
+                                <button
+                                    type="button"
+                                    class="jog-btn jog-stop"
+                                    title="긴급 정지"
+                                    @click="sendJogCommand('STOP')"
+                                >
+                                    ■
+                                </button>
+                                <button
+                                    type="button"
+                                    class="jog-btn jog-right"
+                                    title="우회전"
+                                    @click="sendJogCommand('TURN_RIGHT')"
+                                >
+                                    ▶
+                                </button>
                             </div>
                             <div class="dpad-row">
                                 <div class="jog-placeholder"></div>
-                                <button type="button" class="jog-btn jog-down" title="후진" @click="sendJogCommand('BACKWARD')">▼</button>
+                                <button
+                                    type="button"
+                                    class="jog-btn jog-down"
+                                    title="후진"
+                                    @click="sendJogCommand('BACKWARD')"
+                                >
+                                    ▼
+                                </button>
                                 <div class="jog-placeholder"></div>
                             </div>
                         </div>
@@ -285,8 +362,10 @@
                         <!-- 우측: 원본 기본 슬라이더 및 시원하게 확장된 터미널 로그 스트림 -->
                         <div class="teleop-compact-controls">
                             <div class="speed-slider-row">
-                                <span class="speed-lbl">조종 속도: <strong class="speed-val">{{ jogSpeed.toFixed(1) }}</strong> m/s</span>
-                                <el-slider v-model="jogSpeed" :min="0.1" :max="2.0" :step="0.1" style="flex:1" />
+                                <span class="speed-lbl"
+                                    >조종 속도: <strong class="speed-val">{{ jogSpeed.toFixed(1) }}</strong> m/s</span
+                                >
+                                <el-slider v-model="jogSpeed" :min="0.1" :max="2.0" :step="0.1" style="flex: 1" />
                             </div>
 
                             <!-- 높이가 확장된 터미널 콘솔 로그 뷰어 -->
@@ -297,9 +376,7 @@
                                         <span class="term-prompt">$</span>
                                         <span class="term-title">teleop.log -- stream</span>
                                     </span>
-                                    <button type="button" class="clear-logs-btn" @click="jogLogs = []">
-                                        초기화
-                                    </button>
+                                    <button type="button" class="clear-logs-btn" @click="jogLogs = []">초기화</button>
                                 </div>
                                 <div class="terminal-body" ref="jogLogContainer">
                                     <div v-if="jogLogs.length === 0" class="log-empty">
@@ -325,27 +402,25 @@
         </div>
 
         <template #footer>
-            <el-button @click="$emit('update:visible', false)">취소</el-button>
-            <el-button
-                type="primary"
-                :loading="saving"
-                @click="handleCommandSubmit"
-            >
-                명령 집행
-            </el-button>
+            <el-button @click="$emit('update:visible', false)">닫기</el-button>
         </template>
 
         <!-- 6. 비상정지(E-STOP) / 중요 모드 비밀번호 확인 다이얼로그 (비상정지 안내문 포함) -->
         <BaseDialog
             v-model="passwordConfirmVisible"
             :title="isEstopConfirm ? '개별 비상정지 (E-STOP) 집행 확인' : '제어 명령 전송 비밀번호 재확인'"
-            :description="isEstopConfirm ? '안전 조치를 위해 로봇 비상정지 집행 전 계정 비밀번호를 확인합니다.' : '안전한 로봇 제어 명령 집행을 위해 현재 로그인된 계정 비밀번호를 입력하세요.'"
+            :description="
+                isEstopConfirm
+                    ? '안전 조치를 위해 로봇 비상정지 집행 전 계정 비밀번호를 확인합니다.'
+                    : '안전한 로봇 제어 명령 집행을 위해 현재 로그인된 계정 비밀번호를 입력하세요.'
+            "
             width="460px"
         >
             <el-form label-position="top">
                 <!-- 비상정지 선택 시 안내문 표시 -->
                 <div v-if="isEstopConfirm" class="estop-modal-warning-box">
-                    <strong>개별 비상정지(E-Stop) 집행 시</strong> 해당 로봇의 구동 모터가 즉시 록킹(Locking)되며 진행 중인 모든 대기 및 실행 작업이 즉시 중단됩니다.
+                    <strong>개별 비상정지(E-Stop) 집행 시</strong> 해당 로봇의 구동 모터가 즉시 록킹(Locking)되며 진행
+                    중인 모든 대기 및 실행 작업이 즉시 중단됩니다.
                 </div>
 
                 <el-form-item label="비밀번호 입력" required>
@@ -360,11 +435,7 @@
             </el-form>
             <template #footer>
                 <el-button @click="passwordConfirmVisible = false">취소</el-button>
-                <el-button
-                    :type="isEstopConfirm ? 'danger' : 'primary'"
-                    :loading="saving"
-                    @click="confirmAndSubmit"
-                >
+                <el-button :type="isEstopConfirm ? 'danger' : 'primary'" :loading="saving" @click="confirmAndSubmit">
                     {{ isEstopConfirm ? 'E-STOP 비상집행 확인' : '명령 집행 확인' }}
                 </el-button>
             </template>
@@ -485,21 +556,31 @@ const filteredDestinations = computed(() => {
 
 const stateLabel = (status: string) => {
     switch (status) {
-        case 'IDLE': return '대기 중 (IDLE)'
-        case 'RUNNING': return '작업 중 (RUNNING)'
-        case 'PAUSED': return '일시정지 (PAUSED)'
-        case 'ERROR': return '오류 발생 (ERROR)'
-        default: return status
+        case 'IDLE':
+            return '대기 중 (IDLE)'
+        case 'RUNNING':
+            return '작업 중 (RUNNING)'
+        case 'PAUSED':
+            return '일시정지 (PAUSED)'
+        case 'ERROR':
+            return '오류 발생 (ERROR)'
+        default:
+            return status
     }
 }
 
 const stateVariant = (status: string) => {
     switch (status) {
-        case 'RUNNING': return 'success'
-        case 'IDLE': return 'info'
-        case 'PAUSED': return 'warning'
-        case 'ERROR': return 'danger'
-        default: return 'info'
+        case 'RUNNING':
+            return 'success'
+        case 'IDLE':
+            return 'info'
+        case 'PAUSED':
+            return 'warning'
+        case 'ERROR':
+            return 'danger'
+        default:
+            return 'info'
     }
 }
 
@@ -522,17 +603,20 @@ onMounted(() => {
     setInterval(updateTime, 1000)
 })
 
-watch(() => props.visible, (val) => {
-    if (val) {
-        void loadData()
-        if (props.robot) {
-            commandForm.x = Number(props.robot.x.toFixed(2))
-            commandForm.y = Number(props.robot.y.toFixed(2))
-            commandForm.siteX = props.robot.siteX
-            commandForm.siteY = props.robot.siteY
+watch(
+    () => props.visible,
+    val => {
+        if (val) {
+            void loadData()
+            if (props.robot) {
+                commandForm.x = Number(props.robot.x.toFixed(2))
+                commandForm.y = Number(props.robot.y.toFixed(2))
+                commandForm.siteX = props.robot.siteX
+                commandForm.siteY = props.robot.siteY
+            }
         }
-    }
-})
+    },
+)
 
 // Map Zoom Reset
 const resetMapZoom = () => {
@@ -690,19 +774,25 @@ const handleDestinationChange = (destId: number | null) => {
 
 const getActionName = (action: string) => {
     switch (action) {
-        case 'FORWARD': return '전진 (FORWARD)'
-        case 'BACKWARD': return '후진 (BACKWARD)'
-        case 'TURN_LEFT': return '좌회전 (TURN_LEFT)'
-        case 'TURN_RIGHT': return '우회전 (TURN_RIGHT)'
-        case 'STOP': return '긴급 정지 (STOP)'
-        default: return action
+        case 'FORWARD':
+            return '전진 (FORWARD)'
+        case 'BACKWARD':
+            return '후진 (BACKWARD)'
+        case 'TURN_LEFT':
+            return '좌회전 (TURN_LEFT)'
+        case 'TURN_RIGHT':
+            return '우회전 (TURN_RIGHT)'
+        case 'STOP':
+            return '긴급 정지 (STOP)'
+        default:
+            return action
     }
 }
 
 const sendJogCommand = (action: string) => {
     if (!props.robot) return
     const nowStr = new Date().toLocaleTimeString()
-    
+
     jogLogs.value.push({
         id: Date.now() + Math.random(),
         time: nowStr,
@@ -746,7 +836,7 @@ const confirmAndSubmit = () => {
     const isEstop = isEstopConfirm.value
     passwordConfirmVisible.value = false
     confirmPassword.value = ''
-    
+
     if (isEstop) {
         executeEStop()
     } else {
@@ -794,7 +884,6 @@ const executeCommand = () => {
 
         simulationService.applyCommand(props.robot.id, cmdType, payload)
         ElMessage.success(`[${props.robot.name}] 제어 명령(${executionUnit.value})이 집행되었습니다.`)
-        emit('update:visible', false)
     } finally {
         saving.value = false
     }
@@ -833,8 +922,16 @@ const executeCommand = () => {
             border-radius: 4px;
             font-weight: 600;
 
-            &.work { background: rgba(59, 130, 246, 0.25); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.5); }
-            &.surveillance { background: rgba(168, 85, 247, 0.25); color: #c084fc; border: 1px solid rgba(168, 85, 247, 0.5); }
+            &.work {
+                background: rgba(59, 130, 246, 0.25);
+                color: #60a5fa;
+                border: 1px solid rgba(59, 130, 246, 0.5);
+            }
+            &.surveillance {
+                background: rgba(168, 85, 247, 0.25);
+                color: #c084fc;
+                border: 1px solid rgba(168, 85, 247, 0.5);
+            }
         }
 
         .robot-id-tag {
@@ -866,9 +963,21 @@ const executeCommand = () => {
                 background: currentColor;
             }
 
-            &.online { color: #4ade80; background: rgba(74, 222, 128, 0.18); border: 1px solid rgba(74, 222, 128, 0.3); }
-            &.stale { color: #facc15; background: rgba(250, 204, 21, 0.18); border: 1px solid rgba(250, 204, 21, 0.3); }
-            &.offline { color: #f87171; background: rgba(248, 113, 113, 0.18); border: 1px solid rgba(248, 113, 113, 0.3); }
+            &.online {
+                color: #4ade80;
+                background: rgba(74, 222, 128, 0.18);
+                border: 1px solid rgba(74, 222, 128, 0.3);
+            }
+            &.stale {
+                color: #facc15;
+                background: rgba(250, 204, 21, 0.18);
+                border: 1px solid rgba(250, 204, 21, 0.3);
+            }
+            &.offline {
+                color: #f87171;
+                background: rgba(248, 113, 113, 0.18);
+                border: 1px solid rgba(248, 113, 113, 0.3);
+            }
         }
 
         .battery-chip {
@@ -921,6 +1030,8 @@ const executeCommand = () => {
                 font-weight: 700;
                 font-variant-numeric: tabular-nums;
                 margin-left: 2px;
+                min-width: 43px;
+                text-align: right;
             }
 
             .coord-sep {
@@ -1023,7 +1134,10 @@ const executeCommand = () => {
 
         .poi-marker {
             cursor: pointer;
-            &:hover circle { fill: #60a5fa; transform: scale(1.2); }
+            &:hover circle {
+                fill: #60a5fa;
+                transform: scale(1.2);
+            }
             .poi-label {
                 font-size: 11px;
                 fill: #e2e8f0;
@@ -1156,10 +1270,17 @@ const executeCommand = () => {
             background: radial-gradient(circle at center, #450a0a 0%, #020617 100%);
             .hud-overlay {
                 color: #fca5a5;
-                .cam-id { color: #f87171; }
+                .cam-id {
+                    color: #f87171;
+                }
                 .hud-center-crosshair {
-                    .ch-line-h, .ch-line-v { background: #ef4444; }
-                    .ch-box { border-color: #ef4444; }
+                    .ch-line-h,
+                    .ch-line-v {
+                        background: #ef4444;
+                    }
+                    .ch-box {
+                        border-color: #ef4444;
+                    }
                 }
             }
         }
@@ -1168,16 +1289,11 @@ const executeCommand = () => {
     .camera-scanlines {
         position: absolute;
         inset: 0;
-        background: linear-gradient(
-            rgba(18, 16, 16, 0) 50%, 
-            rgba(0, 0, 0, 0.25) 50%
-        ), linear-gradient(
-            90deg,
-            rgba(255, 0, 0, 0.03),
-            rgba(0, 255, 0, 0.01),
-            rgba(0, 0, 255, 0.03)
-        );
-        background-size: 100% 3px, 6px 100%;
+        background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%),
+            linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
+        background-size:
+            100% 3px,
+            6px 100%;
         pointer-events: none;
     }
 
@@ -1194,7 +1310,8 @@ const executeCommand = () => {
         font-family: 'Consolas', 'Courier New', monospace;
         font-size: 11px;
 
-        .hud-top-row, .hud-bottom-row {
+        .hud-top-row,
+        .hud-bottom-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -1300,15 +1417,38 @@ const executeCommand = () => {
         padding: 6px 14px;
         font-size: 12px;
         font-weight: 700;
-        color: #ffffff;
-        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-        border: 1px solid #f87171;
-        border-radius: 6px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        background: rgba(239, 68, 68, 0.2);
+        border: 1px solid rgba(239, 68, 68, 0.6);
+        border-radius: 8px;
+        color: #f87171;
+        // box-shadow: 0 0 8px rgba(239, 68, 68, 0.25);
+
+        &:hover {
+            background: rgba(239, 68, 68, 0.4);
+            border-color: #ef4444;
+            color: #ffffff;
+            // box-shadow: 0 0 14px rgba(239, 68, 68, 0.6);
+        }
+    }
+
+    .execute-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 20px;
+        font-size: 12px;
+        font-weight: 700;
+        color: #000000;
+        background: var(--button-primary-bg-color);
+        border: 1px solid var(--button-primary-border-color);
+        border-radius: 8px;
         cursor: pointer;
         transition: all 0.2s ease;
 
         &:hover {
-            background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+            background: var(--button-primary-hover-bg-color);
         }
     }
 }
@@ -1322,7 +1462,9 @@ const executeCommand = () => {
         display: flex;
         :deep(.el-radio-button) {
             flex: 1;
-            .el-radio-button__inner { width: 100%; }
+            .el-radio-button__inner {
+                width: 100%;
+            }
         }
     }
     :deep(.el-form-item) {
@@ -1528,7 +1670,10 @@ const executeCommand = () => {
                     width: 7px;
                     height: 7px;
                     border-radius: 50%;
-                    &.green { background: #22c55e; box-shadow: 0 0 6px #22c55e; }
+                    &.green {
+                        background: #22c55e;
+                        box-shadow: 0 0 6px #22c55e;
+                    }
                 }
 
                 .term-prompt {
@@ -1630,12 +1775,24 @@ const executeCommand = () => {
 }
 
 @keyframes mapPulse {
-    0% { r: 12px; opacity: 0.8; }
-    100% { r: 28px; opacity: 0; }
+    0% {
+        r: 12px;
+        opacity: 0.8;
+    }
+    100% {
+        r: 28px;
+        opacity: 0;
+    }
 }
 
 @keyframes targetPulse {
-    0% { transform: scale(1); opacity: 0.7; }
-    100% { transform: scale(1.2); opacity: 1; }
+    0% {
+        transform: scale(1);
+        opacity: 0.7;
+    }
+    100% {
+        transform: scale(1.2);
+        opacity: 1;
+    }
 }
 </style>
