@@ -60,7 +60,7 @@ const drawChart = () => {
     }
 
     chart.setOption({
-        color: [COLOR_TYPE.SECONDARY],
+        color: [COLOR_TYPE.BLUE],
         grid: {
             top: props.gridTop,
             right: props.gridRight,
@@ -84,7 +84,7 @@ const drawChart = () => {
             axisTick: { show: false },
             axisLabel: {
                 color: '#c9c1d4',
-                formatter: (value: string) => value.slice(11, 16),
+                formatter: (value: string) => value.length > 5 ? value.slice(11, 16) : value,
             },
             data: props.data.map(item => item.measured_at),
         },
@@ -109,19 +109,19 @@ const drawChart = () => {
                 showSymbol: false,
                 lineStyle: {
                     width: props.lineWidth,
-                    color: COLOR_TYPE.SECONDARY,
+                    color: COLOR_TYPE.BLUE,
                     shadowBlur: props.showLineGlow ? 12 : 0,
-                    shadowColor: props.showLineGlow ? 'rgba(21, 224, 183, 0.45)' : 'transparent',
+                    shadowColor: props.showLineGlow ? 'rgba(76, 165, 215, 0.45)' : 'transparent',
                 },
                 itemStyle: {
-                    color: COLOR_TYPE.SECONDARY,
+                    color: COLOR_TYPE.BLUE,
                 },
                 areaStyle: {
                     opacity: 0.95,
                     color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-                        { offset: 0, color: 'rgba(21, 224, 183, 0.82)' },
-                        { offset: 0.65, color: 'rgba(76, 165, 215, 0.42)' },
-                        { offset: 1, color: 'rgba(231, 109, 255, 0.08)' },
+                        { offset: 0, color: 'rgba(76, 165, 215, 0.76)' },
+                        { offset: 0.58, color: 'rgba(21, 224, 183, 0.32)' },
+                        { offset: 1, color: 'rgba(231, 109, 255, 0.07)' },
                     ]),
                 },
                 markLine: props.capacity
@@ -155,7 +155,7 @@ const drawChart = () => {
                               },
                               itemStyle: {
                                   color: '#ffffff',
-                                  borderColor: COLOR_TYPE.SECONDARY,
+                                  borderColor: COLOR_TYPE.BLUE,
                                   borderWidth: 2,
                               },
                               data: [

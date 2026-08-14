@@ -20,7 +20,7 @@ const KORAD_MENUS: Menu[] = [
     {
         id: 10,
         parentId: 0,
-        title: '통합 관제 대시보드',
+        title: '대시보드',
         path: '/dashboard',
         icon: 'IconDashboard',
         useYn: 'Y',

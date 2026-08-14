@@ -1,224 +1,267 @@
 <template>
     <div class="dashboard-page">
-        <!-- Top Metric KPI Bar -->
-        <div class="dashboard-kpi-grid">
-            <div class="kpi-card glass-panel">
-                <div class="kpi-icon is-blue">
-                    <Bot :size="24" />
-                </div>
-                <div class="kpi-info">
-                    <span class="kpi-label">통합 운영 로봇</span>
-                    <div class="kpi-value">
-                        <strong>7</strong><sub>대</sub>
-                        <span class="kpi-sub green">정상 6대 · 주의 1대</span>
-                    </div>
-                </div>
+        <section class="dashboard-kpi-strip" aria-label="핵심 운영 지표">
+            <div v-for="item in kpiItems" :key="item.label" class="kpi-strip-item">
+                <component :is="item.icon" class="kpi-strip-icon" :size="17" />
+                <span class="kpi-strip-label">{{ item.label }}</span>
+                <strong class="kpi-strip-value">{{ item.value }}</strong>
+                <span class="kpi-strip-note" :class="item.variant">{{ item.note }}</span>
             </div>
+        </section>
 
-            <div class="kpi-card glass-panel">
-                <div class="kpi-icon is-green">
-                    <ShieldCheck :size="24" />
-                </div>
-                <div class="kpi-info">
-                    <span class="kpi-label">방사선 구역 피폭 위험도</span>
-                    <div class="kpi-value">
-                        <strong>0.02</strong><sub>mSv</sub>
-                        <span class="kpi-sub green">안전 범위 (기준 이하)</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="kpi-card glass-panel">
-                <div class="kpi-icon is-purple">
-                    <Workflow :size="24" />
-                </div>
-                <div class="kpi-info">
-                    <span class="kpi-label">진행 중 융합 미션</span>
-                    <div class="kpi-value">
-                        <strong>65</strong><sub>%</sub>
-                        <span class="kpi-sub blue">폐기물 이송 및 장입</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="kpi-card glass-panel">
-                <div class="kpi-icon is-orange">
-                    <BellRing :size="24" />
-                </div>
-                <div class="kpi-info">
-                    <span class="kpi-label">24시 이벤트 감시</span>
-                    <div class="kpi-value">
-                        <strong>2</strong><sub>건</sub>
-                        <span class="kpi-sub yellow">경고 발생 및 조치 완료</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Main Dashboard Content Grid -->
-        <div class="dashboard-main-grid">
-            <!-- Left Panel: Real-time Robot Telemetry (1s interval) -->
-            <Panel title="실시간 로봇 7대 현황" subtitle="1초 주기 위치/배터리/통신 실시간 동기화">
+        <section class="dashboard-main-grid">
+            <Panel
+                class="dashboard-panel running-mission-panel"
+                title="현재 진행 중인 미션"
+                :total="runningMissions.length"
+                fill
+            >
                 <template #headerRight>
-                    <StatusBadge label="1초 실시간 수신" variant="success" />
-                </template>
-
-                <div class="robot-status-list">
-                    <div
-                        v-for="robot in robots"
-                        :key="robot.id"
-                        class="robot-telemetry-item"
-                        :class="{ 'is-stale': robot.communicationStatus === 'STALE' }"
-                        @click="goToMonitoring(robot)"
+                    <el-button size="small" text type="primary" @click="router.push('/robot-control')"
+                        >제어 화면</el-button
                     >
-                        <div class="robot-head">
-                            <span class="robot-name">{{ robot.name }}</span>
-                            <StatusBadge
-                                :label="robot.communicationStatus === 'ONLINE' ? '정상' : '지연'"
-                                :variant="robot.communicationStatus === 'ONLINE' ? 'success' : 'warning'"
-                            />
+                </template>
+                <div class="running-mission-list">
+                    <div v-for="mission in runningMissions" :key="mission.id" class="running-mission-item">
+                        <div class="mission-row mission-row--top">
+                            <div class="mission-title-group">
+                                <strong>{{ mission.name }}</strong>
+                                <span>{{ mission.currentStep }}</span>
+                            </div>
+                            <StatusBadge :label="mission.statusLabel" :variant="missionStatusVariant(mission.status)" />
                         </div>
-                        <div class="robot-metrics">
-                            <span>배터리 {{ robot.batteryPercent }}%</span>
-                            <span>상태: {{ robot.status }}</span>
+                        <div class="mission-progress-track">
+                            <span class="mission-progress-fill" :style="{ width: `${mission.progress}%` }"></span>
                         </div>
-                        <div class="robot-coord">
-                            <span>X: {{ robot.x.toFixed(2) }}m</span>
-                            <span>Y: {{ robot.y.toFixed(2) }}m</span>
-                            <span>각도: {{ robot.heading }}°</span>
+                        <div class="mission-row mission-row--meta">
+                            <span>{{ mission.robotName }}</span>
+                            <span>{{ mission.progress }}%</span>
+                            <span>ETA {{ mission.eta }}</span>
                         </div>
                     </div>
                 </div>
             </Panel>
 
-            <!-- Center Panel: 2D Live Control Map & Fused Mission Timeline -->
-            <div class="dashboard-center-panel">
-                <Panel title="통합 실시간 2D 관제 지도" subtitle="처분용기 장입 실내 1층 및 외곽 순찰 도면">
-                    <template #headerRight>
-                        <el-button type="primary" size="small" @click="goToIntegrated">관제 화면 전체보기</el-button>
-                    </template>
-                    <div class="live-map-wrapper">
-                        <svg class="live-map-svg" viewBox="0 0 1200 800">
-                            <rect width="100%" height="100%" fill="#0f172a" />
-                            <image href="/sample_map/map.png" width="100%" height="100%" preserveAspectRatio="none" opacity="0.75" />
-                            <!-- Grid -->
-                            <line v-for="i in 12" :key="'h'+i" :x1="i*100" y1="0" :x2="i*100" y2="800" stroke="#334155" stroke-dasharray="4" />
-                            <line v-for="i in 8" :key="'v'+i" x1="0" :y1="i*100" x2="1200" :y2="i*100" stroke="#334155" stroke-dasharray="4" />
+            <div class="dashboard-center-column">
+                <Panel title="폐기물 처리 통계" class="dashboard-panel">
+                    <div class="waste-overview">
+                        <div class="waste-summary-grid">
+                            <div class="waste-summary-card">
+                                <span>오늘 처리</span>
+                                <strong>18건</strong>
+                            </div>
+                            <div class="waste-summary-card">
+                                <span>목표 대비</span>
+                                <strong>75%</strong>
+                            </div>
+                            <div class="waste-summary-card">
+                                <span>평균 소요</span>
+                                <strong>11분</strong>
+                            </div>
+                        </div>
+                        <TrendAreaChart
+                            :data="wasteTrendData"
+                            name="처리량"
+                            unit="건"
+                            :grid-top="12"
+                            :grid-bottom="16"
+                            :show-peak="false"
+                        />
+                    </div>
+                </Panel>
 
-                            <!-- Robot Markers -->
-                            <g
-                                v-for="robot in indoorRobots"
-                                :key="robot.id"
-                                :transform="`translate(${robot.x * 15 + 100}, ${robot.y * 15 + 100})`"
-                                class="map-robot-marker"
+                <div class="center-chart-grid">
+                    <Panel title="미션 통계" class="dashboard-panel">
+                        <CategoryBarChart :data="missionStats" name="미션" unit="건" />
+                    </Panel>
+                    <Panel title="이상 감지 통계" class="dashboard-panel">
+                        <CategoryBarChart :data="anomalyStats" name="이상 감지" unit="건" />
+                    </Panel>
+                </div>
+            </div>
+
+            <Panel
+                class="dashboard-panel robot-overview-panel"
+                title="전체 로봇 실시간 상태"
+                :total="robots.length"
+                fill
+            >
+                <div class="robot-state-card-list">
+                    <button
+                        v-for="robot in robots"
+                        :key="robot.id"
+                        type="button"
+                        class="robot-state-card"
+                        :class="{ 'is-stale': robot.communicationStatus !== 'ONLINE' }"
+                        @click="openRobotDetail(robot)"
+                    >
+                        <span class="robot-card-head">
+                            <span class="robot-name-cell">
+                                <strong>{{ robot.name }}</strong>
+                                <small>{{ robot.robotType === 'WORK' ? '작업' : '감시' }}</small>
+                            </span>
+                            <StatusBadge
+                                :label="communicationLabel(robot.communicationStatus)"
+                                :variant="communicationVariant(robot.communicationStatus)"
+                                min-width="44px"
+                            />
+                        </span>
+
+                        <span class="battery-cell">
+                            <span class="battery-track">
+                                <span class="battery-fill" :style="{ width: `${robot.batteryPercent}%` }"></span>
+                            </span>
+                            <strong>{{ robot.batteryPercent }}%</strong>
+                        </span>
+
+                        <span class="robot-card-meta">
+                            <span>{{ areaLabel(robot) }}</span>
+                            <strong class="coord-cell">{{ robot.x.toFixed(1) }}, {{ robot.y.toFixed(1) }}</strong>
+                            <span>{{ operationLabel(robot.status) }}</span>
+                        </span>
+
+                        <span class="robot-actions-cell" @click.stop>
+                            <button type="button" class="robot-action-btn" @click="goToMonitoring(robot)">관제</button>
+                            <button
+                                v-if="robot.robotType === 'SURVEILLANCE'"
+                                type="button"
+                                class="robot-action-btn"
+                                @click="openCameraModal(robot)"
                             >
-                                <circle r="14" fill="#3b82f6" stroke="#fff" stroke-width="2.5" />
-                                <text x="18" y="5" fill="#fff" font-size="14" font-weight="700">{{ robot.name }}</text>
-                            </g>
-                        </svg>
-                    </div>
-                </Panel>
+                                카메라
+                            </button>
+                        </span>
+                    </button>
+                </div>
+            </Panel>
+        </section>
 
-                <Panel title="폐기물 이송 및 장입 융합 미션 진행 상황" subtitle="무인지게차 → AMR 1·2호기 → 산업용 로봇 교대 순차 연계">
-                    <div class="fused-mission-timeline">
-                        <div class="timeline-step is-done">
-                            <span class="step-num">1</span>
-                            <span class="step-title">무인지게차</span>
-                            <span class="step-desc">팰릿 상차 완료</span>
+        <section class="dashboard-bottom-grid">
+            <Panel
+                class="dashboard-panel event-feed-panel"
+                title="안전 이벤트/알람 피드"
+                :total="safetyEvents.length"
+                fill
+            >
+                <div class="safety-event-feed">
+                    <div
+                        v-for="event in safetyEvents"
+                        :key="event.id"
+                        class="safety-event-item"
+                        :class="`is-${event.severity}`"
+                    >
+                        <div class="event-head">
+                            <strong>{{ event.title }}</strong>
+                            <StatusBadge :label="event.statusLabel" :variant="eventStatusVariant(event.severity)" />
                         </div>
-                        <div class="timeline-arrow">➔</div>
-                        <div class="timeline-step is-active">
-                            <span class="step-num">2</span>
-                            <span class="step-title">AMR 1호기</span>
-                            <span class="step-desc">처분용기 앞 이동 중</span>
-                        </div>
-                        <div class="timeline-arrow">➔</div>
-                        <div class="timeline-step">
-                            <span class="step-num">3</span>
-                            <span class="step-title">산업용 로봇</span>
-                            <span class="step-desc">드럼 정밀 장입 대기</span>
-                        </div>
-                        <div class="timeline-arrow">➔</div>
-                        <div class="timeline-step">
-                            <span class="step-num">4</span>
-                            <span class="step-title">AMR 2호기</span>
-                            <span class="step-desc">다음 팰릿 교대 대기</span>
-                        </div>
-                    </div>
-                </Panel>
-
-                <Panel title="실행 중인 미션 목록" subtitle="현재 진행 중인 Mission/Task와 담당 로봇">
-                    <div class="running-mission-list">
-                        <div v-for="mission in runningMissions" :key="mission.id" class="running-mission-item">
-                            <div class="mission-row mission-row--top">
-                                <div class="mission-title-group">
-                                    <strong>{{ mission.name }}</strong>
-                                    <span>{{ mission.currentStep }}</span>
-                                </div>
-                                <StatusBadge :label="mission.statusLabel" :variant="missionStatusVariant(mission.status)" />
-                            </div>
-                            <div class="mission-progress-track">
-                                <span class="mission-progress-fill" :style="{ width: `${mission.progress}%` }"></span>
-                            </div>
-                            <div class="mission-row mission-row--meta">
-                                <span>담당 {{ mission.robotName }}</span>
-                                <span>진행률 {{ mission.progress }}%</span>
-                                <span>ETA {{ mission.eta }}</span>
-                            </div>
+                        <div class="event-message">{{ event.message }}</div>
+                        <div class="event-meta">
+                            <span>{{ event.area }}</span>
+                            <time>{{ event.occurredAt }}</time>
                         </div>
                     </div>
-                </Panel>
-            </div>
+                </div>
+            </Panel>
 
-            <!-- Right Panel: Charts & Emergency Action -->
-            <div class="dashboard-right-panel">
-                <Panel title="로봇 가동 상태 분포">
-                    <DonutStatusChart
-                        :normal="6"
-                        :warning="1"
-                        :total="7"
-                        normal-label="정상 작동"
-                        warning-label="통신 지연"
-                        summary-label="가동률 85%"
+            <Panel class="dashboard-panel" title="알림 처리 상태">
+                <div class="equipment-error-chart">
+                    <CategoryBarChart :data="alertProcessStats" name="알림 처리" unit="건" />
+                </div>
+            </Panel>
+
+            <Panel class="dashboard-panel" title="장비 에러 통계">
+                <div class="equipment-error-chart">
+                    <CategoryBarChart :data="equipmentErrors" name="장비 에러" unit="건" />
+                </div>
+            </Panel>
+
+            <Panel class="dashboard-panel donut-dashboard-panel" title="로봇 통신 상태">
+                <DonutStatusChart
+                    :normal="communicationCounts.online"
+                    :warning="communicationCounts.warning"
+                    :total="robots.length || 1"
+                    layout="horizontal"
+                    :size="158"
+                    normal-label="정상"
+                    warning-label="지연/오프라인"
+                    :summary-label="`정상 ${communicationRate}%`"
+                />
+            </Panel>
+
+            <Panel class="dashboard-panel donut-dashboard-panel" title="로봇 가동 상태">
+                <DonutStatusChart
+                    :normal="operationCounts.running"
+                    :warning="operationCounts.notRunning"
+                    :total="robots.length || 1"
+                    layout="horizontal"
+                    :size="158"
+                    normal-label="운행/작업"
+                    warning-label="대기/충전/오류"
+                    :summary-label="`가동 ${operationRate}%`"
+                />
+            </Panel>
+        </section>
+
+        <el-dialog
+            v-model="robotDetailVisible"
+            :title="selectedRobot ? `${selectedRobot.name} 상세 상태` : '로봇 상세 상태'"
+            width="560px"
+            class="robot-detail-dialog"
+        >
+            <div v-if="selectedRobot" class="robot-detail-body">
+                <div class="robot-detail-summary">
+                    <StatusBadge
+                        :label="communicationLabel(selectedRobot.communicationStatus)"
+                        :variant="communicationVariant(selectedRobot.communicationStatus)"
                     />
-                </Panel>
-
-                <Panel title="시간별 로봇 가동률 트렌드">
-                    <TrendAreaChart
-                        :data="trendData"
-                        name="가동률"
-                        unit="%"
-                    />
-                </Panel>
-
-                <Panel title="안전 이벤트/알람 피드" subtitle="최근 안전 이벤트 및 조치 상태">
-                    <div class="safety-event-feed">
-                        <div v-for="event in safetyEvents" :key="event.id" class="safety-event-item" :class="`is-${event.severity}`">
-                            <div class="event-head">
-                                <strong>{{ event.title }}</strong>
-                                <StatusBadge :label="event.statusLabel" :variant="eventStatusVariant(event.severity)" />
-                            </div>
-                            <div class="event-message">{{ event.message }}</div>
-                            <div class="event-meta">
-                                <span>{{ event.area }}</span>
-                                <time>{{ event.occurredAt }}</time>
-                            </div>
-                        </div>
+                    <StatusBadge :label="operationLabel(selectedRobot.status)" variant="info" />
+                </div>
+                <dl class="robot-detail-grid">
+                    <div>
+                        <dt>유형</dt>
+                        <dd>{{ selectedRobot.robotType === 'WORK' ? '작업 로봇' : '감시 로봇' }}</dd>
                     </div>
-                </Panel>
-
-                <Panel title="긴급 비상 조치 툴바">
-                    <div class="emergency-toolbar">
-                        <el-button type="danger" style="width: 100%" @click="triggerSafeStop">
-                            전체 로봇 Safe Stop 발송
-                        </el-button>
-                        <el-button type="warning" style="width: 100%" @click="triggerEStop">
-                            원격 E-Stop 비상정지
-                        </el-button>
+                    <div>
+                        <dt>구역</dt>
+                        <dd>{{ areaLabel(selectedRobot) }}</dd>
                     </div>
-                </Panel>
+                    <div>
+                        <dt>좌표</dt>
+                        <dd>X {{ selectedRobot.x.toFixed(2) }} / Y {{ selectedRobot.y.toFixed(2) }}</dd>
+                    </div>
+                    <div>
+                        <dt>방향</dt>
+                        <dd>{{ selectedRobot.heading }}°</dd>
+                    </div>
+                    <div>
+                        <dt>배터리</dt>
+                        <dd>{{ selectedRobot.batteryPercent }}%</dd>
+                    </div>
+                    <div>
+                        <dt>최근 수신</dt>
+                        <dd>
+                            {{ selectedRobot.lastSeenAt ? formatDateTime(selectedRobot.lastSeenAt) : '실시간 수신 중' }}
+                        </dd>
+                    </div>
+                </dl>
             </div>
-        </div>
+            <template #footer>
+                <el-button @click="robotDetailVisible = false">닫기</el-button>
+                <el-button type="primary" @click="selectedRobot && goToMonitoring(selectedRobot)"
+                    >관제 화면 이동</el-button
+                >
+                <el-button
+                    v-if="selectedRobot?.robotType === 'SURVEILLANCE'"
+                    type="primary"
+                    plain
+                    @click="selectedRobot && openCameraModal(selectedRobot)"
+                >
+                    카메라 보기
+                </el-button>
+            </template>
+        </el-dialog>
+
+        <RobotCameraDialog v-model:visible="cameraModalVisible" :robot="activeCameraRobot" />
     </div>
 </template>
 
@@ -229,26 +272,39 @@ import Panel from '@/components/Panel.vue'
 import StatusBadge from '@/components/StatusBadge.vue'
 import DonutStatusChart from '@/components/charts/DonutStatusChart.vue'
 import TrendAreaChart from '@/components/charts/TrendAreaChart.vue'
-import { Bot, ShieldCheck, Workflow, BellRing } from '@lucide/vue'
+import CategoryBarChart from '@/components/charts/CategoryBarChart.vue'
+import RobotCameraDialog from '@/features/monitoring/components/RobotCameraDialog.vue'
+import { Bot, BellRing, Radio, Workflow, PackageCheck } from '@lucide/vue'
 import { simulationService } from '@/services/simulation.service'
-import type { MonitoringRobot } from '@/features/monitoring/service/integrated/integratedMonitoring.types'
-import { ElMessage, ElMessageBox } from 'element-plus'
+import { formatDateTime } from '@/utils/date.util'
+import type {
+    CommunicationStatus,
+    MonitoringRobot,
+} from '@/features/monitoring/service/integrated/integratedMonitoring.types'
 
 const router = useRouter()
 const robots = ref<MonitoringRobot[]>([])
+const robotDetailVisible = ref(false)
+const selectedRobot = ref<MonitoringRobot | null>(null)
+const cameraModalVisible = ref(false)
+const activeCameraRobot = ref<MonitoringRobot | null>(null)
 let unsubscribeSim: (() => void) | null = null
 
 onMounted(() => {
-    unsubscribeSim = simulationService.subscribe((updatedRobots) => {
+    unsubscribeSim = simulationService.subscribe(updatedRobots => {
         robots.value = updatedRobots
+        if (selectedRobot.value) {
+            selectedRobot.value =
+                updatedRobots.find(robot => robot.id === selectedRobot.value?.id) ?? selectedRobot.value
+        }
     })
 })
 
 onBeforeUnmount(() => {
-    if (unsubscribeSim) unsubscribeSim()
+    if (unsubscribeSim) {
+        unsubscribeSim()
+    }
 })
-
-const indoorRobots = computed(() => robots.value.filter(r => r.mapId === 1))
 
 type RunningMissionStatus = 'RUNNING' | 'WAITING' | 'PAUSED'
 
@@ -290,7 +346,7 @@ const runningMissions = ref<RunningMissionItem[]>([
         id: 2,
         name: '외곽 험지 침입 감시 순찰',
         currentStep: '웨이포인트 #3 열화상 스캔',
-        robotName: '4족 보행 로봇 1호기 (Spot)',
+        robotName: '4족 보행 로봇 1호기',
         progress: 42,
         eta: '18분',
         status: 'RUNNING',
@@ -338,6 +394,130 @@ const safetyEvents = ref<SafetyEventItem[]>([
     },
 ])
 
+const wasteTrendData = ref([
+    { measured_at: '09:00', metric_value: 2 },
+    { measured_at: '10:00', metric_value: 5 },
+    { measured_at: '11:00', metric_value: 8 },
+    { measured_at: '12:00', metric_value: 11 },
+    { measured_at: '13:00', metric_value: 15 },
+    { measured_at: '14:00', metric_value: 18 },
+])
+
+const anomalyStats = ref([
+    { label: '통신 지연', value: 4 },
+    { label: '경로 이탈', value: 1 },
+    { label: '장애물 감지', value: 1 },
+    { label: '위치 오차', value: 1 },
+    { label: '임무 응답 지연', value: 1 },
+])
+
+const missionStats = ref([
+    { label: '성공', value: 12 },
+    { label: '진행', value: 3 },
+    { label: '대기', value: 2 },
+    { label: '실패', value: 1 },
+])
+
+const equipmentErrors = ref([
+    { label: '모터/구동부', value: 1 },
+    { label: '배터리', value: 2 },
+    { label: '센서 모듈', value: 2 },
+    { label: '통신 모듈', value: 1 },
+    { label: '카메라/PTZ', value: 1 },
+])
+
+const alertProcessStats = ref([
+    { label: '미확인', value: 2 },
+    { label: '조치 중', value: 1 },
+    { label: '완료', value: 5 },
+    { label: '에스컬레이션', value: 0 },
+])
+
+const communicationCounts = computed(() => {
+    const online = robots.value.filter(robot => robot.communicationStatus === 'ONLINE').length
+    return {
+        online,
+        warning: Math.max(robots.value.length - online, 0),
+    }
+})
+
+const operationCounts = computed(() => {
+    const running = robots.value.filter(robot => robot.status === 'RUNNING').length
+    return {
+        running,
+        notRunning: Math.max(robots.value.length - running, 0),
+    }
+})
+
+const communicationRate = computed(() => {
+    if (robots.value.length === 0) {
+        return 0
+    }
+    return Math.round((communicationCounts.value.online / robots.value.length) * 100)
+})
+
+const operationRate = computed(() => {
+    if (robots.value.length === 0) {
+        return 0
+    }
+    return Math.round((operationCounts.value.running / robots.value.length) * 100)
+})
+
+const kpiItems = computed(() => [
+    { label: '전체 로봇', value: `${robots.value.length}대`, note: '실시간', icon: Bot, variant: 'info' },
+    {
+        label: '정상 통신',
+        value: `${communicationCounts.value.online}대`,
+        note: `${communicationRate.value}%`,
+        icon: Radio,
+        variant: 'success',
+    },
+    {
+        label: '진행 미션',
+        value: `${runningMissions.value.filter(mission => mission.status === 'RUNNING').length}건`,
+        note: '진행 중',
+        icon: Workflow,
+        variant: 'info',
+    },
+    {
+        label: '미확인 알림',
+        value: `${safetyEvents.value.filter(event => event.statusLabel !== '완료').length}건`,
+        note: '확인 필요',
+        icon: BellRing,
+        variant: 'warning',
+    },
+    { label: '오늘 처리량', value: '18건', note: '목표대비 75%', icon: PackageCheck, variant: 'success' },
+])
+
+const communicationLabel = (status: CommunicationStatus) =>
+    ({ ONLINE: '정상', STALE: '지연', OFFLINE: '오프라인' })[status] ?? '정상'
+
+const communicationVariant = (status: CommunicationStatus) =>
+    (({ ONLINE: 'success', STALE: 'warning', OFFLINE: 'danger' }) as const)[status] ?? 'success'
+
+const operationLabel = (status?: string) => {
+    const labels: Record<string, string> = {
+        RUNNING: '운행 중',
+        IDLE: '대기',
+        CHARGING: '충전 중',
+        ERROR: '오류',
+    }
+    return labels[status ?? ''] ?? '운행 중'
+}
+
+const areaLabel = (robot: MonitoringRobot) => {
+    if (robot.mapId === 1) {
+        return '대표 지도'
+    }
+    if (robot.mapId === 2) {
+        return '장입 구역'
+    }
+    if (robot.mapId === 3) {
+        return '외곽 순찰'
+    }
+    return `구역 ${robot.mapId}`
+}
+
 const missionStatusVariant = (status: RunningMissionStatus) => {
     switch (status) {
         case 'RUNNING':
@@ -364,237 +544,369 @@ const eventStatusVariant = (severity: SafetyEventSeverity) => {
     }
 }
 
-const trendData = ref([
-    { measured_at: '09:00', metric_value: 80 },
-    { measured_at: '09:05', metric_value: 85 },
-    { measured_at: '09:10', metric_value: 90 },
-    { measured_at: '09:15', metric_value: 88 },
-    { measured_at: '09:20', metric_value: 92 },
-    { measured_at: '09:25', metric_value: 87 },
-])
+const openRobotDetail = (robot: MonitoringRobot) => {
+    selectedRobot.value = robot
+    robotDetailVisible.value = true
+}
 
-const goToIntegrated = () => {
-    router.push('/monitoring/integrated')
+const openCameraModal = (robot: MonitoringRobot) => {
+    activeCameraRobot.value = robot
+    cameraModalVisible.value = true
 }
 
 const goToMonitoring = (robot: MonitoringRobot) => {
-    if (robot.robotType === 'WORK') router.push('/monitoring/work')
-    else router.push('/monitoring/surveillance')
-}
-
-const triggerSafeStop = async () => {
-    try {
-        await ElMessageBox.confirm('전체 운영 로봇에 Safe Stop을 발송하시겠습니까?', 'Safe Stop 경보', { type: 'warning' })
-        ElMessage.warning('전체 로봇에 Safe Stop 명령이 발송되었습니다.')
-    } catch {
-        // Cancelled
-    }
-}
-
-const triggerEStop = async () => {
-    try {
-        await ElMessageBox.confirm('원격 비상정지(E-Stop)를 즉시 집행하시겠습니까?', '원격 E-Stop 비상집행', { type: 'error' })
-        ElMessage.error('원격 E-Stop 비상정지가 집행되었습니다.')
-    } catch {
-        // Cancelled
-    }
+    const route = robot.robotType === 'WORK' ? '/monitoring/work' : '/monitoring/surveillance'
+    router.push(route)
 }
 </script>
 
 <style scoped lang="scss">
 .dashboard-page {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-}
-
-.dashboard-kpi-grid {
     display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 16px;
+    grid-template-rows: auto minmax(0, 1fr) 240px;
+    gap: 8px;
+    height: calc(100vh - 100px);
+    min-height: 720px;
+    overflow: hidden;
 }
 
-.glass-panel {
-    background: rgba(30, 41, 59, 0.7);
-    backdrop-filter: blur(12px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 10px;
-    padding: 16px 20px;
-    display: flex;
+.dashboard-panel {
+    min-height: 0;
+    padding: 10px;
+
+    :deep(.panel__body) {
+        min-height: 0;
+    }
+
+    :deep(.panel__header) {
+        margin-bottom: 8px;
+    }
+
+    :deep(.panel__title-row h2) {
+        font-size: 16px;
+    }
+}
+
+.dashboard-kpi-strip {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 8px;
+}
+
+.kpi-strip-item {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    grid-template-areas:
+        'icon label value'
+        'icon note value';
     align-items: center;
-    gap: 16px;
+    column-gap: 8px;
+    min-width: 0;
+    min-height: 58px;
+    padding: 9px 12px;
+    border: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
+    border-radius: 8px;
+    background: var(--panel-bg-color);
 }
 
-.kpi-icon {
-    width: 48px;
-    height: 48px;
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    &.is-blue { background: rgba(59, 130, 246, 0.15); color: #3b82f6; }
-    &.is-green { background: rgba(34, 197, 94, 0.15); color: #22c55e; }
-    &.is-purple { background: rgba(168, 85, 247, 0.15); color: #a855f7; }
-    &.is-orange { background: rgba(249, 115, 22, 0.15); color: #f97316; }
+.kpi-strip-icon {
+    grid-area: icon;
+    color: var(--primary-color);
 }
 
-.kpi-info {
-    display: flex;
-    flex-direction: column;
-}
-
-.kpi-label {
-    font-size: 13px;
-    color: var(--text-color--secondary);
-}
-
-.kpi-value {
-    display: flex;
-    align-items: baseline;
-    gap: 4px;
-
-    strong { font-size: 26px; font-weight: 700; color: #fff; }
-    sub { font-size: 14px; color: #94a3b8; }
-}
-
-.kpi-sub {
-    margin-left: 8px;
+.kpi-strip-label {
+    grid-area: label;
+    color: var(--text-color--secondary, #94a3b8);
     font-size: 12px;
-    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
 
-    &.green { color: #22c55e; }
-    &.blue { color: #3b82f6; }
-    &.yellow { color: #f59e0b; }
+.kpi-strip-value {
+    grid-area: value;
+    color: var(--text-color--primary, #f8fafc);
+    font-size: 22px;
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+.kpi-strip-note {
+    grid-area: note;
+    font-size: 12px;
+    font-weight: 700;
+
+    &.success {
+        color: var(--secondary-color);
+    }
+    &.warning {
+        color: var(--warning-color);
+    }
+    &.info {
+        color: var(--info-color);
+    }
 }
 
 .dashboard-main-grid {
     display: grid;
-    grid-template-columns: 340px 1fr 320px;
-    gap: 16px;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 8px;
+    min-height: 0;
 }
 
-.robot-status-list {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    max-height: 640px;
+.dashboard-main-grid > .running-mission-panel {
+    grid-column: span 1;
+}
+
+.dashboard-main-grid > .dashboard-center-column,
+.dashboard-main-grid > .robot-overview-panel {
+    grid-column: span 2;
+}
+
+.robot-overview-panel {
+    :deep(.panel__body) {
+        display: flex;
+        flex-direction: column;
+        height: 0;
+        overflow: hidden;
+    }
+}
+
+.robot-state-card-list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-content: start;
+    gap: 8px;
+    min-height: 0;
     overflow-y: auto;
 }
 
-.robot-telemetry-item {
-    background: rgba(255, 255, 255, 0.04);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+.robot-state-card {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    gap: 5px;
+    width: 100%;
+    min-height: 82px;
+    padding: 9px 10px 8px;
+    appearance: none;
+    background: var(--surface-elevated-color, rgba(30, 41, 59, 0.84));
+    color: var(--text-color--secondary, #94a3b8);
+    border-color: var(--border-color, rgba(255, 255, 255, 0.08));
+    border: 1px solid var(--border-color, rgba(255, 255, 255, 0.08));
     border-radius: 8px;
-    padding: 12px;
+    text-align: left;
+    font: inherit;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition:
+        border-color 0.18s ease,
+        background 0.18s ease;
 
     &:hover {
-        background: rgba(59, 130, 246, 0.1);
-        border-color: #3b82f6;
+        background: var(--layout-menu-active-bg-color, rgba(203, 78, 255, 0.16));
+        border-color: var(--primary-color, #d946ef);
+
+        .robot-actions-cell {
+            opacity: 1;
+            pointer-events: auto;
+        }
+    }
+
+    &.is-stale {
+        border-left: 3px solid var(--warning-color);
     }
 }
 
-.robot-head {
+.robot-card-head {
     display: flex;
+    align-items: flex-start;
     justify-content: space-between;
-    align-items: center;
-    margin-bottom: 6px;
-
-    .robot-name { font-weight: 600; font-size: 14px; color: #fff; }
-}
-
-.robot-metrics, .robot-coord {
-    display: flex;
-    justify-content: space-between;
-    font-size: 12px;
-    color: #94a3b8;
-    margin-top: 4px;
-}
-
-.dashboard-center-panel {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-}
-
-.live-map-wrapper {
-    width: 100%;
-    height: 380px;
-    border-radius: 8px;
-    overflow: hidden;
-    background: #0f172a;
-}
-
-.live-map-svg {
-    width: 100%;
-    height: 100%;
-}
-
-.fused-mission-timeline {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 12px 16px;
-    background: rgba(255, 255, 255, 0.03);
-    border-radius: 8px;
-}
-
-.timeline-step {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    gap: 4px;
-
-    .step-num {
-        width: 28px;
-        height: 28px;
-        border-radius: 50%;
-        background: #334155;
-        color: #94a3b8;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: 700;
-        font-size: 14px;
-    }
-
-    .step-title { font-weight: 600; font-size: 13px; color: #cbd5e1; }
-    .step-desc { font-size: 11px; color: #64748b; }
-
-    &.is-done .step-num { background: #22c55e; color: #fff; }
-    &.is-active .step-num { background: #3b82f6; color: #fff; }
-    &.is-active .step-title { color: #3b82f6; }
-}
-
-.timeline-arrow {
-    color: #475569;
-    font-size: 18px;
-}
-
-.running-mission-list {
-    display: flex;
-    flex-direction: column;
     gap: 10px;
 }
 
-.running-mission-item {
+.robot-name-cell {
     display: flex;
     flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+
+    strong {
+        color: var(--text-color--primary, #f8fafc);
+        font-size: 12px;
+        line-height: 1.2;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    small {
+        color: var(--text-color--muted, #64748b);
+        font-size: 10px;
+    }
+}
+
+.battery-cell {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 38px;
+    align-items: end;
     gap: 8px;
-    padding: 12px 14px;
-    background: rgba(255, 255, 255, 0.04);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    margin-top: 4px;
+
+    strong {
+        color: var(--text-color--primary, #f8fafc);
+        font-size: 12px;
+        text-align: right;
+        line-height: 1;
+    }
+}
+
+.battery-track {
+    display: block;
+    height: 5px;
+    overflow: hidden;
+    border-radius: 999px;
+    background: var(--surface-color, rgba(15, 23, 42, 0.9));
+}
+
+.battery-fill {
+    display: block;
+    height: 100%;
+    border-radius: inherit;
+    background: linear-gradient(90deg, #15e0b7, #4ca5d7);
+}
+
+.robot-card-meta {
+    display: grid;
+    grid-template-columns: minmax(62px, 0.78fr) minmax(72px, 0.88fr) minmax(50px, 0.68fr);
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    line-height: 1.2;
+}
+
+.coord-cell {
+    color: var(--secondary-color);
+    font-size: 11px;
+    font-weight: 800;
+}
+
+.robot-actions-cell {
+    display: flex;
+    position: absolute;
+    right: 10px;
+    bottom: 8px;
+    justify-content: flex-end;
+    gap: 4px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.16s ease;
+}
+
+.robot-action-btn {
+    height: 22px;
+    padding: 0 6px;
+    border: 1px solid color-mix(in srgb, var(--primary-color, #d946ef) 42%, transparent);
+    border-radius: 5px;
+    background: transparent;
+    color: var(--text-color--primary, #f8fafc);
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1;
+    cursor: pointer;
+
+    &:hover {
+        background: color-mix(in srgb, var(--primary-color, #d946ef) 18%, transparent);
+    }
+}
+
+.dashboard-center-column {
+    display: grid;
+    grid-template-rows: minmax(0, 1.28fr) minmax(0, 0.72fr);
+    gap: 8px;
+    min-height: 0;
+}
+
+.waste-overview {
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr);
+    gap: 10px;
+    align-items: center;
+    height: 100%;
+    min-height: 230px;
+}
+
+.waste-summary-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+}
+
+.waste-summary-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 9px 10px;
     border-radius: 8px;
+    background: var(--surface-color, rgba(15, 23, 42, 0.9));
+
+    span {
+        color: var(--text-color--secondary, #94a3b8);
+        font-size: 11px;
+    }
+
+    strong {
+        color: var(--text-color--primary, #f8fafc);
+        font-size: 17px;
+        line-height: 1;
+    }
+}
+
+.center-chart-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    min-height: 0;
+}
+
+.running-mission-panel {
+    :deep(.panel__body) {
+        display: flex;
+        flex-direction: column;
+        height: 0;
+        overflow: hidden;
+    }
+}
+
+.running-mission-list,
+.safety-event-feed {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-height: 0;
+    overflow-y: auto;
+}
+
+.running-mission-item,
+.safety-event-item {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 9px 10px;
+    border: 1px solid var(--border-color, rgba(255, 255, 255, 0.08));
+    border-radius: 8px;
+    background: var(--surface-elevated-color, rgba(30, 41, 59, 0.84));
+}
+
+.running-mission-item {
+    min-height: 98px;
 }
 
 .mission-row {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 12px;
+    gap: 10px;
 }
 
 .mission-title-group {
@@ -604,7 +916,7 @@ const triggerEStop = async () => {
     min-width: 0;
 
     strong {
-        color: #ffffff;
+        color: var(--text-color--primary);
         font-size: 13px;
         white-space: nowrap;
         overflow: hidden;
@@ -612,13 +924,13 @@ const triggerEStop = async () => {
     }
 
     span {
-        color: #94a3b8;
+        color: var(--text-color--secondary);
         font-size: 12px;
     }
 }
 
 .mission-row--meta {
-    color: #94a3b8;
+    color: var(--text-color--secondary);
     font-size: 12px;
 }
 
@@ -626,38 +938,77 @@ const triggerEStop = async () => {
     position: relative;
     height: 6px;
     overflow: hidden;
-    background: rgba(15, 23, 42, 0.9);
+    background: var(--surface-color);
     border-radius: 999px;
 }
 
 .mission-progress-fill {
     position: absolute;
     inset: 0 auto 0 0;
-    background: linear-gradient(90deg, #38bdf8, #a855f7);
+    background: linear-gradient(90deg, #4ca5d7, #e76dff);
     border-radius: inherit;
 }
 
-.dashboard-right-panel {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
+.dashboard-bottom-grid {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 8px;
+    min-height: 0;
 }
 
-.safety-event-feed {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
+.event-feed-panel {
+    :deep(.panel__body) {
+        height: 0;
+        overflow: hidden;
+    }
+}
+
+.donut-dashboard-panel {
+    :deep(.panel__body) {
+        align-items: center;
+        justify-content: center;
+        padding-top: 2px;
+    }
+
+    :deep(.donut-status-chart.is-horizontal) {
+        flex: 0 0 auto;
+        gap: 18px;
+        min-width: 0;
+        justify-content: center;
+    }
+
+    :deep(.donut-status-chart__visual) {
+        flex: 0 0 158px !important;
+        width: 158px !important;
+        height: 158px !important;
+    }
+
+    :deep(.donut-status-chart__legend) {
+        flex: 0 0 96px;
+        min-width: 96px;
+    }
+
+    :deep(.donut-status-chart__legend li) {
+        display: grid;
+        grid-template-columns: 8px minmax(0, 1fr) 28px;
+        gap: 7px;
+        min-width: 0;
+    }
+
+    :deep(.donut-status-chart__legend li span:nth-child(2)) {
+        white-space: normal;
+        word-break: keep-all;
+    }
+
+    :deep(.donut-status-chart__legend strong) {
+        margin-left: 0;
+        text-align: right;
+    }
 }
 
 .safety-event-item {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    padding: 11px 12px;
-    background: rgba(255, 255, 255, 0.04);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    min-height: 82px;
     border-left-width: 3px;
-    border-radius: 8px;
 
     &.is-danger {
         border-left-color: var(--danger-color);
@@ -672,35 +1023,89 @@ const triggerEStop = async () => {
     }
 }
 
-.event-head {
+.event-head,
+.event-meta {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 10px;
+}
 
-    strong {
-        color: #ffffff;
-        font-size: 13px;
-    }
+.event-head strong {
+    color: var(--text-color--primary);
+    font-size: 13px;
 }
 
 .event-message {
-    color: #cbd5e1;
+    color: var(--text-color--secondary);
     font-size: 12px;
-    line-height: 1.4;
+    line-height: 1.25;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .event-meta {
-    display: flex;
-    justify-content: space-between;
-    gap: 10px;
-    color: #64748b;
+    color: var(--text-color--muted);
     font-size: 11px;
 }
 
-.emergency-toolbar {
+.equipment-error-chart {
+    width: 100%;
+    height: 100%;
+    min-height: 150px;
+}
+
+.robot-detail-body {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 16px;
+}
+
+.robot-detail-summary {
+    display: flex;
+    gap: 8px;
+}
+
+.robot-detail-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin: 0;
+
+    div {
+        padding: 12px;
+        border-radius: 8px;
+        background: var(--surface-color);
+    }
+
+    dt {
+        color: var(--text-color--secondary);
+        font-size: 12px;
+        margin-bottom: 6px;
+    }
+
+    dd {
+        margin: 0;
+        color: var(--text-color--primary);
+        font-size: 14px;
+        font-weight: 700;
+    }
+}
+
+@media (max-width: 1500px) {
+    .dashboard-page {
+        height: auto;
+        overflow: visible;
+    }
+
+    .dashboard-kpi-strip {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .dashboard-main-grid,
+    .dashboard-bottom-grid {
+        grid-template-columns: 1fr;
+    }
 }
 </style>

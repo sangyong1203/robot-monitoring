@@ -23,7 +23,7 @@ export const routes: RouteRecordRaw[] = [
                 path: 'dashboard',
                 name: 'dashboard',
                 component: () => import('@/pages/main/dashboard/DashboardPage.vue'),
-                meta: { screenId: 'IRCS_DB_01_P', title: '통합 관제 대시보드' },
+                meta: { screenId: 'IRCS_DB_01_P', title: '대시보드' },
             },
             {
                 path: 'admin/organizations',
