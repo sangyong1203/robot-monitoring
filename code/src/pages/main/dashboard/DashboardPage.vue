@@ -146,6 +146,28 @@
                         </div>
                     </div>
                 </Panel>
+
+                <Panel title="실행 중인 미션 목록" subtitle="현재 진행 중인 Mission/Task와 담당 로봇">
+                    <div class="running-mission-list">
+                        <div v-for="mission in runningMissions" :key="mission.id" class="running-mission-item">
+                            <div class="mission-row mission-row--top">
+                                <div class="mission-title-group">
+                                    <strong>{{ mission.name }}</strong>
+                                    <span>{{ mission.currentStep }}</span>
+                                </div>
+                                <StatusBadge :label="mission.statusLabel" :variant="missionStatusVariant(mission.status)" />
+                            </div>
+                            <div class="mission-progress-track">
+                                <span class="mission-progress-fill" :style="{ width: `${mission.progress}%` }"></span>
+                            </div>
+                            <div class="mission-row mission-row--meta">
+                                <span>담당 {{ mission.robotName }}</span>
+                                <span>진행률 {{ mission.progress }}%</span>
+                                <span>ETA {{ mission.eta }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </Panel>
             </div>
 
             <!-- Right Panel: Charts & Emergency Action -->
@@ -167,6 +189,22 @@
                         name="가동률"
                         unit="%"
                     />
+                </Panel>
+
+                <Panel title="안전 이벤트/알람 피드" subtitle="최근 안전 이벤트 및 조치 상태">
+                    <div class="safety-event-feed">
+                        <div v-for="event in safetyEvents" :key="event.id" class="safety-event-item" :class="`is-${event.severity}`">
+                            <div class="event-head">
+                                <strong>{{ event.title }}</strong>
+                                <StatusBadge :label="event.statusLabel" :variant="eventStatusVariant(event.severity)" />
+                            </div>
+                            <div class="event-message">{{ event.message }}</div>
+                            <div class="event-meta">
+                                <span>{{ event.area }}</span>
+                                <time>{{ event.occurredAt }}</time>
+                            </div>
+                        </div>
+                    </div>
                 </Panel>
 
                 <Panel title="긴급 비상 조치 툴바">
@@ -211,6 +249,120 @@ onBeforeUnmount(() => {
 })
 
 const indoorRobots = computed(() => robots.value.filter(r => r.mapId === 1))
+
+type RunningMissionStatus = 'RUNNING' | 'WAITING' | 'PAUSED'
+
+type RunningMissionItem = {
+    id: number
+    name: string
+    currentStep: string
+    robotName: string
+    progress: number
+    eta: string
+    status: RunningMissionStatus
+    statusLabel: string
+}
+
+type SafetyEventSeverity = 'danger' | 'warning' | 'info'
+
+type SafetyEventItem = {
+    id: number
+    title: string
+    message: string
+    area: string
+    occurredAt: string
+    severity: SafetyEventSeverity
+    statusLabel: string
+}
+
+const runningMissions = ref<RunningMissionItem[]>([
+    {
+        id: 1,
+        name: '[융합] 폐기물 이송 및 처분용기 자동 장입',
+        currentStep: 'AMR 1호기 처분용기 앞 이동 중',
+        robotName: '저상형 AMR 1호기',
+        progress: 65,
+        eta: '12분',
+        status: 'RUNNING',
+        statusLabel: '실행 중',
+    },
+    {
+        id: 2,
+        name: '외곽 험지 침입 감시 순찰',
+        currentStep: '웨이포인트 #3 열화상 스캔',
+        robotName: '4족 보행 로봇 1호기 (Spot)',
+        progress: 42,
+        eta: '18분',
+        status: 'RUNNING',
+        statusLabel: '실행 중',
+    },
+    {
+        id: 3,
+        name: '장입구역 다음 팰릿 교대 준비',
+        currentStep: '무인지게차 상차 완료 대기',
+        robotName: 'AMR 2호기',
+        progress: 20,
+        eta: '대기',
+        status: 'WAITING',
+        statusLabel: '대기',
+    },
+])
+
+const safetyEvents = ref<SafetyEventItem[]>([
+    {
+        id: 1,
+        title: '통신 지연 감지',
+        message: '편심 자율주행 로봇 1호기 telemetry 지연 3.2초',
+        area: 'ZONE C 시설 험지',
+        occurredAt: '14:22:18',
+        severity: 'warning',
+        statusLabel: '확인 필요',
+    },
+    {
+        id: 2,
+        title: '저전압 경고',
+        message: '감시 로봇 배터리 20% 임계치 접근',
+        area: '외곽 순찰 구역',
+        occurredAt: '14:18:04',
+        severity: 'warning',
+        statusLabel: '조치 중',
+    },
+    {
+        id: 3,
+        title: 'Safe Stop 테스트 완료',
+        message: '정기 안전 점검용 Safe Stop 응답 정상',
+        area: '통합 관제',
+        occurredAt: '13:55:41',
+        severity: 'info',
+        statusLabel: '완료',
+    },
+])
+
+const missionStatusVariant = (status: RunningMissionStatus) => {
+    switch (status) {
+        case 'RUNNING':
+            return 'progress'
+        case 'WAITING':
+            return 'info'
+        case 'PAUSED':
+            return 'warning'
+        default:
+            return 'muted'
+    }
+}
+
+const eventStatusVariant = (severity: SafetyEventSeverity) => {
+    switch (severity) {
+        case 'danger':
+            return 'danger'
+        case 'warning':
+            return 'warning'
+        case 'info':
+            return 'info'
+        default:
+            return 'muted'
+    }
+}
 
 const trendData = ref([
     { measured_at: '09:00', metric_value: 80 },
@@ -422,10 +574,128 @@ const triggerEStop = async () => {
     font-size: 18px;
 }
 
+.running-mission-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.running-mission-item {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 12px 14px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 8px;
+}
+
+.mission-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.mission-title-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+
+    strong {
+        color: #ffffff;
+        font-size: 13px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    span {
+        color: #94a3b8;
+        font-size: 12px;
+    }
+}
+
+.mission-row--meta {
+    color: #94a3b8;
+    font-size: 12px;
+}
+
+.mission-progress-track {
+    position: relative;
+    height: 6px;
+    overflow: hidden;
+    background: rgba(15, 23, 42, 0.9);
+    border-radius: 999px;
+}
+
+.mission-progress-fill {
+    position: absolute;
+    inset: 0 auto 0 0;
+    background: linear-gradient(90deg, #38bdf8, #a855f7);
+    border-radius: inherit;
+}
+
 .dashboard-right-panel {
     display: flex;
     flex-direction: column;
     gap: 16px;
+}
+
+.safety-event-feed {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.safety-event-item {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 11px 12px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-left-width: 3px;
+    border-radius: 8px;
+
+    &.is-danger {
+        border-left-color: var(--danger-color);
+    }
+
+    &.is-warning {
+        border-left-color: var(--warning-color);
+    }
+
+    &.is-info {
+        border-left-color: var(--info-color);
+    }
+}
+
+.event-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+
+    strong {
+        color: #ffffff;
+        font-size: 13px;
+    }
+}
+
+.event-message {
+    color: #cbd5e1;
+    font-size: 12px;
+    line-height: 1.4;
+}
+
+.event-meta {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    color: #64748b;
+    font-size: 11px;
 }
 
 .emergency-toolbar {
