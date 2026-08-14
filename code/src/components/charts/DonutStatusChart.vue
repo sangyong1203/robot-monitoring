@@ -89,7 +89,7 @@ const drawChart = () => {
         series: [
             {
                 type: 'pie',
-                radius: ['66%', '84%'],
+                radius: ['76%', '95%'],
                 center: ['50%', '50%'],
                 avoidLabelOverlap: true,
                 label: { show: false },
@@ -201,7 +201,7 @@ onBeforeUnmount(() => {
 }
 
 .donut-status-chart.is-horizontal .donut-status-chart__legend {
-    flex: 0 0 108px;
+    flex: 0 0 100px;
     gap: 10px;
 }
 
@@ -211,17 +211,17 @@ onBeforeUnmount(() => {
     gap: 8px;
     color: var(--text-color--secondary);
     font-size: 13px;
-    line-height: 16px;
+    line-height: 18px;
 }
 
 .donut-status-chart.is-horizontal .donut-status-chart__legend li {
-    min-width: 108px;
+    min-width: 100px;
 }
 
 .donut-status-chart__legend strong {
     margin-left: auto;
     color: #ffffff;
-    font-size: 13px;
+    font-size: 14px;
 }
 
 .donut-status-chart__dot {
