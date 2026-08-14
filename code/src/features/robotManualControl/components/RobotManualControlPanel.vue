@@ -1,0 +1,1610 @@
+﻿<template>
+    <!-- 한 화면에 통합된 2D 지도 + (감시 로봇 시 카메라 영상) + 지정 제어 + 원격 조종 대시보드 Flex 레이아웃 -->
+    <div class="unified-control-flex" :class="{ 'has-camera-layout': hasCamera }">
+        <!-- [좌측] 2D 지도 + (감시용 로봇 시) 실시간 카메라 영상 패널 스택 -->
+        <div class="left-map-stack">
+            <!-- 2. [Panel 2] 좌측 2D 인터랙티브 실시간 지도 패널 (Wheel Zoom & Drag Pan 지원) -->
+            <Panel :title="`지도: ${currentMap?.name || '관제 2D 지도'}`" class="mini-map-panel">
+                <template #headerRight>
+                    <span v-if="robot" class="location-chip">
+                        <MapPin :size="14" class="loc-icon" />
+                        <span class="coord-item"
+                            >X:<strong class="coord-val">{{ robot.x.toFixed(2) }}</strong
+                            >m</span
+                        >
+                        <span class="coord-sep">,</span>
+                        <span class="coord-item"
+                            >Y:<strong class="coord-val">{{ robot.y.toFixed(2) }}</strong
+                            >m</span
+                        >
+                    </span>
+                </template>
+
+                <div
+                    class="map-interactive-container"
+                    @wheel.prevent="handleWheel"
+                    @mousedown="handleMouseDown"
+                    @mousemove="handleMouseMove"
+                    @mouseup="handleMouseUp"
+                    @mouseleave="handleMouseUp"
+                    @click="handleMapClick"
+                >
+                    <svg class="dialog-map-svg" :viewBox="mapViewBox" role="img">
+                        <defs>
+                            <pattern id="mini-map-grid" width="40" height="40" patternUnits="userSpaceOnUse">
+                                <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#334155" stroke-width="1" />
+                            </pattern>
+                        </defs>
+
+                        <!-- Main Map Layer Group with Zoom & Pan transform -->
+                        <g
+                            class="map-transformed-group"
+                            :transform="`translate(${mapPanX}, ${mapPanY}) scale(${mapZoomScale})`"
+                        >
+                            <!-- Background & Map Image (Unstretched Aspect Ratio) -->
+                            <rect x="-1000" y="-1000" width="4000" height="4000" fill="#060911" />
+                            <image
+                                v-if="mapImageSource && !mapImageFailed"
+                                :href="mapImageSource"
+                                x="0"
+                                y="0"
+                                :width="mapWidth"
+                                :height="mapHeight"
+                                preserveAspectRatio="xMidYMid meet"
+                                opacity="0.95"
+                                @error="mapImageFailed = true"
+                            />
+                            <rect
+                                x="-1000"
+                                y="-1000"
+                                width="4000"
+                                height="4000"
+                                fill="url(#mini-map-grid)"
+                                opacity="0.5"
+                            />
+
+                            <!-- POI Markers -->
+                            <g
+                                v-for="poi in filteredDestinations"
+                                :key="`poi-${poi.id}`"
+                                class="poi-marker"
+                                :transform="poiTransform(poi)"
+                                @click.stop="selectPoiDestination(poi)"
+                            >
+                                <circle r="6" fill="#38bdf8" stroke="#ffffff" stroke-width="1.5" />
+                                <text x="10" y="4" class="poi-label">{{ poi.name }}</text>
+                            </g>
+
+                            <!-- Current Robot Marker (Pulsing Aura & Heading Arrow) -->
+                            <g v-if="robot" class="robot-marker" :transform="robotMarkerTransform">
+                                <circle class="pulse-aura" r="22" stroke="#4ade80" />
+                                <circle r="12" fill="#22c55e" stroke="#ffffff" stroke-width="2" />
+                                <path
+                                    d="M 0 -8 L 4 3 L 0 0 L -4 3 Z"
+                                    fill="#ffffff"
+                                    :transform="`rotate(${robot.heading || 0})`"
+                                />
+                                <text x="18" y="4" class="robot-map-name">{{ robot.name }} (현재)</text>
+                            </g>
+
+                            <!-- Target Destination Click Marker (Crosshair & Offset Text) -->
+                            <g
+                                v-if="executionUnit === 'DESTINATION'"
+                                class="target-click-marker"
+                                :transform="targetMarkerTransform"
+                            >
+                                <circle class="target-ring" r="16" stroke="#ef4444" stroke-width="2" fill="none" />
+                                <line x1="-12" y1="0" x2="12" y2="0" stroke="#ef4444" stroke-width="2" />
+                                <line x1="0" y1="-12" x2="0" y2="12" stroke="#ef4444" stroke-width="2" />
+                                <text x="22" y="4" class="target-coord-text">
+                                    목표: ({{ commandForm.x.toFixed(2) }}, {{ commandForm.y.toFixed(2) }})
+                                </text>
+                            </g>
+                        </g>
+                    </svg>
+
+                    <div class="map-zoom-controls" aria-label="지도 확대/축소 제어">
+                        <button
+                            type="button"
+                            class="map-zoom-btn"
+                            title="지도 확대"
+                            @mousedown.stop
+                            @click.stop="zoomMapIn"
+                        >
+                            +
+                        </button>
+                        <span class="map-zoom-value">{{ (mapZoomScale * 100).toFixed(0) }}%</span>
+                        <button
+                            type="button"
+                            class="map-zoom-btn"
+                            title="지도 축소"
+                            @mousedown.stop
+                            @click.stop="zoomMapOut"
+                        >
+                            -
+                        </button>
+                        <button
+                            type="button"
+                            class="map-zoom-btn"
+                            title="Zoom 초기화"
+                            @mousedown.stop
+                            @click.stop="resetMapZoom"
+                        >
+                            <RotateCcw :size="13" />
+                        </button>
+                    </div>
+                </div>
+                <div class="map-hint-footer">
+                    <strong>마우스 휠 스크롤</strong>로 확대/축소 및 <strong>드래그</strong> 이동이 가능하며, 지도를
+                    클릭하면 해당 위치로 목표 좌표가 설정됩니다.
+                </div>
+            </Panel>
+
+            <!-- 5. [Panel 5] (감시용 로봇 전용) 지도 아래 실시간 카메라 영상 패널 (원격 조종 패널과 동일 높이 260px) -->
+            <Panel
+                v-if="hasCamera"
+                title="실시간 카메라 영상"
+                subtitle="HD-PTZ 360° 광학 영상 피드"
+                subtitle-position="right"
+                class="camera-feed-panel"
+            >
+                <template #headerRight>
+                    <span class="live-status-badge"> <span class="live-dot"></span> LIVE 1080p </span>
+                </template>
+
+                <div class="camera-stream-container">
+                    <div class="camera-viewport" :class="{ 'is-thermal-mode': isThermal }">
+                        <div class="camera-scanlines"></div>
+                        <div class="hud-overlay">
+                            <div class="hud-top-row">
+                                <span class="cam-id">CAM-SURV-01 [HD-PTZ]</span>
+                                <span class="cam-fps">60 FPS</span>
+                                <span class="rec-dot">● REC</span>
+                                <span class="cam-time">{{ currentTimeStr }}</span>
+                            </div>
+                            <div class="hud-center-crosshair">
+                                <div class="ch-line-h"></div>
+                                <div class="ch-line-v"></div>
+                                <div class="ch-box"></div>
+                            </div>
+                            <div class="hud-bottom-row">
+                                <span class="hud-tag">PTZ: ACTIVE</span>
+                                <button
+                                    type="button"
+                                    class="cam-tool-btn"
+                                    title="야간 열화상 모드 전환"
+                                    @click="isThermal = !isThermal"
+                                >
+                                    <Eye :size="13" /> {{ isThermal ? '일반 모드' : '열화상 모드' }}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </Panel>
+        </div>
+
+        <!-- [우측] 상하 분할 통합 제어 패널 스택 -->
+        <div class="right-control-panel-stack">
+            <!-- 3. [Panel 3] 우측 상단 지정 명령 및 미션/Task 제어 패널 -->
+            <Panel title="지정 명령 및 미션/Task 제어" class="top-unit-panel">
+                <template #headerRight>
+                    <button type="button" class="execute-btn" :loading="saving" @click="handleCommandSubmit">
+                        명령 집행
+                    </button>
+                    <button type="button" class="single-estop-trigger-btn" @click="triggerEStopClick">
+                        E-STOP (비상정지)
+                    </button>
+                </template>
+
+                <el-form label-position="top" class="custom-control-form">
+                    <!-- 4가지 제어 실행 단위 선택 버튼 -->
+                    <el-form-item label="수동 제어 실행 단위 선택" required>
+                        <RadioToggleGroup
+                            v-model="executionUnit"
+                            :options="[
+                                { label: '목적지 (POI)', value: 'DESTINATION' },
+                                { label: 'Activity', value: 'ACTIVITY' },
+                                { label: 'Task', value: 'TASK' },
+                                { label: 'Mission', value: 'MISSION' },
+                            ]"
+                        />
+                    </el-form-item>
+
+                    <!-- 단위별 폼 콘텐츠 영역 (고정 최소 높이로 상하 이동 현상 방지) -->
+                    <div class="unit-form-content-area">
+                        <!-- 1. DESTINATION (목적지 POI & X/Y 좌표) -->
+                        <template v-if="executionUnit === 'DESTINATION'">
+                            <el-form-item label="등록 목적지 (POI) 선택">
+                                <el-select
+                                    v-model="selectedDestinationId"
+                                    placeholder="POI 선택 시 좌표 자동 입력"
+                                    style="width: 100%"
+                                    clearable
+                                    @change="handleDestinationChange"
+                                >
+                                    <el-option
+                                        v-for="dest in filteredDestinations"
+                                        :key="dest.id"
+                                        :label="`[${dest.type}] ${dest.name} (${dest.mapName})`"
+                                        :value="dest.id"
+                                    />
+                                </el-select>
+                            </el-form-item>
+                            <div class="flex-2col">
+                                <el-form-item label="목적지 X 좌표 (m)" required>
+                                    <el-input-number v-model="commandForm.x" :precision="2" style="width: 100%" />
+                                </el-form-item>
+                                <el-form-item label="목적지 Y 좌표 (m)" required>
+                                    <el-input-number v-model="commandForm.y" :precision="2" style="width: 100%" />
+                                </el-form-item>
+                            </div>
+                        </template>
+
+                        <!-- 2. ACTIVITY (단위 작업 선택) -->
+                        <el-form-item
+                            v-else-if="executionUnit === 'ACTIVITY'"
+                            label="실행할 Activity 선택"
+                            required
+                        >
+                            <el-select v-model="selectedActivityId" placeholder="Activity 선택" style="width: 100%">
+                                <el-option
+                                    v-for="act in activities"
+                                    :key="act.id"
+                                    :label="`[${act.code}] ${act.name} (${act.activityType})`"
+                                    :value="act.id"
+                                />
+                            </el-select>
+                        </el-form-item>
+
+                        <!-- 3. TASK (작업 시퀀스 선택) -->
+                        <el-form-item v-else-if="executionUnit === 'TASK'" label="실행할 Task 선택" required>
+                            <el-select v-model="selectedTaskId" placeholder="Task 선택" style="width: 100%">
+                                <el-option
+                                    v-for="task in tasks"
+                                    :key="task.id"
+                                    :label="`[${task.code}] ${task.name} (${task.robotModelName})`"
+                                    :value="task.id"
+                                />
+                            </el-select>
+                        </el-form-item>
+
+                        <!-- 4. MISSION (복합 융합 미션 선택) -->
+                        <el-form-item v-else-if="executionUnit === 'MISSION'" label="실행할 Mission 선택" required>
+                            <el-select
+                                v-model="commandForm.missionId"
+                                placeholder="Mission 선택"
+                                style="width: 100%"
+                            >
+                                <el-option
+                                    v-for="mis in missions"
+                                    :key="mis.id"
+                                    :label="`[${mis.code}] ${mis.name}`"
+                                    :value="mis.id"
+                                />
+                            </el-select>
+                        </el-form-item>
+                    </div>
+                </el-form>
+            </Panel>
+
+            <!-- 4. [Panel 4] 우측 하단 원격 미세 조종 (Teleop Jog Control) 패널 -->
+            <Panel
+                title="원격 미세 조종 (Teleop Jog)"
+                subtitle="실시간 위치 관제 및 모션 제어"
+                subtitle-position="right"
+                class="teleop-panel"
+            >
+                <div class="teleop-inline-layout">
+                    <!-- D-Pad 4방향 조종 버튼 패널 -->
+                    <div class="dpad-compact-flex">
+                        <div class="dpad-row">
+                            <div class="jog-placeholder"></div>
+                            <button
+                                type="button"
+                                class="jog-btn jog-up"
+                                title="전진"
+                                @click="sendJogCommand('FORWARD')"
+                            >
+                                ▲
+                            </button>
+                            <div class="jog-placeholder"></div>
+                        </div>
+                        <div class="dpad-row">
+                            <button
+                                type="button"
+                                class="jog-btn jog-left"
+                                title="좌회전"
+                                @click="sendJogCommand('TURN_LEFT')"
+                            >
+                                ◀
+                            </button>
+                            <button
+                                type="button"
+                                class="jog-btn jog-stop"
+                                title="긴급 정지"
+                                @click="sendJogCommand('STOP')"
+                            >
+                                ■
+                            </button>
+                            <button
+                                type="button"
+                                class="jog-btn jog-right"
+                                title="우회전"
+                                @click="sendJogCommand('TURN_RIGHT')"
+                            >
+                                ▶
+                            </button>
+                        </div>
+                        <div class="dpad-row">
+                            <div class="jog-placeholder"></div>
+                            <button
+                                type="button"
+                                class="jog-btn jog-down"
+                                title="후진"
+                                @click="sendJogCommand('BACKWARD')"
+                            >
+                                ▼
+                            </button>
+                            <div class="jog-placeholder"></div>
+                        </div>
+                    </div>
+
+                    <!-- 우측: 원본 기본 슬라이더 및 시원하게 확장된 터미널 로그 스트림 -->
+                    <div class="teleop-compact-controls">
+                        <div class="speed-slider-row">
+                            <span class="speed-lbl"
+                                >조종 속도: <strong class="speed-val">{{ jogSpeed.toFixed(1) }}</strong> m/s</span
+                            >
+                            <el-slider v-model="jogSpeed" :min="0.1" :max="2.0" :step="0.1" style="flex: 1" />
+                        </div>
+
+                        <!-- 높이가 확장된 터미널 콘솔 로그 뷰어 -->
+                        <div class="jog-terminal-box">
+                            <div class="terminal-header">
+                                <span class="term-left">
+                                    <span class="term-dot green"></span>
+                                    <span class="term-prompt">$</span>
+                                    <span class="term-title">teleop.log -- stream</span>
+                                </span>
+                                <button type="button" class="clear-logs-btn" @click="jogLogs = []">초기화</button>
+                            </div>
+                            <div class="terminal-body" ref="jogLogContainer">
+                                <div v-if="jogLogs.length === 0" class="log-empty">
+                                    > Awaiting Teleop Jog commands... Click (▲ ◀ ■ ▶ ▼)
+                                </div>
+                                <div
+                                    v-for="log in jogLogs"
+                                    :key="log.id"
+                                    class="log-line"
+                                    :class="{ 'is-stop': log.action === 'STOP' }"
+                                >
+                                    <span class="log-prompt">></span>
+                                    <span class="log-time">[{{ log.time }}]</span>
+                                    <span class="log-action">{{ log.actionName }}</span>
+                                    <span class="log-speed">{{ log.speed.toFixed(1) }}m/s</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </Panel>
+        </div>
+    </div>
+
+    <RobotManualControlConfirmDialog
+        v-model:visible="passwordConfirmVisible"
+        v-model:password="confirmPassword"
+        :is-estop="isEstopConfirm"
+        :loading="saving"
+        @confirm="confirmAndSubmit"
+    />
+</template>
+
+<script setup lang="ts">
+import { ref, reactive, computed, watch, onMounted, onBeforeUnmount, nextTick } from 'vue'
+import { ElMessage } from 'element-plus'
+import Panel from '@/components/Panel.vue'
+import RadioToggleGroup from '@/components/RadioToggleGroup.vue'
+import { RotateCcw, MapPin, Eye } from '@lucide/vue'
+import { simulationService } from '@/services/simulation.service'
+import { fetchMockDestinations } from '@/pages/main/admin/destinations/service/destinations.mock'
+import type { DestinationItem } from '@/pages/main/admin/destinations/service/destinations.types'
+import { getActivities, getTasks, getMissions } from '@/pages/main/admin/missions/service/missionManagement.api'
+import type { ActivityItem, TaskItem, MissionItem } from '@/pages/main/admin/missions/service/missionManagement.types'
+import { fetchMockMaps } from '@/pages/main/admin/maps/service/maps.mock'
+import type { MapItem } from '@/pages/main/admin/maps/service/maps.types'
+import { useAuthenticatedMapImage } from '@/composables/useAuthenticatedMapImage'
+import { worldToPixel, pixelToWorld } from '@/utils/mapCoordinates'
+import RobotManualControlConfirmDialog from './RobotManualControlConfirmDialog.vue'
+import type { JogLogItem, RobotManualControlRobot, StandardControlExecutionUnit } from '../service/robotManualControl.types'
+
+const props = defineProps<{
+    robot: RobotManualControlRobot | null
+}>()
+
+let timeIntervalId: number | undefined
+
+const saving = ref(false)
+const executionUnit = ref<StandardControlExecutionUnit>('DESTINATION')
+
+const destinations = ref<DestinationItem[]>([])
+const maps = ref<MapItem[]>([])
+const activities = ref<ActivityItem[]>([])
+const tasks = ref<TaskItem[]>([])
+const missions = ref<MissionItem[]>([])
+
+const selectedDestinationId = ref<number | null>(null)
+const selectedActivityId = ref<number | null>(null)
+const selectedTaskId = ref<number | null>(null)
+
+const passwordConfirmVisible = ref(false)
+const isEstopConfirm = ref(false)
+const confirmPassword = ref('')
+
+const jogSpeed = ref(0.5)
+const jogLogs = ref<JogLogItem[]>([])
+const jogLogContainer = ref<HTMLElement | null>(null)
+
+// Camera Feed State (Surveillance Robot Only)
+const isThermal = ref(false)
+const currentTimeStr = ref('')
+
+const hasCamera = computed(() => {
+    if (!props.robot) return false
+    return props.robot.robotType === 'SURVEILLANCE'
+})
+
+const updateTime = () => {
+    const now = new Date()
+    currentTimeStr.value = now.toLocaleTimeString('ko-KR', { hour12: false })
+}
+
+// Map Zoom & Drag-Pan state
+const mapZoomScale = ref(1.0)
+const mapPanX = ref(0)
+const mapPanY = ref(0)
+const isDraggingMap = ref(false)
+const dragStart = ref({ x: 0, y: 0 })
+const hasDragged = ref(false)
+
+const mapImageFailed = ref(false)
+
+const commandForm = reactive({
+    x: 15.0,
+    y: 10.0,
+    siteX: undefined as number | undefined,
+    siteY: undefined as number | undefined,
+    missionId: 1,
+})
+
+const currentMap = computed(() => {
+    if (!props.robot) return maps.value[0] ?? null
+    return maps.value.find(m => m.id === props.robot?.mapId) ?? maps.value[0] ?? null
+})
+
+const mapWidth = computed(() => currentMap.value?.width || 1400)
+const mapHeight = computed(() => currentMap.value?.height || 800)
+const mapImageUrl = computed(() => currentMap.value?.imageUrl || '')
+const { imageSource: mapImageSource } = useAuthenticatedMapImage(mapImageUrl)
+
+const mapViewBox = computed(() => `0 0 ${mapWidth.value} ${mapHeight.value}`)
+
+const filteredDestinations = computed(() => {
+    if (!props.robot) return destinations.value
+    return destinations.value.filter(d => {
+        if (!d.targetRobotType || d.targetRobotType === 'ALL') return true
+        return d.targetRobotType === props.robot?.robotType
+    })
+})
+
+const loadData = async () => {
+    destinations.value = await fetchMockDestinations()
+    maps.value = await fetchMockMaps()
+    const [actRes, taskRes, misRes] = await Promise.all([getActivities(), getTasks(), getMissions()])
+    activities.value = actRes.data ?? []
+    tasks.value = taskRes.data ?? []
+    missions.value = misRes.data ?? []
+
+    if (activities.value.length > 0) selectedActivityId.value = activities.value[0].id
+    if (tasks.value.length > 0) selectedTaskId.value = tasks.value[0].id
+    if (missions.value.length > 0) commandForm.missionId = missions.value[0].id
+}
+
+onMounted(() => {
+    void loadData()
+    updateTime()
+    timeIntervalId = window.setInterval(updateTime, 1000)
+})
+
+onBeforeUnmount(() => {
+    if (timeIntervalId !== undefined) {
+        window.clearInterval(timeIntervalId)
+    }
+})
+
+watch(
+    () => props.robot,
+    robot => {
+        if (robot) {
+            commandForm.x = Number(robot.x.toFixed(2))
+            commandForm.y = Number(robot.y.toFixed(2))
+            commandForm.siteX = robot.siteX
+            commandForm.siteY = robot.siteY
+        }
+    },
+    { immediate: true },
+)
+
+// Map Zoom Reset
+const resetMapZoom = () => {
+    mapZoomScale.value = 1.0
+    mapPanX.value = 0
+    mapPanY.value = 0
+    ElMessage.success('지도 뷰어 (Zoom & Pan)가 초기화되었습니다.')
+}
+
+const zoomMapIn = () => {
+    mapZoomScale.value = Math.min(mapZoomScale.value + 0.1, 6.0)
+}
+
+const zoomMapOut = () => {
+    mapZoomScale.value = Math.max(mapZoomScale.value - 0.1, 0.5)
+}
+
+// Wheel Scroll Zoom Centered at Mouse Cursor
+const handleWheel = (e: WheelEvent) => {
+    const zoomFactor = e.deltaY < 0 ? 1.15 : 0.85
+    const newScale = Math.min(Math.max(0.5, mapZoomScale.value * zoomFactor), 6.0)
+
+    const svg = (e.currentTarget as HTMLElement).querySelector('svg.dialog-map-svg') as SVGSVGElement | null
+    const targetGroup = (e.currentTarget as HTMLElement).querySelector('g.map-transformed-group') as SVGGElement | null
+    if (!svg || !targetGroup) return
+
+    const pt = svg.createSVGPoint()
+    pt.x = e.clientX
+    pt.y = e.clientY
+    const groupCTM = targetGroup.getScreenCTM()
+    if (!groupCTM) return
+
+    const cursor = pt.matrixTransform(groupCTM.inverse())
+
+    const scaleRatio = newScale / mapZoomScale.value
+    mapPanX.value = cursor.x - scaleRatio * (cursor.x - mapPanX.value)
+    mapPanY.value = cursor.y - scaleRatio * (cursor.y - mapPanY.value)
+    mapZoomScale.value = newScale
+}
+
+// Mouse Drag to Pan Map
+const handleMouseDown = (e: MouseEvent) => {
+    if (e.button !== 0) return
+    isDraggingMap.value = true
+    hasDragged.value = false
+    dragStart.value = { x: e.clientX, y: e.clientY }
+}
+
+const handleMouseMove = (e: MouseEvent) => {
+    if (!isDraggingMap.value) return
+    const dx = e.clientX - dragStart.value.x
+    const dy = e.clientY - dragStart.value.y
+
+    if (Math.abs(dx) > 3 || Math.abs(dy) > 3) {
+        hasDragged.value = true
+    }
+
+    const svg = (e.currentTarget as HTMLElement).querySelector('svg.dialog-map-svg') as SVGSVGElement | null
+    if (!svg) return
+    const rect = svg.getBoundingClientRect()
+    const scaleFactorX = mapWidth.value / rect.width
+
+    mapPanX.value += (dx * scaleFactorX) / mapZoomScale.value
+    mapPanY.value += (dy * scaleFactorX) / mapZoomScale.value
+
+    dragStart.value = { x: e.clientX, y: e.clientY }
+}
+
+const handleMouseUp = () => {
+    isDraggingMap.value = false
+}
+
+// Map Click with Inner Group CTM Inverse (Silent, 100% Precision at ANY Zoom level & Pan position)
+const handleMapClick = (e: MouseEvent) => {
+    if (hasDragged.value) {
+        hasDragged.value = false
+        return
+    }
+    if (executionUnit.value !== 'DESTINATION') return
+    const targetGroup = (e.currentTarget as HTMLElement).querySelector('g.map-transformed-group') as SVGGElement | null
+    const svg = (e.currentTarget as HTMLElement).querySelector('svg.dialog-map-svg') as SVGSVGElement | null
+    if (!targetGroup || !svg || !currentMap.value) return
+
+    const pt = svg.createSVGPoint()
+    pt.x = e.clientX
+    pt.y = e.clientY
+    const groupCTM = targetGroup.getScreenCTM()
+    if (!groupCTM) return
+
+    const cursorPoint = pt.matrixTransform(groupCTM.inverse())
+    const clickPixelX = cursorPoint.x
+    const clickPixelY = cursorPoint.y
+
+    const metadata = {
+        width: currentMap.value.width,
+        height: currentMap.value.height,
+        resolution: currentMap.value.resolution || 0.05,
+        origin_x: currentMap.value.originX ?? currentMap.value.origin_x ?? 0,
+        origin_y: currentMap.value.originY ?? currentMap.value.origin_y ?? 0,
+    }
+
+    const worldPoint = pixelToWorld({ pixel_x: clickPixelX, pixel_y: clickPixelY }, metadata)
+    commandForm.x = Number(worldPoint.x.toFixed(2))
+    commandForm.y = Number(worldPoint.y.toFixed(2))
+    selectedDestinationId.value = null
+}
+
+const robotMarkerTransform = computed(() => {
+    if (!props.robot || !currentMap.value) return 'translate(0, 0)'
+    const metadata = {
+        width: currentMap.value.width,
+        height: currentMap.value.height,
+        resolution: currentMap.value.resolution || 0.05,
+        origin_x: currentMap.value.originX ?? currentMap.value.origin_x ?? 0,
+        origin_y: currentMap.value.originY ?? currentMap.value.origin_y ?? 0,
+    }
+    const pixel = worldToPixel({ x: props.robot.x, y: props.robot.y }, metadata)
+    return `translate(${pixel.pixel_x}, ${pixel.pixel_y})`
+})
+
+const targetMarkerTransform = computed(() => {
+    if (!currentMap.value) return 'translate(0, 0)'
+    const metadata = {
+        width: currentMap.value.width,
+        height: currentMap.value.height,
+        resolution: currentMap.value.resolution || 0.05,
+        origin_x: currentMap.value.originX ?? currentMap.value.origin_x ?? 0,
+        origin_y: currentMap.value.originY ?? currentMap.value.origin_y ?? 0,
+    }
+    const pixel = worldToPixel({ x: commandForm.x, y: commandForm.y }, metadata)
+    return `translate(${pixel.pixel_x}, ${pixel.pixel_y})`
+})
+
+const poiTransform = (poi: DestinationItem) => {
+    if (!currentMap.value) return 'translate(0, 0)'
+    const metadata = {
+        width: currentMap.value.width,
+        height: currentMap.value.height,
+        resolution: currentMap.value.resolution || 0.05,
+        origin_x: currentMap.value.originX ?? currentMap.value.origin_x ?? 0,
+        origin_y: currentMap.value.originY ?? currentMap.value.origin_y ?? 0,
+    }
+    const pixel = worldToPixel({ x: poi.x, y: poi.y }, metadata)
+    return `translate(${pixel.pixel_x}, ${pixel.pixel_y})`
+}
+
+const selectPoiDestination = (poi: DestinationItem) => {
+    selectedDestinationId.value = poi.id
+    commandForm.x = poi.x
+    commandForm.y = poi.y
+    commandForm.siteX = poi.siteX
+    commandForm.siteY = poi.siteY
+    ElMessage.info(`목적지 '${poi.name}' 선택 완료`)
+}
+
+const handleDestinationChange = (destId: number | null) => {
+    if (!destId) return
+    const target = destinations.value.find(d => d.id === destId)
+    if (target) {
+        selectPoiDestination(target)
+    }
+}
+
+const getActionName = (action: string) => {
+    switch (action) {
+        case 'FORWARD':
+            return '전진 (FORWARD)'
+        case 'BACKWARD':
+            return '후진 (BACKWARD)'
+        case 'TURN_LEFT':
+            return '좌회전 (TURN_LEFT)'
+        case 'TURN_RIGHT':
+            return '우회전 (TURN_RIGHT)'
+        case 'STOP':
+            return '긴급 정지 (STOP)'
+        default:
+            return action
+    }
+}
+
+const sendJogCommand = (action: string) => {
+    if (!props.robot) return
+    const nowStr = new Date().toLocaleTimeString()
+
+    jogLogs.value.push({
+        id: Date.now() + Math.random(),
+        time: nowStr,
+        action,
+        actionName: getActionName(action),
+        speed: jogSpeed.value,
+    })
+
+    if (jogLogs.value.length > 30) {
+        jogLogs.value.shift()
+    }
+
+    void nextTick(() => {
+        if (jogLogContainer.value) {
+            jogLogContainer.value.scrollTop = jogLogContainer.value.scrollHeight
+        }
+    })
+
+    simulationService.applyCommand(props.robot.id, 'MOVE_TO', {
+        x: props.robot.x + (action === 'FORWARD' ? 0.5 : action === 'BACKWARD' ? -0.5 : 0),
+        y: props.robot.y + (action === 'TURN_RIGHT' ? 0.5 : action === 'TURN_LEFT' ? -0.5 : 0),
+    })
+    // Toast message popup removed as requested by user!
+}
+
+const triggerEStopClick = () => {
+    isEstopConfirm.value = true
+    passwordConfirmVisible.value = true
+}
+
+const handleCommandSubmit = () => {
+    if (!props.robot) return
+    executeCommand()
+}
+
+const confirmAndSubmit = () => {
+    if (!confirmPassword.value) {
+        ElMessage.warning('비밀번호를 입력해 주세요.')
+        return
+    }
+    const isEstop = isEstopConfirm.value
+    passwordConfirmVisible.value = false
+    confirmPassword.value = ''
+
+    if (isEstop) {
+        executeEStop()
+    } else {
+        executeCommand()
+    }
+}
+
+const executeEStop = () => {
+    if (!props.robot) return
+    saving.value = true
+    try {
+        simulationService.applyCommand(props.robot.id, 'E_STOP', { reason: '수동 원격 비상정지 집행' })
+        ElMessage.error(`[${props.robot.name}] 개별 E-STOP 비상정지가 전송되었습니다.`)
+    } finally {
+        saving.value = false
+    }
+}
+
+const executeCommand = () => {
+    if (!props.robot) return
+    saving.value = true
+    try {
+        let cmdType = 'MOVE_TO'
+        let payload: Record<string, any> = {}
+
+        switch (executionUnit.value) {
+            case 'DESTINATION':
+                cmdType = 'MOVE_TO'
+                payload = { x: commandForm.x, y: commandForm.y }
+                break
+            case 'ACTIVITY':
+                cmdType = 'EXECUTE_ACTIVITY'
+                payload = { activityId: selectedActivityId.value }
+                break
+            case 'TASK':
+                cmdType = 'EXECUTE_TASK'
+                payload = { taskId: selectedTaskId.value }
+                break
+            case 'MISSION':
+                cmdType = 'START_MISSION'
+                payload = { missionId: commandForm.missionId }
+                break
+        }
+
+        simulationService.applyCommand(props.robot.id, cmdType, payload)
+        ElMessage.success(`[${props.robot.name}] 제어 명령(${executionUnit.value})이 집행되었습니다.`)
+    } finally {
+        saving.value = false
+    }
+}
+</script>
+
+<style scoped lang="scss">
+.location-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: rgba(30, 41, 59, 0.85);
+    border: 1px solid rgba(56, 189, 248, 0.16);
+
+    padding: 3px 10px;
+    border-radius: 4px;
+    color: #94a3b8;
+    font-size: 12px;
+
+    .loc-icon {
+        color: #38bdf8;
+        margin-right: 2px;
+    }
+
+    .coord-item {
+        display: inline-flex;
+        align-items: center;
+        gap: 2px;
+    }
+
+    .coord-val {
+        color: #ffffff;
+        font-weight: 700;
+        font-variant-numeric: tabular-nums;
+        margin-left: 2px;
+        min-width: 43px;
+        text-align: right;
+    }
+
+    .coord-sep {
+        color: #64748b;
+        margin: 0 3px 0 1px;
+    }
+}
+
+/* Flexbox Unified Control Layout */
+.unified-control-flex {
+    display: flex;
+    gap: 12px;
+    height: 580px;
+
+    &.has-camera-layout {
+        height: 640px;
+    }
+
+    .left-map-stack {
+        width: 520px;
+        flex-shrink: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .mini-map-panel {
+        flex: 1;
+        min-height: 0;
+        padding: 14px;
+
+        :deep(.panel__header h2) {
+            color: #38bdf8;
+            font-size: 14px;
+            font-weight: 700;
+        }
+    }
+
+    .right-control-panel-stack {
+        flex: 1;
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+}
+
+/* 2. 2D Interactive Map Container & High Contrast Colors */
+.mini-map-panel {
+    display: flex;
+    flex-direction: column;
+
+    .map-interactive-container {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        cursor: grab;
+        background: #060911;
+        overflow: hidden;
+        border-radius: 6px;
+        border: 1px solid rgba(56, 189, 248, 0.15);
+
+        &:active {
+            cursor: grabbing;
+        }
+
+        .dialog-map-svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        .poi-marker {
+            cursor: pointer;
+            &:hover circle {
+                fill: #60a5fa;
+                transform: scale(1.2);
+            }
+            .poi-label {
+                font-size: 11px;
+                fill: #e2e8f0;
+                font-weight: 600;
+            }
+        }
+
+        .robot-marker {
+            .pulse-aura {
+                animation: mapPulse 2s infinite ease-out;
+            }
+            .robot-map-name {
+                font-size: 12px;
+                fill: #4ade80;
+                font-weight: bold;
+            }
+        }
+
+        .target-click-marker {
+            .target-ring {
+                animation: targetPulse 1.5s infinite alternate;
+            }
+            .target-coord-text {
+                font-size: 12px;
+                fill: #f87171;
+                font-weight: bold;
+                paint-order: stroke;
+                stroke: #060911;
+                stroke-width: 3px;
+                stroke-linecap: round;
+                stroke-linejoin: round;
+            }
+        }
+
+        .map-zoom-controls {
+            position: absolute;
+            bottom: 12px;
+            right: 12px;
+            display: inline-flex;
+            align-items: center;
+            gap: 2px;
+            color: #38bdf8;
+            border-radius: 6px;
+        }
+
+        .map-zoom-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 22px;
+            height: 22px;
+            background: transparent;
+            border: 0;
+            border-radius: 4px;
+            color: #67d5ff;
+            cursor: pointer;
+            transition: all 0.2s ease;
+
+            &:hover {
+                background: rgba(56, 189, 248, 0.16);
+                color: #ffffff;
+            }
+
+            &:active {
+                transform: scale(0.95);
+            }
+        }
+
+        .map-zoom-btn {
+            font-size: 15px;
+            line-height: 1;
+            background: rgba(56, 189, 248, 0.16);
+            border: 1px solid rgba(56, 189, 248, 0.16);
+        }
+
+        .map-zoom-value {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            width: 44px;
+            height: 22px;
+            font-size: 11px;
+            font-weight: 700;
+            border: 1px solid rgba(56, 189, 248, 0.16);
+            background: rgba(56, 189, 248, 0.16);
+        }
+    }
+
+    .map-hint-footer {
+        padding: 10px 14px;
+        font-size: 12px;
+        color: #cbd5e1;
+        background: rgba(15, 23, 42, 0.9);
+        margin-top: 8px;
+        border-radius: 4px;
+
+        strong {
+            color: #38bdf8;
+        }
+    }
+}
+
+/* 5. Camera Feed Panel Styling (Surveillance Robot Only - Height 260px matching Teleop Panel) */
+.camera-feed-panel {
+    height: 260px;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    padding: 12px 14px;
+
+    :deep(.panel__header) {
+        margin-bottom: 8px;
+        flex-shrink: 0;
+    }
+
+    :deep(.panel__heading h2) {
+        color: #38bdf8;
+        font-size: 14px;
+        font-weight: 700;
+        margin: 0;
+    }
+
+    :deep(.panel__heading span) {
+        color: #94a3b8;
+        font-size: 12px;
+    }
+
+    .live-status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        font-size: 11px;
+        font-weight: bold;
+        color: #ef4444;
+        background: rgba(239, 68, 68, 0.15);
+        border: 1px solid rgba(239, 68, 68, 0.4);
+        padding: 2px 8px;
+        border-radius: 4px;
+
+        .live-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #ef4444;
+            box-shadow: 0 0 6px #ef4444;
+            animation: liveBlink 1.2s infinite alternate;
+        }
+    }
+
+    .camera-stream-container {
+        flex: 1;
+        min-height: 0;
+        position: relative;
+        border-radius: 6px;
+        overflow: hidden;
+        border: 1px solid rgba(56, 189, 248, 0.2);
+        background: #000000;
+    }
+
+    .camera-viewport {
+        width: 100%;
+        height: 100%;
+        position: relative;
+        background: radial-gradient(circle at center, #0f172a 0%, #020617 100%);
+        transition: background 0.3s ease;
+
+        &.is-thermal-mode {
+            background: radial-gradient(circle at center, #450a0a 0%, #020617 100%);
+            .hud-overlay {
+                color: #fca5a5;
+                .cam-id {
+                    color: #f87171;
+                }
+                .hud-center-crosshair {
+                    .ch-line-h,
+                    .ch-line-v {
+                        background: #ef4444;
+                    }
+                    .ch-box {
+                        border-color: #ef4444;
+                    }
+                }
+            }
+        }
+    }
+
+    .camera-scanlines {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%),
+            linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
+        background-size:
+            100% 3px,
+            6px 100%;
+        pointer-events: none;
+    }
+
+    /* High-Tech CCTV Camera HUD Overlay */
+    .hud-overlay {
+        position: absolute;
+        inset: 0;
+        padding: 10px 12px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        pointer-events: none;
+        color: #38bdf8;
+        font-family: 'Consolas', 'Courier New', monospace;
+        font-size: 11px;
+
+        .hud-top-row,
+        .hud-bottom-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 2;
+        }
+
+        .cam-id {
+            font-weight: bold;
+            color: #ffffff;
+        }
+
+        .cam-fps {
+            margin-left: 8px;
+            color: #4ade80;
+        }
+
+        .rec-dot {
+            color: #ef4444;
+            font-weight: bold;
+            animation: liveBlink 1s infinite alternate;
+        }
+
+        .cam-time {
+            color: #cbd5e1;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .hud-center-crosshair {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 70px;
+            height: 70px;
+            pointer-events: none;
+            opacity: 0.5;
+
+            .ch-line-h {
+                position: absolute;
+                top: 50%;
+                left: 0;
+                right: 0;
+                height: 1px;
+                background: #38bdf8;
+            }
+
+            .ch-line-v {
+                position: absolute;
+                left: 50%;
+                top: 0;
+                bottom: 0;
+                width: 1px;
+                background: #38bdf8;
+            }
+
+            .ch-box {
+                position: absolute;
+                inset: 15px;
+                border: 1px dashed #38bdf8;
+            }
+        }
+
+        .cam-tool-btn {
+            pointer-events: auto;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: rgba(15, 23, 42, 0.85);
+            border: 1px solid rgba(56, 189, 248, 0.35);
+            color: #38bdf8;
+            font-size: 11px;
+            padding: 3px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+
+            &:hover {
+                background: rgba(56, 189, 248, 0.25);
+                color: #ffffff;
+                border-color: #38bdf8;
+            }
+        }
+    }
+}
+
+.top-unit-panel {
+    flex: 1;
+    min-height: 295px;
+    padding: 14px 16px 6px 16px;
+    overflow: hidden;
+
+    :deep(.panel__header h2) {
+        color: #38bdf8;
+        font-size: 14px;
+        font-weight: 700;
+    }
+
+    /* Single E-STOP Button Style */
+    .single-estop-trigger-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 14px;
+        font-size: 12px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        background: rgba(239, 68, 68, 0.2);
+        border: 1px solid rgba(239, 68, 68, 0.6);
+        border-radius: 8px;
+        color: #f87171;
+        // box-shadow: 0 0 8px rgba(239, 68, 68, 0.25);
+
+        &:hover {
+            background: rgba(239, 68, 68, 0.4);
+            border-color: #ef4444;
+            color: #ffffff;
+            // box-shadow: 0 0 14px rgba(239, 68, 68, 0.6);
+        }
+    }
+
+    .execute-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 20px;
+        font-size: 12px;
+        font-weight: 700;
+        color: #000000;
+        background: var(--button-primary-bg-color);
+        border: 1px solid var(--button-primary-border-color);
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+
+        &:hover {
+            background: var(--button-primary-hover-bg-color);
+        }
+    }
+}
+
+.custom-control-form {
+    display: flex;
+    flex-direction: column;
+
+    .mode-radio-group {
+        width: 100%;
+        display: flex;
+        :deep(.el-radio-button) {
+            flex: 1;
+            .el-radio-button__inner {
+                width: 100%;
+            }
+        }
+    }
+    :deep(.el-form-item) {
+        margin-bottom: 12px;
+    }
+}
+
+/* 고정 최소 높이 폼 영역으로 탭 변경 시 Teleop Jog 위치 이동 방지 */
+.unit-form-content-area {
+    min-height: 135px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+}
+
+.flex-2col {
+    display: flex;
+    gap: 12px;
+
+    :deep(.el-form-item) {
+        flex: 1;
+        margin-bottom: 0;
+    }
+}
+
+/* Teleop Panel High-Tech Styling (높이 및 flex-grow 유연 배치) */
+.teleop-panel {
+    height: 260px;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    padding: 12px 16px 14px 16px;
+    overflow: hidden;
+
+    :deep(.panel__header) {
+        margin-bottom: 10px;
+        flex-shrink: 0;
+    }
+
+    :deep(.panel__heading--bottom) {
+        gap: 3px;
+    }
+
+    :deep(.panel__heading h2) {
+        color: #38bdf8;
+        font-size: 14px;
+        font-weight: 700;
+        margin: 0;
+    }
+
+    :deep(.panel__heading span) {
+        color: #94a3b8;
+        font-size: 12px;
+    }
+
+    .teleop-inline-layout {
+        display: flex;
+        gap: 16px;
+        align-items: stretch;
+        flex: 1;
+        min-height: 0;
+    }
+
+    /* D-Pad Futuristic Gamepad Styling */
+    .dpad-compact-flex {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        gap: 6px;
+        width: 175px;
+        flex-shrink: 0;
+        background: rgba(15, 23, 42, 0.75);
+        border: 1px solid rgba(56, 189, 248, 0.2);
+        border-radius: 12px;
+        padding: 8px;
+        box-shadow: inset 0 0 12px rgba(0, 0, 0, 0.5);
+
+        .dpad-row {
+            display: flex;
+            gap: 6px;
+            justify-content: center;
+        }
+
+        .jog-placeholder {
+            width: 44px;
+            height: 44px;
+        }
+
+        .jog-btn {
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(30, 41, 59, 0.9);
+            border: 1px solid rgba(56, 189, 248, 0.3);
+            border-radius: 8px;
+            color: #38bdf8;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+
+            &:hover {
+                background: rgba(56, 189, 248, 0.25);
+                border-color: #38bdf8;
+                color: #ffffff;
+                box-shadow: 0 0 12px rgba(56, 189, 248, 0.5);
+            }
+
+            &:active {
+                transform: scale(0.92);
+                background: rgba(56, 189, 248, 0.5);
+            }
+
+            &.jog-stop {
+                background: rgba(239, 68, 68, 0.2);
+                border-color: rgba(239, 68, 68, 0.6);
+                color: #f87171;
+                font-size: 16px;
+                box-shadow: 0 0 8px rgba(239, 68, 68, 0.25);
+
+                &:hover {
+                    background: rgba(239, 68, 68, 0.4);
+                    border-color: #ef4444;
+                    color: #ffffff;
+                    box-shadow: 0 0 14px rgba(239, 68, 68, 0.6);
+                }
+            }
+        }
+    }
+
+    .teleop-compact-controls {
+        flex: 1;
+        min-width: 0;
+        min-height: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+
+        .speed-slider-row {
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 13px;
+
+            .speed-lbl {
+                white-space: nowrap;
+                color: #cbd5e1;
+
+                .speed-val {
+                    color: #38bdf8;
+                    font-variant-numeric: tabular-nums;
+                    display: inline-block;
+                    min-width: 32px;
+                    text-align: right;
+                }
+            }
+        }
+
+        /* 고도화된 실시간 Terminal 로그 콘솔 스타일 */
+        .jog-terminal-box {
+            background: #080d1a;
+            border: 1px solid rgba(56, 189, 248, 0.2);
+            border-radius: 8px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            min-height: 0;
+            box-shadow: inset 0 0 12px rgba(0, 0, 0, 0.6);
+
+            .terminal-header {
+                flex-shrink: 0;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                padding: 6px 12px;
+                background: rgba(15, 23, 42, 0.95);
+                border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+
+                .term-left {
+                    display: flex;
+                    align-items: center;
+                    gap: 6px;
+                }
+
+                .term-dot {
+                    width: 7px;
+                    height: 7px;
+                    border-radius: 50%;
+                    &.green {
+                        background: #22c55e;
+                        box-shadow: 0 0 6px #22c55e;
+                    }
+                }
+
+                .term-prompt {
+                    color: #38bdf8;
+                    font-family: monospace;
+                    font-weight: bold;
+                    font-size: 11px;
+                }
+
+                .term-title {
+                    font-size: 11px;
+                    color: #94a3b8;
+                    font-family: monospace;
+                    font-weight: 600;
+                }
+
+                .clear-logs-btn {
+                    background: rgba(255, 255, 255, 0.05);
+                    border: 1px solid rgba(255, 255, 255, 0.1);
+                    border-radius: 4px;
+                    padding: 1px 6px;
+                    color: #94a3b8;
+                    font-size: 10px;
+                    cursor: pointer;
+                    transition: all 0.15s ease;
+
+                    &:hover {
+                        background: rgba(239, 68, 68, 0.2);
+                        border-color: rgba(239, 68, 68, 0.5);
+                        color: #f87171;
+                    }
+                }
+            }
+
+            .terminal-body {
+                flex: 1;
+                min-height: 0;
+                overflow-y: auto;
+                padding: 8px 12px;
+                font-family: 'Consolas', 'Courier New', monospace;
+                font-size: 11px;
+                line-height: 1.6;
+
+                &::-webkit-scrollbar {
+                    width: 6px;
+                }
+                &::-webkit-scrollbar-track {
+                    background: rgba(15, 23, 42, 0.6);
+                }
+                &::-webkit-scrollbar-thumb {
+                    background: rgba(56, 189, 248, 0.3);
+                    border-radius: 3px;
+                    &:hover {
+                        background: rgba(56, 189, 248, 0.6);
+                    }
+                }
+
+                .log-empty {
+                    color: #475569;
+                    font-size: 11px;
+                }
+
+                .log-line {
+                    display: flex;
+                    gap: 8px;
+                    align-items: center;
+
+                    .log-prompt {
+                        color: #475569;
+                        font-weight: bold;
+                    }
+
+                    .log-time {
+                        color: #64748b;
+                        font-size: 10px;
+                    }
+
+                    .log-action {
+                        color: #38bdf8;
+                        font-weight: 600;
+                    }
+
+                    .log-speed {
+                        color: #4ade80;
+                        margin-left: auto;
+                        font-weight: bold;
+                        font-variant-numeric: tabular-nums;
+                    }
+
+                    &.is-stop {
+                        .log-action {
+                            color: #f87171;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@keyframes mapPulse {
+    0% {
+        r: 12px;
+        opacity: 0.8;
+    }
+    100% {
+        r: 28px;
+        opacity: 0;
+    }
+}
+
+@keyframes targetPulse {
+    0% {
+        transform: scale(1);
+        opacity: 0.7;
+    }
+    100% {
+        transform: scale(1.2);
+        opacity: 1;
+    }
+}
+</style>
