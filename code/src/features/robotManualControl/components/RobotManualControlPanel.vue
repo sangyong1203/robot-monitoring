@@ -242,11 +242,7 @@
                         </template>
 
                         <!-- 2. ACTIVITY (단위 작업 선택) -->
-                        <el-form-item
-                            v-else-if="executionUnit === 'ACTIVITY'"
-                            label="실행할 Activity 선택"
-                            required
-                        >
+                        <el-form-item v-else-if="executionUnit === 'ACTIVITY'" label="실행할 Activity 선택" required>
                             <el-select v-model="selectedActivityId" placeholder="Activity 선택" style="width: 100%">
                                 <el-option
                                     v-for="act in activities"
@@ -271,11 +267,7 @@
 
                         <!-- 4. MISSION (복합 융합 미션 선택) -->
                         <el-form-item v-else-if="executionUnit === 'MISSION'" label="실행할 Mission 선택" required>
-                            <el-select
-                                v-model="commandForm.missionId"
-                                placeholder="Mission 선택"
-                                style="width: 100%"
-                            >
+                            <el-select v-model="commandForm.missionId" placeholder="Mission 선택" style="width: 100%">
                                 <el-option
                                     v-for="mis in missions"
                                     :key="mis.id"
@@ -417,10 +409,18 @@ import type { MapItem } from '@/pages/main/admin/maps/service/maps.types'
 import { useAuthenticatedMapImage } from '@/composables/useAuthenticatedMapImage'
 import { worldToPixel, pixelToWorld } from '@/utils/mapCoordinates'
 import RobotManualControlConfirmDialog from './RobotManualControlConfirmDialog.vue'
-import type { JogLogItem, RobotManualControlRobot, StandardControlExecutionUnit } from '../service/robotManualControl.types'
+import type {
+    JogLogItem,
+    RobotManualControlRobot,
+    StandardControlExecutionUnit,
+} from '../service/robotManualControl.types'
 
 const props = defineProps<{
     robot: RobotManualControlRobot | null
+}>()
+
+const emit = defineEmits<{
+    (e: 'command-sent'): void
 }>()
 
 let timeIntervalId: number | undefined
@@ -775,6 +775,7 @@ const executeEStop = () => {
     saving.value = true
     try {
         simulationService.applyCommand(props.robot.id, 'E_STOP', { reason: '수동 원격 비상정지 집행' })
+        emit('command-sent')
         ElMessage.error(`[${props.robot.name}] 개별 E-STOP 비상정지가 전송되었습니다.`)
     } finally {
         saving.value = false
@@ -808,6 +809,7 @@ const executeCommand = () => {
         }
 
         simulationService.applyCommand(props.robot.id, cmdType, payload)
+        emit('command-sent')
         ElMessage.success(`[${props.robot.name}] 제어 명령(${executionUnit.value})이 집행되었습니다.`)
     } finally {
         saving.value = false
@@ -857,7 +859,7 @@ const executeCommand = () => {
 /* Flexbox Unified Control Layout */
 .unified-control-flex {
     display: flex;
-    gap: 12px;
+    gap: 8px;
     height: 580px;
 
     &.has-camera-layout {
@@ -865,11 +867,11 @@ const executeCommand = () => {
     }
 
     .left-map-stack {
-        width: 520px;
+        flex: 1;
         flex-shrink: 0;
         display: flex;
         flex-direction: column;
-        gap: 12px;
+        gap: 8px;
     }
 
     .mini-map-panel {
@@ -889,7 +891,7 @@ const executeCommand = () => {
         min-width: 0;
         display: flex;
         flex-direction: column;
-        gap: 12px;
+        gap: 8px;
     }
 }
 
@@ -1306,7 +1308,7 @@ const executeCommand = () => {
 
 .flex-2col {
     display: flex;
-    gap: 12px;
+    gap: 8px;
 
     :deep(.el-form-item) {
         flex: 1;
@@ -1434,7 +1436,7 @@ const executeCommand = () => {
             flex-shrink: 0;
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 8px;
             font-size: 13px;
 
             .speed-lbl {

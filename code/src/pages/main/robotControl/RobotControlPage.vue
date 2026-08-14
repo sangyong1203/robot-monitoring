@@ -1,4 +1,4 @@
-<template>
+﻿<template>
     <div class="robot-control-page">
         <!-- 상단 영역: 소속 기관 운영 중인 로봇 목록 (한 줄 레이아웃 + 좌우 가로 스크롤) -->
         <div class="robots-overview-section">
@@ -44,152 +44,38 @@
         <el-tabs v-model="activeTab" class="control-main-tabs">
             <!-- 1. 수동 제어 탭 -->
             <el-tab-pane label="로봇 수동 제어" name="manual" style="height: 100%;">
-                <div class="control-grid">
-                    <!-- 수동 명령 집행 폼 -->
-                    <div class="control-card">
-                        <div class="card-header-selected">
-                            <h4>수동 명령 실행 — 대상: <strong class="text-primary">{{ selectedRobot?.name || '로봇 선택 안됨' }}</strong></h4>
-                            <StatusBadge v-if="selectedRobot" :label="stateLabel(selectedRobot.operatingState)" :variant="stateVariant(selectedRobot.operatingState)" />
-                        </div>
-
-                        <el-form label-position="top" class="control-form">
-                            <!-- 제어 실행 단위 선택 커스텀 버튼 -->
-                            <el-form-item label="수동 제어 실행 단위 선택" required>
-                                <el-radio-group v-model="executionUnit" size="default" class="unit-radio-group">
-                                    <el-radio-button value="DESTINATION">목적지 (POI)</el-radio-button>
-                                    <el-radio-button value="ACTIVITY">Activity</el-radio-button>
-                                    <el-radio-button value="TASK">Task</el-radio-button>
-                                    <el-radio-button value="MISSION">Mission</el-radio-button>
-                                    <el-radio-button value="SET_MODE">운영모드</el-radio-button>
-                                    <el-radio-button value="E_STOP">비상정지</el-radio-button>
-                                </el-radio-group>
-                            </el-form-item>
-
-                            <!-- 1. 목적지 선택 (DESTINATION) -->
-                            <template v-if="executionUnit === 'DESTINATION'">
-                                <el-form-item label="등록 목적지 (POI) 선택">
-                                    <el-select
-                                        v-model="selectedDestinationId"
-                                        placeholder="목적지 선택 시 좌표 자동입력"
-                                        style="width: 100%"
-                                        clearable
-                                        @change="handleDestinationChange"
-                                    >
-                                        <el-option
-                                            v-for="dest in filteredDestinations"
-                                            :key="dest.id"
-                                            :label="`[${dest.type}] ${dest.name} (${dest.mapName})`"
-                                            :value="dest.id"
-                                        />
-                                    </el-select>
-                                </el-form-item>
-                                <div class="grid-2col">
-                                    <el-form-item label="목적지 X 좌표 (m)">
-                                        <el-input-number v-model="targetX" :precision="2" style="width:100%" />
-                                    </el-form-item>
-                                    <el-form-item label="목적지 Y 좌표 (m)">
-                                        <el-input-number v-model="targetY" :precision="2" style="width:100%" />
-                                    </el-form-item>
-                                </div>
-                            </template>
-
-                            <!-- 2. Activity 선택 -->
-                            <el-form-item v-else-if="executionUnit === 'ACTIVITY'" label="실행할 Activity 선택" required>
-                                <el-select v-model="selectedActivityId" placeholder="Activity 선택" style="width: 100%">
-                                    <el-option
-                                        v-for="act in activities"
-                                        :key="act.id"
-                                        :label="`[${act.code}] ${act.name} (${act.activityType})`"
-                                        :value="act.id"
-                                    />
-                                </el-select>
-                            </el-form-item>
-
-                            <!-- 3. Task 선택 -->
-                            <el-form-item v-else-if="executionUnit === 'TASK'" label="실행할 Task 선택" required>
-                                <el-select v-model="selectedTaskId" placeholder="Task 선택" style="width: 100%">
-                                    <el-option
-                                        v-for="task in tasks"
-                                        :key="task.id"
-                                        :label="`[${task.code}] ${task.name} (${task.robotModelName})`"
-                                        :value="task.id"
-                                    />
-                                </el-select>
-                            </el-form-item>
-
-                            <!-- 4. Mission 선택 -->
-                            <el-form-item v-else-if="executionUnit === 'MISSION'" label="실행할 융합 Mission 선택" required>
-                                <el-select v-model="selectedMissionId" placeholder="Mission 선택" style="width: 100%">
-                                    <el-option
-                                        v-for="mis in missions"
-                                        :key="mis.id"
-                                        :label="`[${mis.code}] ${mis.name}`"
-                                        :value="mis.id"
-                                    />
-                                </el-select>
-                            </el-form-item>
-
-                            <!-- 5. 운영 모드 선택 -->
-                            <el-form-item v-else-if="executionUnit === 'SET_MODE'" label="운영 모드 변경">
-                                <el-radio-group v-model="targetMode" class="unit-radio-group mode-radio-group">
-                                    <el-radio-button value="AUTO">자동 (AUTO)</el-radio-button>
-                                    <el-radio-button value="MANUAL">수동 (MANUAL)</el-radio-button>
-                                    <el-radio-button value="PAUSED">일시정지 (PAUSED)</el-radio-button>
-                                </el-radio-group>
-                            </el-form-item>
-
-                            <!-- 6. 비상정지 / Safe Stop -->
-                            <el-form-item v-else-if="executionUnit === 'E_STOP'" label="비상 정지 사유 기재">
-                                <el-input v-model="stopReason" placeholder="원격 정지 사유 기재" />
-                            </el-form-item>
-
-                            <!-- 요구사항 4: 공간 차지 최소화 회색 설명문 스타일 -->
-                            <div class="form-hint-note">
-                                * 중요 제어 명령 전송 시 계정 비밀번호 확인 및 이력이 실시간 기록됩니다.
-                            </div>
-
-                            <el-button
-                                :type="executionUnit === 'E_STOP' ? 'danger' : 'primary'"
-                                style="width: 100%"
-                                @click="openPasswordConfirm"
-                            >
-                                명령 전송
-                            </el-button>
-                        </el-form>
-                    </div>
-
-                    <!-- 오른쪽: 최근 제어 명령 이력 -->
-                    <div class="control-logs-card">
-                        <h4>제어 명령 요청/응답 이력</h4>
-                        <el-table :data="logs" stripe height="100%">
-                            <el-table-column prop="requestedAt" label="요청시각" width="160" />
-                            <el-table-column label="대상 로봇" width="140">
-                                <template #default="{ row }">
-                                    <TableRowTooltip :content="row.robotName" />
-                                </template>
-                            </el-table-column>
-                            <el-table-column prop="commandType" label="명령 유형" width="130" />
-                            <el-table-column label="세부 내용" min-width="220">
-                                <template #default="{ row }">
-                                    <TableRowTooltip :content="row.payloadSummary" />
-                                </template>
-                            </el-table-column>
-                            <el-table-column label="요청자" width="120">
-                                <template #default="{ row }">
-                                    <TableRowTooltip :content="row.requestedBy" />
-                                </template>
-                            </el-table-column>
-                            <el-table-column label="상태" width="120" align="center">
-                                <template #default="{ row }">
-                                    <StatusBadge :label="row.status" :variant="row.status === 'APPLIED' ? 'success' : 'info'" />
-                                </template>
-                            </el-table-column>
-                        </el-table>
-                    </div>
-                </div>
+                <RobotManualControlPanel :robot="selectedRobot" @command-sent="loadControlLogs" />
             </el-tab-pane>
 
-            <!-- 2. 자동 제어 스케줄 탭 -->
+            <!-- 2. 제어 명령 집행 이력 탭 -->
+            <el-tab-pane label="제어 명령 집행 이력" name="logs">
+                <el-table :data="logs" stripe height="100%">
+                    <el-table-column prop="requestedAt" label="요청시각" width="160" />
+                    <el-table-column label="대상 로봇" width="160">
+                        <template #default="{ row }">
+                            <TableRowTooltip :content="row.robotName" />
+                        </template>
+                    </el-table-column>
+                    <el-table-column prop="commandType" label="명령 유형" width="140" />
+                    <el-table-column label="세부 내용" min-width="260">
+                        <template #default="{ row }">
+                            <TableRowTooltip :content="row.payloadSummary" />
+                        </template>
+                    </el-table-column>
+                    <el-table-column label="요청자" width="140">
+                        <template #default="{ row }">
+                            <TableRowTooltip :content="row.requestedBy" />
+                        </template>
+                    </el-table-column>
+                    <el-table-column label="상태" width="120" align="center">
+                        <template #default="{ row }">
+                            <StatusBadge :label="row.status" :variant="row.status === 'APPLIED' ? 'success' : 'info'" />
+                        </template>
+                    </el-table-column>
+                </el-table>
+            </el-tab-pane>
+
+            <!-- 3. 자동 제어 스케줄 탭 -->
             <el-tab-pane label="자동 제어 스케줄 관리" name="schedules">
                 <TableToolbar>
                     <template #right>
@@ -231,24 +117,6 @@
                 </el-table>
             </el-tab-pane>
         </el-tabs>
-
-        <!-- 1. 비밀번호 재확인 다이얼로그 -->
-        <BaseDialog
-            v-model="passwordDialogVisible"
-            title="제어 명령 전송 비밀번호 재확인"
-            description="안전한 로봇 제어 명령 집행을 위해 현재 로그인된 계정 비밀번호를 입력하세요."
-            width="460px"
-        >
-            <el-form label-position="top">
-                <el-form-item label="비밀번호 입력" required>
-                    <el-input v-model="confirmPassword" type="password" placeholder="비밀번호 입력 (예: admin123)" show-password />
-                </el-form-item>
-            </el-form>
-            <template #footer>
-                <el-button @click="passwordDialogVisible = false">취소</el-button>
-                <el-button type="primary" :loading="sending" @click="confirmAndSubmitCommand">명령 집행 확인</el-button>
-            </template>
-        </BaseDialog>
 
         <!-- 2. 신규 자동 제어 등록 다이얼로그 -->
         <BaseDialog
@@ -382,14 +250,12 @@ import BaseDialog from '@/components/BaseDialog.vue'
 import DaysCheckboxGroup from '@/components/DaysCheckboxGroup.vue'
 import RadioToggleGroup from '@/components/RadioToggleGroup.vue'
 import TableRowTooltip from '@/components/TableRowTooltip.vue'
+import RobotManualControlPanel from '@/features/robotManualControl/components/RobotManualControlPanel.vue'
 import { ElMessage } from 'element-plus'
-import { simulationService } from '@/services/simulation.service'
 import { getControlLogs, getControlSchedules } from './service/robotControl.api'
-import type { RobotControlLog, AutoControlSchedule, ControlExecutionUnit } from './service/robotControl.types'
-import { fetchMockDestinations } from '../admin/destinations/service/destinations.mock'
-import type { DestinationItem } from '../admin/destinations/service/destinations.types'
-import { getActivities, getTasks, getMissions } from '../admin/missions/service/missionManagement.api'
-import type { ActivityItem, TaskItem, MissionItem } from '../admin/missions/service/missionManagement.types'
+import type { AutoControlSchedule, RobotControlLog } from './service/robotControl.types'
+import { getTasks, getMissions } from '../admin/missions/service/missionManagement.api'
+import type { TaskItem, MissionItem } from '../admin/missions/service/missionManagement.types'
 
 type OperatingState = 'IDLE' | 'RUNNING' | 'MANUAL_CONTROL' | 'SCHEDULE_RUNNING' | 'CHARGING' | 'POWER_OFF'
 
@@ -407,21 +273,6 @@ type RobotOverviewItem = {
 
 const activeTab = ref('manual')
 const selectedRobotId = ref<number>(1)
-const executionUnit = ref<ControlExecutionUnit>('DESTINATION')
-
-const selectedDestinationId = ref<number | null>(null)
-const selectedActivityId = ref<number | null>(null)
-const selectedTaskId = ref<number | null>(null)
-const selectedMissionId = ref<number | null>(null)
-
-const targetX = ref(12.5)
-const targetY = ref(8.2)
-const targetMode = ref('AUTO')
-const stopReason = ref('')
-
-const passwordDialogVisible = ref(false)
-const confirmPassword = ref('')
-const sending = ref(false)
 
 const scheduleDialogVisible = ref(false)
 const scheduleForm = ref({
@@ -466,8 +317,6 @@ const robots = ref<RobotOverviewItem[]>([
     { id: 7, name: '실외 자율주행 로봇 1호기', robotType: 'SURVEILLANCE', zoneName: 'ZONE C (보행/차도)', x: 60.0, y: 12.0, batteryPercent: 90, operatingState: 'CHARGING', communicationStatus: 'ONLINE' },
 ])
 
-const destinations = ref<DestinationItem[]>([])
-const activities = ref<ActivityItem[]>([])
 const tasks = ref<TaskItem[]>([])
 const missions = ref<MissionItem[]>([])
 const logs = ref<RobotControlLog[]>([])
@@ -475,12 +324,7 @@ const schedules = ref<AutoControlSchedule[]>([])
 
 const operatingRobotCount = computed(() => robots.value.filter(r => r.operatingState !== 'POWER_OFF').length)
 const operatingRobots = computed(() => robots.value.filter(r => r.operatingState === 'IDLE' || r.operatingState === 'RUNNING' || r.operatingState === 'SCHEDULE_RUNNING'))
-const selectedRobot = computed(() => robots.value.find(r => r.id === selectedRobotId.value))
-
-const filteredDestinations = computed(() => {
-    if (!selectedRobot.value) return destinations.value
-    return destinations.value.filter(d => !d.targetRobotType || d.targetRobotType === 'ALL' || d.targetRobotType === selectedRobot.value?.robotType)
-})
+const selectedRobot = computed(() => robots.value.find(r => r.id === selectedRobotId.value) ?? null)
 
 const stateLabel = (st: OperatingState) => {
     switch (st) {
@@ -506,93 +350,6 @@ const stateVariant = (st: OperatingState) => {
 
 const selectRobot = (id: number) => {
     selectedRobotId.value = id
-    selectedDestinationId.value = null
-    const targetBot = robots.value.find(r => r.id === id)
-    if (targetBot) {
-        targetX.value = targetBot.x
-        targetY.value = targetBot.y
-    }
-}
-
-const handleDestinationChange = (destId: number | null) => {
-    if (!destId) return
-    const target = destinations.value.find(d => d.id === destId)
-    if (target) {
-        targetX.value = target.x
-        targetY.value = target.y
-        ElMessage.info(`목적지 '${target.name}' 좌표가 바인딩되었습니다.`)
-    }
-}
-
-const openPasswordConfirm = () => {
-    if (!selectedRobot.value) {
-        ElMessage.warning('제어 대상 로봇을 먼저 선택하세요.')
-        return
-    }
-    confirmPassword.value = ''
-    passwordDialogVisible.value = true
-}
-
-const confirmAndSubmitCommand = async () => {
-    if (!confirmPassword.value.trim()) {
-        ElMessage.warning('비밀번호를 입력하세요.')
-        return
-    }
-
-    sending.value = true
-    try {
-        const r = selectedRobot.value
-        if (!r) return
-
-        let payloadStr = ''
-        let cmdType = 'MOVE_TO'
-
-        if (executionUnit.value === 'DESTINATION') {
-            cmdType = 'MOVE_TO'
-            const dest = destinations.value.find(d => d.id === selectedDestinationId.value)
-            payloadStr = dest ? `목적지: ${dest.name} (X: ${targetX.value}m, Y: ${targetY.value}m)` : `X: ${targetX.value}m, Y: ${targetY.value}m`
-        } else if (executionUnit.value === 'ACTIVITY') {
-            cmdType = 'EXECUTE_ACTIVITY'
-            const act = activities.value.find(a => a.id === selectedActivityId.value)
-            payloadStr = `Activity: ${act?.name || '기본 Activity'}`
-        } else if (executionUnit.value === 'TASK') {
-            cmdType = 'EXECUTE_TASK'
-            const t = tasks.value.find(tk => tk.id === selectedTaskId.value)
-            payloadStr = `Task: ${t?.name || '기본 Task'}`
-        } else if (executionUnit.value === 'MISSION') {
-            cmdType = 'START_MISSION'
-            const mis = missions.value.find(m => m.id === selectedMissionId.value)
-            payloadStr = `Mission: ${mis?.name || '기본 Mission'}`
-        } else if (executionUnit.value === 'SET_MODE') {
-            cmdType = 'SET_MODE'
-            payloadStr = `운영 모드 변경: ${targetMode.value}`
-        } else if (executionUnit.value === 'E_STOP') {
-            cmdType = 'E_STOP'
-            payloadStr = `비상정지 사유: ${stopReason.value || '관제 원격 정지'}`
-        }
-
-        simulationService.applyCommand(r.id, cmdType as any, {
-            x: targetX.value,
-            y: targetY.value,
-            mode: targetMode.value,
-        })
-
-        logs.value.unshift({
-            id: Date.now(),
-            robotId: r.id,
-            robotName: r.name,
-            commandType: cmdType,
-            payloadSummary: payloadStr,
-            requestedBy: '운영자 (operator)',
-            requestedAt: new Date().toISOString().replace('T', ' ').slice(0, 19),
-            status: 'APPLIED',
-        })
-
-        passwordDialogVisible.value = false
-        ElMessage.success(`[${r.name}]에 ${cmdType} 명령 집행이 완료되었습니다.`)
-    } finally {
-        sending.value = false
-    }
 }
 
 const openScheduleDialog = () => {
@@ -657,19 +414,20 @@ const toggleSchedule = (row: AutoControlSchedule) => {
     ElMessage.success(`스케줄 [${row.name}] 상태가 ${row.status === 'ACTIVE' ? '활성화' : '일시정지'}되었습니다.`)
 }
 
+const loadControlLogs = async () => {
+    const logRes = await getControlLogs()
+    logs.value = logRes.data ?? []
+}
+
 const loadData = async () => {
-    destinations.value = await fetchMockDestinations()
-    const actRes = await getActivities()
     const taskRes = await getTasks()
     const misRes = await getMissions()
-    const logRes = await getControlLogs()
     const schedRes = await getControlSchedules()
 
-    activities.value = actRes.data ?? []
     tasks.value = taskRes.data ?? []
     missions.value = misRes.data ?? []
-    logs.value = logRes.data ?? []
     schedules.value = schedRes.data ?? []
+    await loadControlLogs()
 }
 
 onMounted(() => {
@@ -856,160 +614,6 @@ onMounted(() => {
         display: flex;
         flex-direction: column;
         min-height: 0;
-    }
-}
-
-.control-grid {
-    display: flex;
-    gap: 20px;
-    flex: 1;
-    min-height: 0;
-}
-
-.control-card {
-    flex: 0 0 460px;
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 8px;
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    min-height: 0;
-
-    h4 {
-        margin-top: 0;
-        margin-bottom: 16px;
-        font-size: 15px;
-    }
-}
-
-.control-logs-card {
-    flex: 1;
-    min-width: 0;
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 8px;
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    min-height: 0;
-
-    h4 {
-        margin-top: 0;
-        margin-bottom: 16px;
-        font-size: 15px;
-    }
-
-    :deep(.el-table) {
-        flex: 1;
-        min-height: 0;
-    }
-}
-
-.card-header-selected {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 16px;
-    border-bottom: 1px solid var(--border-color);
-    padding-bottom: 10px;
-
-    h4 {
-        margin: 0;
-    }
-}
-
-.unit-radio-group {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-
-    :deep(.el-radio-button__inner) {
-        background: rgba(255, 255, 255, 0.05);
-        border: 1px solid rgba(255, 255, 255, 0.15) !important;
-        color: #cbd5e1;
-        border-radius: 6px !important;
-        padding: 7px 12px;
-        font-size: 12px;
-        font-weight: 600;
-        transition: all 200ms ease;
-    }
-
-    :deep(.el-radio-button.is-active .el-radio-button__inner) {
-        background: var(--primary-color) !important;
-        border-color: var(--primary-color) !important;
-        color: #000000 !important;
-        font-weight: 700;
-    }
-}
-
-.mode-radio-group {
-    width: 100%;
-    display: flex;
-
-    :deep(.el-radio-button) {
-        flex: 1;
-
-        .el-radio-button__inner {
-            width: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-    }
-}
-
-.form-hint-note {
-    font-size: 12px;
-    color: #94a3b8;
-    margin-bottom: 12px;
-    line-height: 1.4;
-}
-
-.grid-2col {
-    display: flex;
-    gap: 12px;
-
-    > * {
-        flex: 1;
-        min-width: 0;
-    }
-}
-
-.mission-type-radio-group {
-    display: flex;
-    width: 100%;
-    background: rgba(0, 0, 0, 0.25);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 8px;
-    padding: 3px;
-
-    :deep(.el-radio-button) {
-        flex: 1;
-        display: flex;
-
-        .el-radio-button__inner {
-            width: 100%;
-            background: transparent;
-            border: 1px solid transparent !important;
-            border-radius: 6px;
-            color: var(--text-color--secondary);
-            box-shadow: none !important;
-            transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
-            padding: 8px 16px;
-            font-weight: 500;
-
-            &:hover {
-                color: var(--primary-color);
-            }
-        }
-
-        &.is-active .el-radio-button__inner {
-            background: var(--primary-color-1) !important;
-            color: var(--primary-color) !important;
-            border-color: var(--border-glass-color) !important;
-            font-weight: 700;
-        }
     }
 }
 
