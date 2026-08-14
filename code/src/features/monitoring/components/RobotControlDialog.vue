@@ -29,18 +29,6 @@
                         <Battery :size="15" class="bat-icon" />
                         <strong class="bat-val">{{ robot.batteryPercent }}%</strong>
                     </span>
-                    <span class="location-chip">
-                        <MapPin :size="14" class="loc-icon" />
-                        <span class="coord-item"
-                            >X:<strong class="coord-val">{{ robot.x.toFixed(2) }}</strong
-                            >m</span
-                        >
-                        <span class="coord-sep">,</span>
-                        <span class="coord-item"
-                            >Y:<strong class="coord-val">{{ robot.y.toFixed(2) }}</strong
-                            >m</span
-                        >
-                    </span>
                 </div>
             </div>
         </Panel>
@@ -52,9 +40,18 @@
                 <!-- 2. [Panel 2] 좌측 2D 인터랙티브 실시간 지도 패널 (Wheel Zoom & Drag Pan 지원) -->
                 <Panel :title="`지도: ${currentMap?.name || '관제 2D 지도'}`" class="mini-map-panel">
                     <template #headerRight>
-                        <button type="button" class="zoom-reset-btn" @click="resetMapZoom">
-                            <RotateCcw :size="13" /> Zoom 초기화
-                        </button>
+                        <span v-if="robot" class="location-chip">
+                            <MapPin :size="14" class="loc-icon" />
+                            <span class="coord-item"
+                                >X:<strong class="coord-val">{{ robot.x.toFixed(2) }}</strong
+                                >m</span
+                            >
+                            <span class="coord-sep">,</span>
+                            <span class="coord-item"
+                                >Y:<strong class="coord-val">{{ robot.y.toFixed(2) }}</strong
+                                >m</span
+                            >
+                        </span>
                     </template>
 
                     <div
@@ -140,8 +137,36 @@
                             </g>
                         </svg>
 
-                        <!-- Zoom Level Indicator Badge -->
-                        <div class="zoom-indicator-badge">Zoom: {{ (mapZoomScale * 100).toFixed(0) }}%</div>
+                        <div class="map-zoom-controls" aria-label="지도 확대/축소 제어">
+                            <button
+                                type="button"
+                                class="map-zoom-btn"
+                                title="지도 확대"
+                                @mousedown.stop
+                                @click.stop="zoomMapIn"
+                            >
+                                +
+                            </button>
+                            <span class="map-zoom-value">{{ (mapZoomScale * 100).toFixed(0) }}%</span>
+                            <button
+                                type="button"
+                                class="map-zoom-btn"
+                                title="지도 축소"
+                                @mousedown.stop
+                                @click.stop="zoomMapOut"
+                            >
+                                -
+                            </button>
+                            <button
+                                type="button"
+                                class="map-zoom-btn"
+                                title="Zoom 초기화"
+                                @mousedown.stop
+                                @click.stop="resetMapZoom"
+                            >
+                                <RotateCcw :size="13" />
+                            </button>
+                        </div>
                     </div>
                     <div class="map-hint-footer">
                         <strong>마우스 휠 스크롤</strong>로 확대/축소 및 <strong>드래그</strong> 이동이 가능하며, 지도를
@@ -626,6 +651,14 @@ const resetMapZoom = () => {
     ElMessage.success('지도 뷰어 (Zoom & Pan)가 초기화되었습니다.')
 }
 
+const zoomMapIn = () => {
+    mapZoomScale.value = Math.min(mapZoomScale.value + 0.1, 6.0)
+}
+
+const zoomMapOut = () => {
+    mapZoomScale.value = Math.max(mapZoomScale.value - 0.1, 0.5)
+}
+
 // Wheel Scroll Zoom Centered at Mouse Cursor
 const handleWheel = (e: WheelEvent) => {
     const zoomFactor = e.deltaY < 0 ? 1.15 : 0.85
@@ -1002,43 +1035,44 @@ const executeCommand = () => {
                 color: #ffffff;
             }
         }
+    }
+}
 
-        .location-chip {
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            background: rgba(30, 41, 59, 0.85);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            padding: 3px 10px;
-            border-radius: 4px;
-            color: #94a3b8;
-            font-size: 12px;
+.location-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: rgba(30, 41, 59, 0.85);
+    border: 1px solid rgba(56, 189, 248, 0.16);
 
-            .loc-icon {
-                color: #38bdf8;
-                margin-right: 2px;
-            }
+    padding: 3px 10px;
+    border-radius: 4px;
+    color: #94a3b8;
+    font-size: 12px;
 
-            .coord-item {
-                display: inline-flex;
-                align-items: center;
-                gap: 2px;
-            }
+    .loc-icon {
+        color: #38bdf8;
+        margin-right: 2px;
+    }
 
-            .coord-val {
-                color: #ffffff;
-                font-weight: 700;
-                font-variant-numeric: tabular-nums;
-                margin-left: 2px;
-                min-width: 43px;
-                text-align: right;
-            }
+    .coord-item {
+        display: inline-flex;
+        align-items: center;
+        gap: 2px;
+    }
 
-            .coord-sep {
-                color: #64748b;
-                margin: 0 3px 0 1px;
-            }
-        }
+    .coord-val {
+        color: #ffffff;
+        font-weight: 700;
+        font-variant-numeric: tabular-nums;
+        margin-left: 2px;
+        min-width: 43px;
+        text-align: right;
+    }
+
+    .coord-sep {
+        color: #64748b;
+        margin: 0 3px 0 1px;
     }
 }
 
@@ -1085,33 +1119,6 @@ const executeCommand = () => {
 .mini-map-panel {
     display: flex;
     flex-direction: column;
-
-    /* Zoom Reset Button Style */
-    .zoom-reset-btn {
-        display: inline-flex;
-        align-items: center;
-        gap: 5px;
-        padding: 4px 10px;
-        font-size: 12px;
-        font-weight: 600;
-        color: #38bdf8;
-        background: rgba(56, 189, 248, 0.12);
-        border: 1px solid rgba(56, 189, 248, 0.35);
-        border-radius: 4px;
-        cursor: pointer;
-        transition: all 0.2s ease;
-
-        &:hover {
-            background: rgba(56, 189, 248, 0.25);
-            border-color: #38bdf8;
-            color: #ffffff;
-            box-shadow: 0 0 8px rgba(56, 189, 248, 0.4);
-        }
-
-        &:active {
-            transform: scale(0.95);
-        }
-    }
 
     .map-interactive-container {
         position: relative;
@@ -1172,19 +1179,58 @@ const executeCommand = () => {
             }
         }
 
-        .zoom-indicator-badge {
+        .map-zoom-controls {
             position: absolute;
             bottom: 12px;
             right: 12px;
-            background: rgba(15, 23, 42, 0.85);
-            border: 1px solid rgba(56, 189, 248, 0.3);
+            display: inline-flex;
+            align-items: center;
+            gap: 2px;
             color: #38bdf8;
-            font-size: 11px;
-            font-weight: bold;
-            padding: 3px 8px;
+            border-radius: 6px;
+        }
+
+        .map-zoom-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 22px;
+            height: 22px;
+            background: transparent;
+            border: 0;
             border-radius: 4px;
-            pointer-events: none;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
+            color: #67d5ff;
+            cursor: pointer;
+            transition: all 0.2s ease;
+
+            &:hover {
+                background: rgba(56, 189, 248, 0.16);
+                color: #ffffff;
+            }
+
+            &:active {
+                transform: scale(0.95);
+            }
+        }
+
+        .map-zoom-btn {
+            font-size: 15px;
+            line-height: 1;
+            background: rgba(56, 189, 248, 0.16);
+            border: 1px solid rgba(56, 189, 248, 0.16);
+        }
+
+        .map-zoom-value {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            width: 44px;
+            height: 22px;
+            font-size: 11px;
+            font-weight: 700;
+            border: 1px solid rgba(56, 189, 248, 0.16);
+            background: rgba(56, 189, 248, 0.16);
         }
     }
 
