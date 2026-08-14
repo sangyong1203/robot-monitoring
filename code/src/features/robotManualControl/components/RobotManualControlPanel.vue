@@ -524,13 +524,14 @@ onBeforeUnmount(() => {
 })
 
 watch(
-    () => props.robot,
-    robot => {
-        if (robot) {
-            commandForm.x = Number(robot.x.toFixed(2))
-            commandForm.y = Number(robot.y.toFixed(2))
-            commandForm.siteX = robot.siteX
-            commandForm.siteY = robot.siteY
+    () => props.robot?.id,
+    robotId => {
+        if (robotId && props.robot) {
+            commandForm.x = Number(props.robot.x.toFixed(2))
+            commandForm.y = Number(props.robot.y.toFixed(2))
+            commandForm.siteX = props.robot.siteX
+            commandForm.siteY = props.robot.siteY
+            selectedDestinationId.value = null
         }
     },
     { immediate: true },

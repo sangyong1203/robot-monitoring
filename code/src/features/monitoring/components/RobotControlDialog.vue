@@ -4,7 +4,7 @@
         @update:model-value="$emit('update:visible', $event)"
         class="upgraded-control-dialog"
         :title="`${robot?.name ?? '로봇'} 수동 원격 제어 & 관제 대시보드`"
-        width="1140px"
+        width="1400px"
     >
         <!-- 1. [Panel 1] 로봇 실시간 텔레메트리 헤더 패널 -->
         <Panel v-if="robot" class="telemetry-header-panel">
@@ -38,7 +38,6 @@
         <template #footer>
             <el-button @click="$emit('update:visible', false)">닫기</el-button>
         </template>
-
     </BaseDialog>
 </template>
 
@@ -87,7 +86,6 @@ const stateVariant = (status: string) => {
 </script>
 
 <style scoped lang="scss">
-
 /* 1. Header Telemetry Bar Panel */
 .telemetry-header-panel {
     margin-bottom: 12px;
