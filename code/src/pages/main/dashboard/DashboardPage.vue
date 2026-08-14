@@ -47,26 +47,27 @@
                     <div class="waste-overview">
                         <div class="waste-summary-grid">
                             <div class="waste-summary-card">
-                                <span>오늘 처리</span>
-                                <strong>18건</strong>
+                                <span>오늘 처리 드럼</span>
+                                <strong>72드럼</strong>
                             </div>
                             <div class="waste-summary-card">
                                 <span>목표 대비</span>
-                                <strong>75%</strong>
+                                <strong>80%</strong>
                             </div>
                             <div class="waste-summary-card">
-                                <span>평균 소요</span>
-                                <strong>11분</strong>
+                                <span>작업 시간당</span>
+                                <strong>4.5드럼</strong>
                             </div>
                         </div>
-                        <TrendAreaChart
-                            :data="wasteTrendData"
-                            name="처리량"
-                            unit="건"
-                            :grid-top="12"
-                            :grid-bottom="16"
-                            :show-peak="false"
-                        />
+                        <div class="waste-chart-board">
+                            <div class="waste-chart-header">
+                                <span style="margin-left: 16px">h / 드럼</span>
+                                <span style="margin-right: 16px">24시간 시간당 처리량</span>
+
+                                <!-- <strong>누적 {{ wasteTotalDrums }}드럼 · 목표 {{ wasteTargetRate }}%</strong> -->
+                            </div>
+                            <WasteProcessingChart :data="wasteProcessingData" />
+                        </div>
                     </div>
                 </Panel>
 
@@ -272,8 +273,8 @@ import { useRouter } from 'vue-router'
 import Panel from '@/components/Panel.vue'
 import StatusBadge from '@/components/StatusBadge.vue'
 import DonutStatusChart from '@/components/charts/DonutStatusChart.vue'
-import TrendAreaChart from '@/components/charts/TrendAreaChart.vue'
 import CategoryBarChart from '@/components/charts/CategoryBarChart.vue'
+import WasteProcessingChart from '@/components/charts/WasteProcessingChart.vue'
 import RobotCameraDialog from '@/features/monitoring/components/RobotCameraDialog.vue'
 import { Bot, BellRing, Radio, Workflow, PackageCheck } from '@lucide/vue'
 import { simulationService } from '@/services/simulation.service'
@@ -395,14 +396,21 @@ const safetyEvents = ref<SafetyEventItem[]>([
     },
 ])
 
-const wasteTrendData = ref([
-    { measured_at: '09:00', metric_value: 2 },
-    { measured_at: '10:00', metric_value: 5 },
-    { measured_at: '11:00', metric_value: 8 },
-    { measured_at: '12:00', metric_value: 11 },
-    { measured_at: '13:00', metric_value: 15 },
-    { measured_at: '14:00', metric_value: 18 },
+const wasteProcessingData = ref([
+    { hour: '00', drums: 2 },
+    { hour: '03', drums: 3 },
+    { hour: '06', drums: 4 },
+    { hour: '09', drums: 5 },
+    { hour: '12', drums: 4 },
+    { hour: '15', drums: 6 },
+    { hour: '18', drums: 5 },
+    { hour: '21', drums: 3 },
+    { hour: '24', drums: 2 },
 ])
+
+const wasteTotalDrums = 72
+const wasteTargetDrums = 90
+const wasteTargetRate = Math.round((wasteTotalDrums / wasteTargetDrums) * 100)
 
 const anomalyStats = ref([
     { label: '통신 지연', value: 4 },
@@ -487,7 +495,7 @@ const kpiItems = computed(() => [
         icon: BellRing,
         variant: 'warning',
     },
-    { label: '오늘 처리량', value: '18건', note: '목표대비 75%', icon: PackageCheck, variant: 'success' },
+    { label: '오늘 처리 드럼', value: '72드럼', note: '목표대비 80%', icon: PackageCheck, variant: 'success' },
 ])
 
 const communicationLabel = (status: CommunicationStatus) =>
@@ -821,7 +829,7 @@ const goToMonitoring = (robot: MonitoringRobot) => {
 
 .waste-overview {
     display: grid;
-    grid-template-rows: auto minmax(0, 1fr);
+    grid-template-rows: 40px minmax(0, 1fr);
     gap: 10px;
     align-items: center;
     height: 100%;
@@ -839,7 +847,7 @@ const goToMonitoring = (robot: MonitoringRobot) => {
     align-items: center;
     justify-content: space-between;
     gap: 8px;
-    padding: 9px 10px;
+    padding: 7px 10px;
     border-radius: 8px;
     background: var(--surface-color, rgba(15, 23, 42, 0.9));
 
@@ -850,8 +858,30 @@ const goToMonitoring = (robot: MonitoringRobot) => {
 
     strong {
         color: var(--text-color--primary, #f8fafc);
-        font-size: 17px;
+        font-size: 16px;
         line-height: 1;
+    }
+}
+
+.waste-chart-board {
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr);
+    gap: 8px;
+    min-height: 0;
+    height: 100%;
+}
+
+.waste-chart-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    color: var(--text-color--secondary, #94a3b8);
+    font-size: 12px;
+
+    strong {
+        color: var(--text-color--primary, #f8fafc);
+        font-size: 12px;
     }
 }
 
