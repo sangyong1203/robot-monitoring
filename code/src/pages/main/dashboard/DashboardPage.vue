@@ -100,11 +100,22 @@
                                 <strong>{{ robot.name }}</strong>
                                 <small>{{ robot.robotType === 'WORK' ? '작업' : '감시' }}</small>
                             </span>
-                            <StatusBadge
-                                :label="communicationLabel(robot.communicationStatus)"
-                                :variant="communicationVariant(robot.communicationStatus)"
-                                min-width="44px"
-                            />
+                            <span class="robot-card-head-actions" @click.stop>
+                                <button type="button" class="robot-action-btn" @click="goToMonitoring(robot)">관제</button>
+                                <button
+                                    v-if="robot.robotType === 'SURVEILLANCE'"
+                                    type="button"
+                                    class="robot-action-btn"
+                                    @click="openCameraModal(robot)"
+                                >
+                                    카메라
+                                </button>
+                                <StatusBadge
+                                    :label="communicationLabel(robot.communicationStatus)"
+                                    :variant="communicationVariant(robot.communicationStatus)"
+                                    min-width="44px"
+                                />
+                            </span>
                         </span>
 
                         <span class="battery-cell">
@@ -118,18 +129,6 @@
                             <span>{{ areaLabel(robot) }}</span>
                             <strong class="coord-cell">{{ robot.x.toFixed(1) }}, {{ robot.y.toFixed(1) }}</strong>
                             <span>{{ operationLabel(robot.status) }}</span>
-                        </span>
-
-                        <span class="robot-actions-cell" @click.stop>
-                            <button type="button" class="robot-action-btn" @click="goToMonitoring(robot)">관제</button>
-                            <button
-                                v-if="robot.robotType === 'SURVEILLANCE'"
-                                type="button"
-                                class="robot-action-btn"
-                                @click="openCameraModal(robot)"
-                            >
-                                카메라
-                            </button>
                         </span>
                     </button>
                 </div>
@@ -705,11 +704,6 @@ const goToMonitoring = (robot: MonitoringRobot) => {
     &:hover {
         background: var(--layout-menu-active-bg-color, rgba(203, 78, 255, 0.16));
         border-color: var(--primary-color, #d946ef);
-
-        .robot-actions-cell {
-            opacity: 1;
-            pointer-events: auto;
-        }
     }
 
     &.is-stale {
@@ -722,6 +716,14 @@ const goToMonitoring = (robot: MonitoringRobot) => {
     align-items: flex-start;
     justify-content: space-between;
     gap: 10px;
+}
+
+.robot-card-head-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 4px;
+    flex-shrink: 0;
 }
 
 .robot-name-cell {
@@ -788,18 +790,6 @@ const goToMonitoring = (robot: MonitoringRobot) => {
     color: var(--secondary-color);
     font-size: 11px;
     font-weight: 800;
-}
-
-.robot-actions-cell {
-    display: flex;
-    position: absolute;
-    right: 10px;
-    bottom: 8px;
-    justify-content: flex-end;
-    gap: 4px;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.16s ease;
 }
 
 .robot-action-btn {
