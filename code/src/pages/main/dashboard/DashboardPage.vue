@@ -847,22 +847,22 @@ const goToMonitoring = (robot: MonitoringRobot) => {
 }
 
 .waste-overview {
-    display: grid;
-    grid-template-rows: 40px minmax(0, 1fr);
+    display: flex;
+    flex-direction: column;
     gap: 10px;
-    align-items: center;
     height: 100%;
     min-height: 230px;
 }
 
 .waste-summary-grid {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    display: flex;
     gap: 8px;
+    flex: 0 0 auto;
 }
 
 .waste-summary-card {
     display: flex;
+    flex: 1 1 0;
     align-items: center;
     justify-content: space-between;
     gap: 8px;
@@ -883,15 +883,16 @@ const goToMonitoring = (robot: MonitoringRobot) => {
 }
 
 .waste-chart-board {
-    display: grid;
-    grid-template-rows: auto minmax(0, 1fr);
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
     gap: 8px;
     min-height: 0;
-    height: 100%;
 }
 
 .waste-chart-header {
     display: flex;
+    flex: 0 0 auto;
     align-items: center;
     justify-content: space-between;
     gap: 10px;

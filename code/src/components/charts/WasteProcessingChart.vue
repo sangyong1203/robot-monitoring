@@ -18,6 +18,24 @@ const props = defineProps<{
 const chartRef = ref<HTMLDivElement | null>(null)
 let chart: echarts.ECharts | null = null
 let resizeObserver: ResizeObserver | null = null
+let delayedResizeTimer: number | null = null
+
+const resizeChart = () => {
+    if (!chart) {
+        return
+    }
+
+    requestAnimationFrame(() => {
+        chart?.resize()
+    })
+
+    if (delayedResizeTimer) {
+        window.clearTimeout(delayedResizeTimer)
+    }
+    delayedResizeTimer = window.setTimeout(() => {
+        chart?.resize()
+    }, 260)
+}
 
 const drawChart = () => {
     if (!chart) {
@@ -28,8 +46,8 @@ const drawChart = () => {
         color: ['#e76dff'],
         grid: {
             top: 8,
-            right: 12,
-            bottom: 18,
+            right: 16,
+            bottom: 22,
             left: 34,
         },
         tooltip: {
@@ -47,7 +65,9 @@ const drawChart = () => {
             axisLabel: {
                 color: '#c9c1d4',
                 fontSize: 11,
+                margin: 10,
                 interval: 0,
+                hideOverlap: true,
                 formatter: (value: string) => `${value}시`,
             },
             data: props.data.map(item => item.hour),
@@ -104,14 +124,21 @@ onMounted(() => {
     }
 
     chart = echarts.init(chartRef.value)
-    resizeObserver = new ResizeObserver(() => {
-        chart?.resize()
-    })
+    resizeObserver = new ResizeObserver(resizeChart)
     resizeObserver.observe(chartRef.value)
+    if (chartRef.value.parentElement) {
+        resizeObserver.observe(chartRef.value.parentElement)
+    }
+    window.addEventListener('resize', resizeChart)
     drawChart()
+    resizeChart()
 })
 
 onBeforeUnmount(() => {
+    if (delayedResizeTimer) {
+        window.clearTimeout(delayedResizeTimer)
+    }
+    window.removeEventListener('resize', resizeChart)
     resizeObserver?.disconnect()
     chart?.dispose()
 })
@@ -120,6 +147,7 @@ onBeforeUnmount(() => {
 <style scoped>
 .waste-processing-chart {
     width: 100%;
+    flex: 1 1 auto;
     height: 100%;
     min-height: 0;
 }
