@@ -54,6 +54,26 @@ export const mockActivities: ActivityItem[] = [
         description: '4족 보행 로봇 외곽 험지 감시',
         createdAt: '2026-08-01 10:20:00',
     },
+    {
+        id: 6,
+        name: '웨이포인트 열화상 스캔',
+        code: 'ACT-THERMAL-SCAN-01',
+        activityType: 'INSPECT',
+        destinationId: 5,
+        destinationName: '외곽 침입 감시 웨이포인트 #3',
+        description: '외곽 험지 침입 감시를 위한 열화상 스캔',
+        createdAt: '2026-08-01 10:25:00',
+    },
+    {
+        id: 7,
+        name: '상차 완료 대기',
+        code: 'ACT-WAIT-PALLET-READY-01',
+        activityType: 'WAIT',
+        destinationId: 2,
+        destinationName: 'AMR 2호기 교대 대기위치',
+        description: '장입구역 다음 팰릿 교대를 위한 상차 완료 대기',
+        createdAt: '2026-08-01 10:30:00',
+    },
 ]
 
 export const mockTasks: TaskItem[] = [
@@ -100,6 +120,35 @@ export const mockTasks: TaskItem[] = [
         description: '산업용 로봇 드럼 정밀 장입 Task',
         createdAt: '2026-08-01 11:10:00',
     },
+    {
+        id: 4,
+        name: '외곽 험지 침입 감시 순찰 Task',
+        code: 'TASK-SPOT-PATROL-01',
+        robotModelId: 5,
+        robotModelName: '4족 보행 로봇',
+        destinationId: 5,
+        destinationName: '외곽 침입 감시 웨이포인트 #3',
+        activities: [
+            { sequence: 1, activityId: 5, activityName: '외곽 험지 순찰', destinationName: '외곽 침입 감시 웨이포인트 #1' },
+            { sequence: 2, activityId: 6, activityName: '웨이포인트 열화상 스캔', destinationName: '외곽 침입 감시 웨이포인트 #3' },
+        ],
+        description: '4족 보행 로봇 외곽 험지 침입 감시 순찰 Task',
+        createdAt: '2026-08-01 11:15:00',
+    },
+    {
+        id: 5,
+        name: '장입구역 다음 팰릿 교대 준비 Task',
+        code: 'TASK-AMR2-PALLET-STANDBY-01',
+        robotModelId: 2,
+        robotModelName: '저상형 AMR',
+        destinationId: 2,
+        destinationName: 'AMR 2호기 교대 대기위치',
+        activities: [
+            { sequence: 1, activityId: 7, activityName: '상차 완료 대기', destinationName: 'AMR 2호기 교대 대기위치' },
+        ],
+        description: '장입구역 다음 팰릿 교대를 위한 AMR 2호기 대기 Task',
+        createdAt: '2026-08-01 11:20:00',
+    },
 ]
 
 export const mockMissions: MissionItem[] = [
@@ -133,6 +182,28 @@ export const mockMissions: MissionItem[] = [
         status: 'ACTIVE',
         createdAt: '2026-08-02 09:00:00',
     },
+    {
+        id: 2,
+        name: '외곽 험지 침입 감시 순찰',
+        code: 'MIS-SPOT-PATROL-01',
+        missionType: 'SINGLE',
+        description: '4족 보행 로봇 1호기가 외곽 험지 웨이포인트를 순찰하고 열화상 스캔을 수행하는 감시 미션',
+        tasks: [{ sequence: 1, taskId: 4, taskName: '외곽 험지 침입 감시 순찰 Task', robotName: '4족 보행 로봇 1호기' }],
+        conditions: [],
+        status: 'ACTIVE',
+        createdAt: '2026-08-02 09:10:00',
+    },
+    {
+        id: 3,
+        name: '장입구역 다음 팰릿 교대 준비',
+        code: 'MIS-PALLET-STANDBY-01',
+        missionType: 'SINGLE',
+        description: 'AMR 2호기가 장입구역 다음 팰릿 교대 준비를 위해 상차 완료 상태를 대기하는 미션',
+        tasks: [{ sequence: 1, taskId: 5, taskName: '장입구역 다음 팰릿 교대 준비 Task', robotName: 'AMR 2호기' }],
+        conditions: [],
+        status: 'ACTIVE',
+        createdAt: '2026-08-02 09:20:00',
+    },
 ]
 
 export const mockSchedules: ScheduleItem[] = [
@@ -154,8 +225,8 @@ export const mockSchedules: ScheduleItem[] = [
         id: 2,
         code: 'SCHED-HOURLY-01',
         name: '2시간 간격 Spot 험지 순찰 스케줄',
-        missionId: 1,
-        missionName: '[융합] 폐기물 이송 및 처분용기 자동 장입 복합 미션',
+        missionId: 2,
+        missionName: '외곽 험지 침입 감시 순찰',
         robotId: 5,
         robotName: '4족 보행 로봇 1호기 (Spot)',
         cronExpression: '매 2시간 마다',
