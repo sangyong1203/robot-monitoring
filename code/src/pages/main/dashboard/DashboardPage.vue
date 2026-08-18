@@ -20,7 +20,12 @@
                 fill
             >
                 <template #headerRight>
-                    <el-button size="small" text type="primary" @click="router.push('/robot-control')"
+                    <el-button
+                        class="mission-control-button"
+                        size="small"
+                        text
+                        type="primary"
+                        @click="router.push('/robot-control')"
                         >제어 화면</el-button
                     >
                 </template>
@@ -438,7 +443,7 @@ const selectedRobotMission = computed(() => {
 })
 
 const kpiItems = computed(() => [
-    { label: '전체 로봇', value: robots.value.length, unit: '대', note: '실시간', icon: Bot, variant: 'info' },
+    { label: '관제 로봇', value: robots.value.length, unit: '대', note: '실시간', icon: Bot, variant: 'info' },
     {
         label: '정상 통신',
         value: communicationCounts.value.online,
@@ -881,6 +886,13 @@ const goToMonitoring = (robot: MonitoringRobot) => {
         height: 0;
         overflow: hidden;
     }
+}
+
+.mission-control-button {
+    height: 24px;
+    min-height: 24px;
+    padding: 0 10px;
+    line-height: 24px;
 }
 
 .running-mission-list,
