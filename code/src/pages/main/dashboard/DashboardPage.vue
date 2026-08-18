@@ -207,64 +207,13 @@
             </Panel>
         </section>
 
-        <el-dialog
-            v-model="robotDetailVisible"
-            :title="selectedRobot ? `${selectedRobot.name} 상세 상태` : '로봇 상세 상태'"
-            width="560px"
-            class="robot-detail-dialog"
-        >
-            <div v-if="selectedRobot" class="robot-detail-body">
-                <div class="robot-detail-summary">
-                    <StatusBadge
-                        :label="communicationLabel(selectedRobot.communicationStatus)"
-                        :variant="communicationVariant(selectedRobot.communicationStatus)"
-                    />
-                    <StatusBadge :label="operationLabel(selectedRobot.status)" variant="info" />
-                </div>
-                <dl class="robot-detail-grid">
-                    <div>
-                        <dt>유형</dt>
-                        <dd>{{ selectedRobot.robotType === 'WORK' ? '작업 로봇' : '감시 로봇' }}</dd>
-                    </div>
-                    <div>
-                        <dt>구역</dt>
-                        <dd>{{ areaLabel(selectedRobot) }}</dd>
-                    </div>
-                    <div>
-                        <dt>좌표</dt>
-                        <dd>X {{ selectedRobot.x.toFixed(2) }} / Y {{ selectedRobot.y.toFixed(2) }}</dd>
-                    </div>
-                    <div>
-                        <dt>방향</dt>
-                        <dd>{{ selectedRobot.heading }}°</dd>
-                    </div>
-                    <div>
-                        <dt>배터리</dt>
-                        <dd>{{ selectedRobot.batteryPercent }}%</dd>
-                    </div>
-                    <div>
-                        <dt>최근 수신</dt>
-                        <dd>
-                            {{ selectedRobot.lastSeenAt ? formatDateTime(selectedRobot.lastSeenAt) : '실시간 수신 중' }}
-                        </dd>
-                    </div>
-                </dl>
-            </div>
-            <template #footer>
-                <el-button @click="robotDetailVisible = false">닫기</el-button>
-                <el-button type="primary" @click="selectedRobot && goToMonitoring(selectedRobot)"
-                    >관제 화면 이동</el-button
-                >
-                <el-button
-                    v-if="selectedRobot?.robotType === 'SURVEILLANCE'"
-                    type="primary"
-                    plain
-                    @click="selectedRobot && openCameraModal(selectedRobot)"
-                >
-                    카메라 보기
-                </el-button>
-            </template>
-        </el-dialog>
+        <RobotDetailDialog
+            v-model:visible="robotDetailVisible"
+            :robot="selectedRobot"
+            :mission="selectedRobotMission"
+            @open-monitoring="goToMonitoring"
+            @open-camera="openCameraModal"
+        />
 
         <RobotCameraDialog v-model:visible="cameraModalVisible" :robot="activeCameraRobot" />
     </div>
@@ -278,10 +227,10 @@ import StatusBadge from '@/components/StatusBadge.vue'
 import DonutStatusChart from '@/components/charts/DonutStatusChart.vue'
 import CategoryBarChart from '@/components/charts/CategoryBarChart.vue'
 import WasteProcessingChart from '@/components/charts/WasteProcessingChart.vue'
+import RobotDetailDialog from './components/RobotDetailDialog.vue'
 import RobotCameraDialog from '@/features/monitoring/components/RobotCameraDialog.vue'
 import { Bot, BellRing, Radio, Workflow, PackageCheck } from '@lucide/vue'
 import { simulationService } from '@/services/simulation.service'
-import { formatDateTime } from '@/utils/date.util'
 import type {
     CommunicationStatus,
     MonitoringRobot,
@@ -473,6 +422,19 @@ const operationRate = computed(() => {
         return 0
     }
     return Math.round((operationCounts.value.running / robots.value.length) * 100)
+})
+
+const selectedRobotMission = computed(() => {
+    if (!selectedRobot.value) {
+        return null
+    }
+
+    const robotName = selectedRobot.value.name
+    return (
+        runningMissions.value.find(
+            mission => mission.robotName.includes(robotName) || robotName.includes(mission.robotName),
+        ) ?? null
+    )
 })
 
 const kpiItems = computed(() => [
@@ -1097,43 +1059,6 @@ const goToMonitoring = (robot: MonitoringRobot) => {
     width: 100%;
     height: 100%;
     min-height: 150px;
-}
-
-.robot-detail-body {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-}
-
-.robot-detail-summary {
-    display: flex;
-    gap: 8px;
-}
-
-.robot-detail-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-    margin: 0;
-
-    div {
-        padding: 12px;
-        border-radius: 8px;
-        background: var(--surface-color);
-    }
-
-    dt {
-        color: var(--text-color--secondary);
-        font-size: 12px;
-        margin-bottom: 6px;
-    }
-
-    dd {
-        margin: 0;
-        color: var(--text-color--primary);
-        font-size: 14px;
-        font-weight: 700;
-    }
 }
 
 @media (max-width: 1500px) {
